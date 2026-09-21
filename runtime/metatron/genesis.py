@@ -156,3 +156,38 @@ class Machine:
             "lineage":[asdict(e) for e in self.lineage],
             "partition":[list(b) for b in self.partition],
         },sort_keys=True,separators=(",",":"))
+
+
+    @classmethod
+    def load(cls, payload):
+        data=json.loads(payload)
+        machine=cls.__new__(cls)
+        machine.capabilities={
+            name:(tuple(item[0]),item[1])
+            for name,item in data["capabilities"].items()
+        }
+        machine.residuals={
+            ident:Residual(
+                item["id"],tuple(item["target"]),item["authority"],
+                item["closure"],item["size"]
+            )
+            for ident,item in data["residuals"].items()
+        }
+        machine.warrants={
+            ident:Warrant(item["id"],item["subject"],item["payload"])
+            for ident,item in data["warrants"].items()
+        }
+        machine.revoked=set(data["revoked"])
+        machine.queries=[Query(value) for value in data["queries"]]
+        machine.lineage=[
+            Event(item["kind"],item["subject"],item["details"])
+            for item in data["lineage"]
+        ]
+        machine.partition=tuple(tuple(block) for block in data["partition"])
+        machine.relations=set()
+        active=machine.active()
+        if "step" in active and compose(active["step"],active["step"])==active["step"]:
+            machine.relations.add((("step","step"),"step"))
+        if machine.behavior_partition()!=machine.partition:
+            raise GenesisError("serialized live view is semantically invalid")
+        return machine
