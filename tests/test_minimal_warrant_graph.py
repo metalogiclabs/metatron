@@ -80,7 +80,7 @@ class MinimalWarrantGraphTests(unittest.TestCase):
         c = graph.append(Node("fact", {"name": "c"}, (b,)))
         independent = graph.append(Node("fact", {"name": "independent"}))
 
-        self.assertEqual(graph.affected((a,)), (a, b, c))
+        self.assertEqual(affected(graph, (a,)), (a, b, c))
         graph.append(Node("revoke", {"target": b}))
 
         self.assertIn(a, graph.live_ids())
@@ -100,7 +100,7 @@ class MinimalWarrantGraphTests(unittest.TestCase):
         self.assertEqual(restored.dumps(), payload)
         self.assertEqual(restored.ids, graph.ids)
         self.assertEqual(restored.live_ids(), graph.live_ids())
-        self.assertEqual(restored.root_digest(), graph.root_digest())
+        self.assertEqual(root_digest(restored), root_digest(graph))
 
     def test_tampered_history_is_rejected(self):
         graph = WarrantGraph()
@@ -188,7 +188,7 @@ class MinimalWarrantGraphTests(unittest.TestCase):
             line for line in source.splitlines()
             if line.strip() and not line.lstrip().startswith("#")
         ]
-        self.assertLessEqual(len(semantic_lines), 180)
+        self.assertLessEqual(len(semantic_lines), 120)
 
 
 if __name__ == "__main__":
