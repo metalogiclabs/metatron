@@ -28,3 +28,35 @@ class Residual:
     closure_size: int
     closure_digest: str
     authority_digest: str
+
+@dataclass(frozen=True)
+class ResidualCertificate:
+    id: str
+    target: Table
+    target_digest: str
+    closure_size: int
+    closure_digest: str
+    authority_digest: str
+
+@dataclass(frozen=True)
+class Capability:
+    name: str
+    table: Table
+    residual_certificate_id: str | None = None
+    certificate_id: str | None = None
+
+@dataclass(frozen=True)
+class Certificate:
+    id: str
+    kind: str
+    subject_digest: str
+
+@dataclass(frozen=True)
+class Relation:
+    left: tuple[str, ...]
+    right: str
+
+@dataclass(frozen=True)
+class LineageEvent:
+    kind: str
+    payload: dict[str, object]
