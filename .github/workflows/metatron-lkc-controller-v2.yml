@@ -66,9 +66,9 @@ jobs:
                   "conclusion": "success",
               },
               "base_controller_v1": "3c52add4d608c753104208d14424af5b871686d6",
-              "record": "benchmarks/lean_kernel/records/partition-v8-v11.json",
+              "record": "benchmarks/lean_kernel/records/partition-v11-v12.json",
               "external_champion": "v5-natfold",
-              "next_external_candidate": "v11-one-seed",
+              "next_external_candidate": "v12-two-seed",
               "claim_boundary": (
                   "Local proxy evidence may stage or replace a contender but "
                   "cannot promote the external champion."

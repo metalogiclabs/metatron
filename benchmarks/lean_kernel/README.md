@@ -54,3 +54,15 @@ Partition V11 is universally proved and canonically accepted and reduces the
 frozen local replay total from V10's 0.282958007s to 0.249743756s. This is
 local proxy evidence only, so V5 remains the external PMU champion while V11
 replaces V10 as the sole staged external-measurement contender.
+
+
+### V12 staging update
+
+A second universal early-row identity is now compiled into the local contender:
+
+`partAux 2 m = m / 2 + 1`.
+
+Partition V12 is universally proved and canonically accepted. Its frozen local
+replay total is 0.206662600s, down from V11's 0.249743756s (17.2501% lower).
+The external/local boundary is unchanged: V5 remains the external PMU champion,
+while V12 replaces V11 as the sole staged external-measurement contender.

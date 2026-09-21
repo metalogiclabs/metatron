@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "problem": "partition",
+  "controller": "two-tier-frontier-v2",
+  "predecessor_record": "benchmarks/lean_kernel/records/partition-v8-v11.json",
+  "policy": {
+    "external_champion_requires_comparable_external_measurement": true,
+    "local_proxy_can_only_stage_or_replace_a_contender": true,
+    "only_one_candidate_is_eligible_for_the_next_external_measurement": true
+  },
+  "external_champion": {
+    "name": "v5-natfold",
+    "external_run_id": 198,
+    "external_total_instructions": 4546112652,
+    "local_proxy_seconds": 1.311141315
+  },
+  "staging_trace": [
+    {
+      "name": "v11-one-seed",
+      "family": "closed-form-part-size-1-seed",
+      "qualification_run": 35649976292,
+      "source_sha256": "a34c08cabd7e33982dd1fc9549cf4289589a6bcb25f769e7f1c60bf75659b24f",
+      "local_proxy_seconds": 0.249743756,
+      "action": "STAGED_PREDECESSOR"
+    },
+    {
+      "name": "v12-two-seed",
+      "family": "closed-form-part-size-2-seed",
+      "repo": "heathsanchez/test",
+      "branch": "lkc-partition-two-seed-v12",
+      "commit": "e2383de625fe380bf2dbaf540e3434adcb1b199a",
+      "qualification_run": 35650701319,
+      "source_sha256": "e2e234dea49ad7a4876676fa0894c70704c5a597ae584f358df63d4afe56690b",
+      "universal_proof": true,
+      "canonical_accepted": true,
+      "axioms": ["propext", "Quot.sound"],
+      "local_proxy_seconds": 0.2066626,
+      "improvement_vs_v11_fraction": 0.172501433829641,
+      "action": "REPLACE_STAGED"
+    }
+  ],
+  "result": {
+    "external_champion": "v5-natfold",
+    "staged_candidate": "v12-two-seed",
+    "next_external_measurement_candidate": "v12-two-seed",
+    "v8_v9_v10_v11_external_measurement_needed": false,
+    "claim": "V12 is the best locally qualified contender, not an externally promoted champion."
+  }
+}
