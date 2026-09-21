@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "problem": "partition",
+  "controller_policy": {
+    "escalation_after_distinct_regressions": 2,
+    "policy_escalation_is_not_certified_insufficiency": true
+  },
+  "initial_champion": "v4-rowdp",
+  "events": [
+    {
+      "candidate": "v5-natfold",
+      "family": "folded-multiplicity-sum",
+      "expected_action": "PROMOTE",
+      "evidence": "same frozen SAIR playground PMU cohort; 15.084284532347322% lower three-case total"
+    },
+    {
+      "candidate": "v6-streaming-list",
+      "family": "streaming-list-sharing",
+      "expected_action": "REJECT_REGRESSION",
+      "evidence": "universally proved and canonically accepted; frozen local proxy 1.455617047s vs champion 1.311141315s"
+    },
+    {
+      "candidate": "v7-array-streaming",
+      "family": "persistent-array-sharing",
+      "expected_action": "ESCALATE_SEARCH_POLICY",
+      "evidence": "universally proved and canonically accepted; frozen local proxy 4.648955425s vs champion 1.311141315s"
+    }
+  ],
+  "result": {
+    "champion": "v5-natfold",
+    "certified_insufficiency": false,
+    "search_policy": "broaden representation search; prefer kernel-cheap sequential/scan forms or independently proved recurrences before another persistent indexed structure"
+  }
+}

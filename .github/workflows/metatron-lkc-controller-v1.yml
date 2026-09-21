@@ -1,0 +1,86 @@
+name: Metatron LKC Controller V1
+
+on:
+  push:
+    branches: [metatron-lkc-controller-v1]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate Metatron evidence
+        run: |
+          python scripts/check_manifest.py
+          python -m unittest tests.test_manifest -v
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Fetch pinned Mathlib
+        run: |
+          lake update
+          lake exe cache get
+
+      - name: Reject local proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|constant|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+
+      - name: Build Lean reference semantics
+        run: |
+          lake build Metatron
+          lake build metatron_reference
+          lake env lean formal/Metatron/FixtureTest.lean
+
+      - name: Run full V0 and frontier-controller tests
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Write controller attestation
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          attestation = {
+              "schema_version": 1,
+              "head_sha": os.environ["GITHUB_SHA"],
+              "workflow_run": {
+                  "id": int(os.environ["GITHUB_RUN_ID"]),
+                  "url": (
+                      f'{os.environ["GITHUB_SERVER_URL"]}/'
+                      f'{os.environ["GITHUB_REPOSITORY"]}/actions/runs/'
+                      f'{os.environ["GITHUB_RUN_ID"]}'
+                  ),
+                  "conclusion": "success",
+              },
+              "base_v0_maintenance_head": "cf6f0833013d743eefe4f304cd6a03e96f558b3d",
+              "base_v0_maintenance_run": 35613228632,
+              "controller_record": "benchmarks/lean_kernel/records/partition-controller-v1.json",
+              "claim_boundary": (
+                  "Policy escalation after repeated verified regressions does not "
+                  "constitute a certified insufficiency result."
+              ),
+          }
+          Path("/tmp/metatron-lkc-controller-v1.json").write_text(
+              json.dumps(attestation, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+
+      - name: Upload controller attestation
+        uses: actions/upload-artifact@v4
+        with:
+          name: metatron-lkc-controller-v1
+          path: /tmp/metatron-lkc-controller-v1.json
+          if-no-files-found: error
