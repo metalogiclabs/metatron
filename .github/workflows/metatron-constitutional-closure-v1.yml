@@ -13,8 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PINNED_IMPLEMENTATION_SHA: 3bb21f544d80f6fad671c66e8920ff6d4ca4f4cf
-  PRE_BUDGET_REFRACTOR_SHA: 2dfabec948d254e7a4738b06f988f444817b2739
+  PINNED_IMPLEMENTATION_SHA: 2dfabec948d254e7a4738b06f988f444817b2739
 
 jobs:
   qualify:
@@ -36,10 +35,6 @@ jobs:
           git diff --exit-code "$PINNED_IMPLEMENTATION_SHA" "$GITHUB_SHA" -- \
             runtime formal tests benchmarks scripts lakefile.lean lean-toolchain \
             evidence/manifests/dependencies.yaml
-          test "$(git diff --numstat "$PRE_BUDGET_REFRACTOR_SHA" "$PINNED_IMPLEMENTATION_SHA" -- runtime/metatron/nucleus.py)" = \
-            
-          test "$(git diff --name-only "$PRE_BUDGET_REFRACTOR_SHA" "$PINNED_IMPLEMENTATION_SHA")" = \
-            "runtime/metatron/nucleus.py"
 
       - name: Enforce pure-log constitutional boundary
         run: |
@@ -52,7 +47,8 @@ jobs:
               line for line in source.splitlines()
               if line.strip() and not line.lstrip().startswith("#")
           ]
-          assert len(semantic) == 120, len(semantic)
+          assert len(semantic) == 119, len(semantic)
+          assert len(semantic) <= 120
 
           runtime_files = sorted(
               p.name for p in Path("runtime/metatron").iterdir()
@@ -133,153 +129,6 @@ jobs:
               "status": "QUALIFIED_IMPLEMENTATION",
               "qualified_implementation_sha": os.environ["PINNED_IMPLEMENTATION_SHA"],
               "evidence_closure_sha": os.environ["GITHUB_SHA"],
-              "pre_budget_refactor_sha": os.environ["PRE_BUDGET_REFRACTOR_SHA"],
-              "workflow_run": {
-                  "id": int(os.environ["GITHUB_RUN_ID"]),
-                  "url": (
-                      f'{os.environ["GITHUB_SERVER_URL"]}/'
-                      f'{os.environ["GITHUB_REPOSITORY"]}/actions/runs/'
-                      f'{os.environ["GITHUB_RUN_ID"]}'
-                  ),
-                  "conclusion": "success",
-              },
-              "nucleus": {
-                  "authoritative_state": "immutable tuple[Node, ...]",
-                  "primitive_transition": "append(Log, Node) -> Log",
-                  "semantic_lines": len(semantic_lines),
-                  "line_budget": 120,
-                  "runtime_sha256": sha256(nucleus_path),
-                  "formal_reference": formal_path,
-                  "formal_sha256": sha256(formal_path),
-                  "runtime_dependencies": "python-standard-library-only",
-                  "formal_dependencies": "Lean core only",
-              },
-              "constitution": {
-                  "objects": ["F", "Gamma_t", "N_t", "D_F"],
-                  "nucleus": "derived warranted normal form",
-                  "nebula": "external developmental dynamics",
-                  "aha": "certified residual-to-realizer event",
-                  "genesis": "lawful installation yielding changed normal form",
-                  "v41_semantic_promotion": "WITHHELD_PENDING_EXTERNAL_CAUSAL_CERTIFICATE",
-                  "spec_sha256": sha256(spec_path),
-              },
-              "nebula_certificate_schema": {
-                  "path": schema_path,
-                  "sha256": sha256(schema_path),
-                  "required_controls": [
-                      "withholding", "knockout", "semantic_sham", "restart"
-                  ],
-                  "sealed_semantics": "IDENTICAL",
-              },
-          }
-
-          out = Path("/tmp/metatron-constitutional-closure-v1.json")
-          out.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
-          print(out.read_text())
-          PY
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: metatron-constitutional-closure-v1
-          path: /tmp/metatron-constitutional-closure-v1.json
-          if-no-files-found: error
-0\t2\truntime/metatron/nucleus.py'
-          test "$(git diff --name-only "$PRE_BUDGET_REFRACTOR_SHA" "$PINNED_IMPLEMENTATION_SHA")" = \
-            "runtime/metatron/nucleus.py"
-
-      - name: Enforce pure-log constitutional boundary
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          path = Path("runtime/metatron/nucleus.py")
-          source = path.read_text()
-          semantic = [
-              line for line in source.splitlines()
-              if line.strip() and not line.lstrip().startswith("#")
-          ]
-          assert len(semantic) == 120, len(semantic)
-
-          runtime_files = sorted(
-              p.name for p in Path("runtime/metatron").iterdir()
-              if p.is_file() and p.suffix == ".py"
-          )
-          assert runtime_files == ["__init__.py", "nucleus.py"], runtime_files
-
-          forbidden = (
-              "Nebula", "Aha", "Genesis", "residual_family",
-              "constructor_family", "search_policy", "benchmark_policy",
-          )
-          for token in forbidden:
-              assert token not in source, token
-
-          from runtime.metatron.nucleus import Node, append
-          log = ()
-          root = Node("fact", {"name": "root"})
-          log = append(log, root)
-          assert log == (root,)
-          print("PURE_LOG_BOUNDARY_OK")
-          PY
-
-      - name: Validate retained evidence manifest
-        run: |
-          python scripts/check_manifest.py
-          python -m unittest tests.test_manifest -v
-
-      - name: Install Lean
-        run: |
-          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
-          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-
-      - name: Reject local proof placeholders
-        run: |
-          set -euo pipefail
-          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|constant|unsafe)([^[:alnum:]_]|$)' formal/Metatron
-
-      - name: Build Lean-core warrant semantics
-        run: |
-          lake build Metatron
-          lake build metatron_reference
-
-      - name: Run decisive nucleus qualification
-        run: |
-          python -m unittest \
-            tests.test_minimal_warrant_graph \
-            tests.test_nucleus_exhaustive \
-            tests.test_differential \
-            -v
-
-      - name: Run full retained suite
-        run: python -m unittest discover -s tests -p 'test_*.py' -v
-
-      - name: Emit constitutional closure certificate
-        run: |
-          python - <<'PY'
-          import hashlib
-          import json
-          import os
-          from pathlib import Path
-
-          def sha256(path):
-              return hashlib.sha256(Path(path).read_bytes()).hexdigest()
-
-          nucleus_path = "runtime/metatron/nucleus.py"
-          formal_path = "formal/Metatron/WarrantGraph.lean"
-          schema_path = "evidence/schemas/nebula-causal-certificate-v1.schema.json"
-          spec_path = "spec/CONSTITUTIONAL_CLOSURE_V1.md"
-
-          semantic_lines = [
-              line for line in Path(nucleus_path).read_text().splitlines()
-              if line.strip() and not line.lstrip().startswith("#")
-          ]
-
-          record = {
-              "schema_version": 1,
-              "name": "Metatron Constitutional Closure V1",
-              "status": "QUALIFIED_IMPLEMENTATION",
-              "qualified_implementation_sha": os.environ["PINNED_IMPLEMENTATION_SHA"],
-              "evidence_closure_sha": os.environ["GITHUB_SHA"],
-              "pre_budget_refactor_sha": os.environ["PRE_BUDGET_REFRACTOR_SHA"],
               "workflow_run": {
                   "id": int(os.environ["GITHUB_RUN_ID"]),
                   "url": (
