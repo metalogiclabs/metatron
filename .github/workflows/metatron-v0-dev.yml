@@ -24,4 +24,8 @@ jobs:
       - name: Build Lean reference library
         run: lake build Metatron
       - name: Compile Fixture interface test
-        run: lake env lean formal/Metatron/FixtureTest.lean
+        run: |
+          mkdir -p .lake/build/lib/lean/Metatron
+          lake env lean -o .lake/build/lib/lean/Metatron/Fixture.olean formal/Metatron/Fixture.lean
+          lake env lean formal/Metatron/FixtureTest.lean
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|constant|unsafe)([^[:alnum:]_]|$)' formal/Metatron
