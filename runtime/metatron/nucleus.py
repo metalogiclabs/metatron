@@ -6,7 +6,7 @@ import json
 from typing import Any, Iterable
 
 
-Json = None | bool | int | float | str | list["Json"] | dict[str, "Json"]
+Json = type(None) | bool | int | float | str | list["Json"] | dict[str, "Json"]
 
 
 def _canonical(value: Any) -> bytes:
