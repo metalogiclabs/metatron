@@ -1,0 +1,56 @@
+name: Metatron LKC Eight Lane V1
+
+on:
+  push:
+    branches: [metatron-lkc-8lane-v1]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run minimal nucleus and eight-lane tests
+        run: |
+          python -m unittest tests.test_minimal_warrant_graph -v
+          python -m unittest tests.test_lkc_eight_lane -v
+
+      - name: Recheck nucleus hard budget
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          p=Path("runtime/metatron/nucleus.py")
+          source=p.read_text()
+          semantic=[line for line in source.splitlines()
+                    if line.strip() and not line.lstrip().startswith("#")]
+          assert len(semantic) <= 120, len(semantic)
+          print("nucleus semantic lines", len(semantic))
+          PY
+
+      - name: Emit canonical warrant log and schedule
+        run: |
+          python - <<'PY'
+          import json
+          from dataclasses import asdict
+          from benchmarks.lean_kernel.eight_lane import lanes, write_log
+          write_log("/tmp/lkc8-events.jsonl")
+          schedule=[asdict(x) for x in lanes()]
+          open("/tmp/lkc8-schedule.json","w").write(json.dumps(schedule,indent=2)+"\n")
+          print(json.dumps(schedule,indent=2))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: metatron-lkc-eight-lane-v1
+          path: |
+            /tmp/lkc8-events.jsonl
+            /tmp/lkc8-schedule.json
+          if-no-files-found: error
