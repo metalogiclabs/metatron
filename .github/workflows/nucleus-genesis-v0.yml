@@ -1,0 +1,30 @@
+name: Nucleus Genesis V0
+
+on:
+  push:
+    branches: [nucleus-genesis-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  genesis:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run Nucleus Genesis tests
+        run: python -m unittest tests.test_nucleus_genesis -v
+      - name: Reject accidental fixture broadening
+        run: |
+          python - <<'PY'
+          from runtime.metatron.genesis import ID_TABLE, STEP_TABLE, Machine
+          m = Machine.genesis()
+          assert ID_TABLE == (0, 1, 2)
+          assert STEP_TABLE == (1, 1, 2)
+          assert m.partition == ((0,), (1, 2))
+          print("NUCLEUS_GENESIS_FIXTURE_PINNED")
+          PY
