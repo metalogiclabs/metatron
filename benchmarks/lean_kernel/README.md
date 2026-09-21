@@ -24,3 +24,21 @@ The first sealed trace is Partition V4→V7:
 This is the intended developmental discipline:
 
 `verify -> compare like with like -> promote/reject -> retain the residual`.
+
+
+## Two-tier external staging
+
+The second Partition trace (V8→V10) exposed a necessary distinction between
+an **externally warranted champion** and a **locally qualified contender**.
+
+V5 remains the external champion because it is the newest candidate with a
+comparable frozen SAIR PMU measurement. V8, V9, and V10 are all universally
+proved and canonically accepted, but currently carry only the frozen local
+wall-time proxy. They therefore cannot displace V5 externally.
+
+The staging controller collapses the three local wins into one measurement
+request:
+
+`V8 STAGE_FOR_EXTERNAL → V9 REPLACE_STAGED → V10 REPLACE_STAGED`.
+
+Thus only V10 should consume the next scarce external PMU run.

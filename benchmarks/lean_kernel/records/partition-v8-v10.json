@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "problem": "partition",
+  "controller": "two-tier-frontier-v2",
+  "policy": {
+    "external_champion_requires_comparable_external_measurement": true,
+    "local_proxy_can_only_stage_or_replace_a_contender": true,
+    "only_one_candidate_is_eligible_for_the_next_external_measurement": true
+  },
+  "external_champion": {
+    "name": "v5-natfold",
+    "external_run_id": 198,
+    "external_total_instructions": 4546112652,
+    "local_proxy_seconds": 1.311141315
+  },
+  "staging_trace": [
+    {
+      "name": "v8-shiftzip",
+      "family": "sequential-shift-zip",
+      "repo": "heathsanchez/test",
+      "branch": "lkc-partition-shiftzip-v8",
+      "commit": "17d1a91993cb795663eb68370d5a778289d06ae3",
+      "qualification_run": 35614956987,
+      "source_sha256": "e0145843763dda96d0dec30834b59d7466c1bdee5c8a5918aca58e585349eaa5",
+      "universal_proof": true,
+      "canonical_accepted": true,
+      "axioms": ["propext", "Quot.sound"],
+      "local_proxy_seconds": 0.505994296,
+      "action": "STAGE_FOR_EXTERNAL"
+    },
+    {
+      "name": "v9-directshift",
+      "family": "allocation-free-sequential-shift",
+      "repo": "heathsanchez/test",
+      "branch": "lkc-partition-directshift-v9",
+      "commit": "07e27d7f29f0a94f6017f3fb5a7d80804a9ed9a5",
+      "qualification_run": 35615565278,
+      "source_sha256": "2d3f57c83fa41a58322f55b364b06c0a49c22d9d1b1b0abf75a967141481f8d5",
+      "universal_proof": true,
+      "canonical_accepted": true,
+      "axioms": ["propext", "Quot.sound"],
+      "local_proxy_seconds": 0.320588831,
+      "action": "REPLACE_STAGED"
+    },
+    {
+      "name": "v10-seeded",
+      "family": "seeded-allocation-free-sequential-shift",
+      "repo": "heathsanchez/test",
+      "branch": "lkc-partition-seeded-v10",
+      "commit": "de1770f463f1365788e497d4ac77545b3ba19888",
+      "qualification_run": 35643122669,
+      "source_sha256": "28a13726f5cf128627c65f15688721e37b8354a833a739304179f37e55eeab88",
+      "universal_proof": true,
+      "canonical_accepted": true,
+      "axioms": ["propext", "Quot.sound"],
+      "local_proxy_seconds": 0.282958007,
+      "action": "REPLACE_STAGED"
+    }
+  ],
+  "result": {
+    "external_champion": "v5-natfold",
+    "staged_candidate": "v10-seeded",
+    "next_external_measurement_candidate": "v10-seeded",
+    "v8_v9_external_measurement_needed": false,
+    "claim": "V10 is the best locally qualified contender, not an externally promoted champion."
+  }
+}
