@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://metalogiclabs.xyz/schemas/nebula-causal-certificate-v1.schema.json",
+  "title": "Nebula Causal Certificate V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source",
+    "generations",
+    "controls",
+    "sealed_semantics"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "branch",
+        "commit",
+        "run_id"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "run_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "artifact": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "corpus_hashes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "generations": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "generation",
+          "residual",
+          "realizer",
+          "novelty",
+          "warranted"
+        ],
+        "properties": {
+          "generation": {
+            "type": "string",
+            "pattern": "^G[1-3]$"
+          },
+          "residual": {
+            "type": "string",
+            "minLength": 1
+          },
+          "realizer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "warranted": {
+            "const": true
+          },
+          "novelty": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "residual_unavailable_before",
+              "residual_available_after",
+              "realizer_unavailable_before",
+              "realizer_available_after"
+            ],
+            "properties": {
+              "residual_unavailable_before": {
+                "const": true
+              },
+              "residual_available_after": {
+                "const": true
+              },
+              "realizer_unavailable_before": {
+                "const": true
+              },
+              "realizer_available_after": {
+                "const": true
+              },
+              "witness": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "withholding",
+        "knockout",
+        "semantic_sham",
+        "restart"
+      ],
+      "properties": {
+        "withholding": {
+          "const": "PASS"
+        },
+        "knockout": {
+          "const": "PASS"
+        },
+        "semantic_sham": {
+          "const": "PASS"
+        },
+        "restart": {
+          "const": "PASS"
+        }
+      }
+    },
+    "sealed_semantics": {
+      "const": "IDENTICAL"
+    },
+    "verdict": {
+      "enum": [
+        "BOUNDED_POSITIVE",
+        "NEGATIVE",
+        "INCONCLUSIVE"
+      ]
+    }
+  }
+}
