@@ -92,5 +92,20 @@ class NucleusGenesisTests(unittest.TestCase):
         self.assertEqual(regenerated.size, 1)
 
 
+    def test_restart_uses_compiled_inheritance_without_replaying_discovery(self):
+        machine = Machine.genesis()
+        residual = machine.certify(STEP_TABLE)
+        candidate = machine.lift(residual, "step")
+        machine.promote(candidate, machine.verify(candidate))
+        machine.protect(Query.IS_ONE)
+
+        payload = machine.dump()
+        restarted = Machine.load(payload)
+
+        self.assertEqual(restarted.dump(), payload)
+        self.assertEqual(restarted.execute("step", State.ZERO), State.ONE)
+        self.assertEqual(restarted.partition, ((0,), (1,), (2,)))
+
+
 if __name__ == "__main__":
     unittest.main()
