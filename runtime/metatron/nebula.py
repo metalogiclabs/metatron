@@ -105,7 +105,7 @@ class NebulaMachine:
         if size < 3:
             raise ValueError("Nebula V0 needs at least three states")
         self.states = tuple(range(size))
-        self.requirement = TerminalRequirement()
+        self.requirement: TerminalRequirement | None = None
         self.distinctions: dict[str, tuple[Distinction, str | None]] = {
             "is_0": (Distinction(0), None)
         }
@@ -115,7 +115,7 @@ class NebulaMachine:
         self.lineage: list[Event] = []
         self.generation = 0
         self.partition = self._partition()
-        self._append("GENESIS", "singleton_partition")
+        self._append("GENESIS", "unperturbed")
 
     @classmethod
     def genesis(cls, size: int = 5) -> "NebulaMachine":
@@ -157,12 +157,16 @@ class NebulaMachine:
         )
 
     def satisfied(self) -> bool:
-        return all(len(block) == 1 for block in self.partition)
+        return self.requirement is not None and all(
+            len(block) == 1 for block in self.partition
+        )
 
     def active_obstruction_blocks(self) -> tuple[tuple[int, ...], ...]:
         return tuple(block for block in self.partition if len(block) > 1)
 
     def certify_current_obstruction(self) -> Obstruction | None:
+        if self.requirement is None:
+            raise NotDerivableError("no terminal requirement is active")
         blocks = self.active_obstruction_blocks()
         if not blocks:
             return None
@@ -328,7 +332,16 @@ class NebulaMachine:
         self.promote(candidate, warrant)
         return True
 
-    def ignite(self, max_generations: int = 32) -> int:
+    def ignite(
+        self,
+        requirement: TerminalRequirement,
+        max_generations: int = 32,
+    ) -> int:
+        if self.requirement is not None and self.requirement != requirement:
+            raise NebulaError("a different terminal requirement is already active")
+        if self.requirement is None:
+            self.requirement = requirement
+            self._append("PERTURB", requirement.kind)
         start = self.generation
         while not self.satisfied():
             if self.generation - start >= max_generations:
@@ -336,7 +349,7 @@ class NebulaMachine:
             self.step()
         self._append(
             "TERMINAL_REQUIREMENT_SATISFIED",
-            self.requirement.kind,
+            requirement.kind,
             generations=self.generation - start,
         )
         return self.generation - start
