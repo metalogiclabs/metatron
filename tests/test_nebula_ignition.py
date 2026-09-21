@@ -2,6 +2,7 @@ import unittest
 
 from runtime.metatron.nebula import (
     NebulaMachine,
+    TerminalRequirement,
     NotDerivableError,
     UnknownChoiceError,
     select_unique_minimal,
@@ -16,7 +17,7 @@ class NebulaIgnitionTests(unittest.TestCase):
         self.assertEqual(machine.partition, ((0,), (1, 2, 3, 4)))
         self.assertEqual(unresolved_potential(machine.partition), 3)
 
-        generations = machine.ignite()
+        generations = machine.ignite(TerminalRequirement())
 
         self.assertEqual(generations, 3)
         self.assertTrue(machine.satisfied())
@@ -34,6 +35,7 @@ class NebulaIgnitionTests(unittest.TestCase):
 
     def test_next_obstruction_does_not_exist_before_parent_lift(self):
         machine = NebulaMachine.genesis(size=5)
+        machine.perturb(TerminalRequirement())
 
         # The future block is not a current object in the quotient.
         with self.assertRaises(NotDerivableError):
@@ -60,6 +62,7 @@ class NebulaIgnitionTests(unittest.TestCase):
 
     def test_each_generation_strictly_reduces_exact_residual(self):
         machine = NebulaMachine.genesis(size=5)
+        machine.perturb(TerminalRequirement())
         potentials = [unresolved_potential(machine.partition)]
 
         while not machine.satisfied():
@@ -70,7 +73,7 @@ class NebulaIgnitionTests(unittest.TestCase):
 
     def test_causal_knockout_of_g1_retracts_all_descendants(self):
         machine = NebulaMachine.genesis(size=5)
-        machine.ignite()
+        machine.ignite(TerminalRequirement())
 
         learned = [
             (name, warrant_id)
@@ -93,7 +96,7 @@ class NebulaIgnitionTests(unittest.TestCase):
 
     def test_descendant_warrants_record_causal_parentage(self):
         machine = NebulaMachine.genesis(size=5)
-        machine.ignite()
+        machine.ignite(TerminalRequirement())
 
         learned = [
             (name, warrant_id)
