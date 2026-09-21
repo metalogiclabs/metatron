@@ -1,7 +1,7 @@
 import subprocess
 import unittest
 
-from runtime.metatron.nucleus import Node, WarrantGraph
+from runtime.metatron.nucleus import Node, append, ids, live_ids
 
 
 def reference():
@@ -20,26 +20,39 @@ def reference():
 
 
 def fixture():
-    graph = WarrantGraph()
-    a = graph.append(Node("fact", {"name": "a"}))
-    b = graph.append(Node("fact", {"name": "b"}, (a,)))
-    graph.append(Node("fact", {"name": "c"}, (b,)))
-    graph.append(Node("fact", {"name": "independent"}))
-    return graph, b
+    log = ()
+    node_ids = []
+
+    for name, premise_positions in (
+        ("a", ()),
+        ("b", (0,)),
+        ("c", (1,)),
+        ("independent", ()),
+    ):
+        node = Node(
+            "fact",
+            {"name": name},
+            tuple(node_ids[i] for i in premise_positions),
+        )
+        log = append(log, node)
+        node_ids.append(node.id)
+
+    return log, tuple(node_ids)
 
 
-def live_positions(graph):
-    positions = {node_id: i for i, node_id in enumerate(graph.ids)}
-    return tuple(positions[node_id] for node_id in graph.live_ids())
+def live_positions(log):
+    positions = {node_id: i for i, node_id in enumerate(ids(log))}
+    return tuple(positions[node_id] for node_id in live_ids(log))
 
 
 class DifferentialTests(unittest.TestCase):
     def test_python_matches_lean_warrant_semantics(self):
         ref = reference()
-        graph, b = fixture()
-        self.assertEqual(ref["WARRANT_BASELINE"], live_positions(graph))
-        graph.append(Node("revoke", {"target": b}))
-        self.assertEqual(ref["WARRANT_REVOKED"], live_positions(graph))
+        log, node_ids = fixture()
+        self.assertEqual(ref["WARRANT_BASELINE"], live_positions(log))
+
+        log = append(log, Node("revoke", {"target": node_ids[1]}))
+        self.assertEqual(ref["WARRANT_REVOKED"], live_positions(log))
 
 
 if __name__ == "__main__":

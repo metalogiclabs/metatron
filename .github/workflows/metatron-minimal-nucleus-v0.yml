@@ -66,9 +66,9 @@ jobs:
               ).get("qualified_implementation_sha")
 
           record = {
-              "schema_version": 1,
+              "schema_version": 2,
               "head_sha": os.environ["GITHUB_SHA"],
-              "qualified_implementation_sha": qualified_sha,
+              "previous_qualified_implementation_sha": qualified_sha,
               "workflow_run": {
                   "id": int(os.environ["GITHUB_RUN_ID"]),
                   "url": (
@@ -84,10 +84,9 @@ jobs:
                   "line_budget": 120,
                   "runtime_dependencies": "python-standard-library-only",
                   "formal_dependencies": "Lean core only",
-                  "authoritative_persistence": "canonical-jsonl-event-log",
-                  "authoritative_in_memory_store": "immutable WarrantGraph._log tuple",
-                  "public_runtime_types": ["Node", "WarrantGraph"],
-                  "primitive_mutation": "WarrantGraph.append(Node)",
+                  "authoritative_state": "immutable tuple[Node, ...]",
+                  "public_runtime_types": ["Node", "Log (tuple alias)"],
+                  "primitive_transition": "append(Log, Node) -> Log",
                   "formal_reference": "formal/Metatron/WarrantGraph.lean",
               },
           }
