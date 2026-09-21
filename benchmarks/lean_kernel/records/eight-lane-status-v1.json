@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "campaign": "SAIR Lean Kernel Challenge Stage 1",
+  "objective": "lowest valid kernel instruction total on all eight independent leaderboards",
+  "authority_boundary": "This file is external evidence/policy state. The Metatron nucleus remains the append-only warrant graph.",
+  "lanes": {
+    "partition": {
+      "external_champion": {
+        "name": "v5-natfold",
+        "external_run_id": 198,
+        "external_total_instructions": 4546112652
+      },
+      "best_local": {
+        "name": "v13-three-compiled",
+        "repo": "heathsanchez/test",
+        "branch": "lkc-partition-three-compiled-v13",
+        "commit": "ebcc890db3098f1a238c6419fc1ed9eddfcaaf2d",
+        "qualification_run": 35660577434,
+        "source_sha256": "bcb6325b9d0ca5c7259b0de76d903ba5cb20e05fdb60938b5201745d00491085",
+        "universal_proof": true,
+        "canonical_accepted": true,
+        "axioms": ["propext", "Quot.sound"],
+        "local_proxy_seconds": 0.182697394
+      },
+      "status": "REQUEST_EXTERNAL"
+    },
+    "primecount": {
+      "external_champion": {"name": "v3-structural"},
+      "screen_candidate": {
+        "name": "v5-bitset-probe",
+        "branch": "lkc-flash2-primecount-v5-bitset",
+        "commit": "e0b506b2276b181890fb31912b391cb748fb196e",
+        "screen_run": 35423022766,
+        "wall_time_improvement_pct": 11.171794277638526,
+        "universal_proof": false
+      },
+      "status": "SCREEN_WIN_PROOF_REQUIRED"
+    },
+    "mertens": {
+      "champion": {"name": "v6-structural"},
+      "rejected_probe": {
+        "name": "v9-bitset-probe",
+        "branch": "lkc-flash2-mertens-v9-bitset",
+        "commit": "0e90efe068bf3ab54c1c350a03f671b3578551a3",
+        "screen_run": 35423028612,
+        "wall_time_improvement_pct": -23.301916230627384
+      },
+      "status": "REFUTED_RESOURCE"
+    },
+    "fib": {
+      "champion": {"name": "v2-bitwise"},
+      "rejected_probe": {
+        "name": "v4-shift-probe",
+        "branch": "lkc-flash2-fib-v4-shift",
+        "commit": "8f06a3fe81476fb8d2755e290d1deb8b14fb247c",
+        "screen_run": 35422786945,
+        "wall_time_improvement_pct": -1.7309719455808725
+      },
+      "public_packages": {
+        "snapshot_run": 35659790535,
+        "count": 2,
+        "families": [
+          "tiny fast-pair / fast doubling",
+          "large anchor/interpolation construction"
+        ]
+      },
+      "status": "CHAMPION_RETAINED_PUBLIC_FAMILIES_INGESTED"
+    },
+    "polydisc": {
+      "champion": {"name": "v3-frozen"},
+      "probe": {
+        "name": "v4-fixed-shape",
+        "branch": "lkc-flash2-polydisc-v4",
+        "callgrind_run": 35423038757,
+        "callgrind_improvement_pct": 0.01065298045975771,
+        "proof_status": "red"
+      },
+      "status": "FLAT_AND_UNQUALIFIED"
+    },
+    "ca-rule110": {
+      "champion": {"name": "v60-frozen"},
+      "probe": {
+        "name": "v64-generic-step-dispatch",
+        "branch": "lkc-flash2-rule110-v64",
+        "commit": "216c0e5973e8bd6a66c80e5aa86392a8c8e3bdc9",
+        "proof_status": "unqualified"
+      },
+      "status": "MEASURE_AND_QUALIFY_PROBE"
+    },
+    "permanent": {
+      "champion": {"name": "v5-frozen"},
+      "probe": {
+        "name": "v6-reverse-row-order",
+        "branch": "lkc-flash2-permanent-v6",
+        "commit": "62bbb6616e9a9f8473ca84865d2f5706deaa2811",
+        "proof_status": "probe intentionally omits impl_correct"
+      },
+      "status": "MEASURE_PROBE_FIRST"
+    },
+    "sha256": {
+      "champion": {"name": "v23-frozen"},
+      "probe": {
+        "name": "v24-deferred-normalization",
+        "branch": "lkc-flash2-sha-v24",
+        "commit": "f55bae277f4d0aa01718140e5b36bdacba06934a",
+        "proof_status": "unqualified"
+      },
+      "status": "MEASURE_AND_QUALIFY_PROBE"
+    }
+  },
+  "next_actions": [
+    "Primecount: turn v5 bitset screen winner into universally proved candidate before any external measurement.",
+    "Partition: keep v13 staged locally; external PMU only when no stronger local successor remains.",
+    "Rule110/Permanent/SHA: run isolated measurement gates on current probes before proof investment.",
+    "Mertens/Fib/Polydisc: do not revisit rejected/flat families; open new representation families."
+  ]
+}
