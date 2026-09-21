@@ -679,4 +679,4 @@ If those answers become ambiguous, the repo is drifting back into an ontology-fi
 \textbf{When compression becomes insufficient, regrow—not guess.}
 \end{gathered}
 }
-\`
+\]
