@@ -6,13 +6,14 @@ The minimal nucleus is intentionally tiny:
 
 ```text
 Node(kind, payload, premises)
-WarrantGraph.append(node)
+append(Log, Node) -> Log
 ```
 
-A node is content-addressed. The authoritative state is one append-only log.
-The current machine is the deterministic live view of that log: revoked nodes
-and descendants whose premises are no longer live disappear from execution,
-while history remains intact.
+A node is content-addressed. The sole runtime authority is an immutable
+`tuple[Node, ...]`. `append` returns a new log; it does not mutate hidden
+state. The current machine is the deterministic live view of that log: revoked
+nodes and descendants whose premises are no longer live disappear from
+execution, while history remains intact.
 
 ## Minimal Warrant Graph V0
 
@@ -26,8 +27,8 @@ Qualified implementation:
 - complete runtime package: 5,672 bytes
 - Python standard library only
 - Lean core only; Mathlib is not a dependency
-- public runtime types: `Node`, `WarrantGraph`
-- sole authoritative mutation: `WarrantGraph.append(Node)`
+- qualified predecessor public runtime types: `Node`, `WarrantGraph`
+- current pure API: `Node`, `Log`, `append(Log, Node) -> Log`
 
 The qualification record is
 `evidence/qualified-runs/minimal-warrant-graph-v0.json`.
@@ -54,3 +55,17 @@ The Lean Kernel controller remains an external benchmark/policy example, not
 part of Metatron's trusted semantics.
 
 See `docs/minimal-warrant-graph-v0.md`.
+
+## Current pure-log head
+
+The branch has since removed the `WarrantGraph` wrapper itself. The active
+implementation is now a pure immutable warrant log plus pure derived functions.
+The exact-head workflow writes its successful source SHA/run to:
+
+`evidence/qualified-runs/minimal-warrant-graph-v0-latest.json`
+
+only after the full Python/Lean gate passes.
+
+Nebula/Genesis/Aha are deliberately **not** new trusted runtime types. A real
+Nebula ignition result is accepted, if earned, as an external causal certificate
+over ordinary warranted nodes. See `docs/nebula-causal-certificate-v1.md`.
