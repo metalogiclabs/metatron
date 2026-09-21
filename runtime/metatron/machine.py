@@ -96,6 +96,8 @@ class Machine:
         self.revoked_certificates = set()
         self._relations = []
         self._next_residual_serial = 1
+        self.queries: list[Query] = []
+        self.active_partition: tuple[tuple[int, ...], ...] = ((0,), (1,), (2,))
         self.queries = []
         self.active_partition = ((0,), (1,), (2,))
 
