@@ -101,7 +101,7 @@ Changing the policy does not rewrite history.
 `runtime/metatron/nucleus.py` is guarded by a test requiring:
 
 - standard-library imports only;
-- no more than 180 nonblank, noncomment lines.
+- no more than 120 nonblank, noncomment lines.
 
 The existing V0 runtime and Lean Kernel controller are retained on this branch
 as compatibility/reference layers while the warrant graph is qualified. They
@@ -120,3 +120,20 @@ new tests establish:
 6. tamper detection;
 7. Lean Kernel evidence represented without kernel-specific types;
 8. the explicit size/dependency budget.
+
+
+## Graph-backed compatibility
+
+The former V0 `Machine` API is now a compatibility facade over the warrant
+graph. Its instance dictionary contains only `graph`; legacy capability,
+certificate, residual, relation, query, partition, revocation and lineage
+stores are recomputed from the log.
+
+The old serialization snapshot has also been removed from authority:
+`dump_machine` is exactly the canonical graph JSONL and `load_machine`
+is graph replay.
+
+A causal-equivalence gate freezes the retained V0 lifecycle and simultaneously
+checks the stronger live-view rule: revoking a capability warrant removes its
+dependent relation from active closure while preserving the historical
+relation record.
