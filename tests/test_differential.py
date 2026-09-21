@@ -3,6 +3,7 @@ import unittest
 
 from runtime.metatron.machine import partition_for_queries, project_table
 from runtime.metatron.model import Query, STEP_TABLE, State, eval_query
+from runtime.metatron.nucleus import Node, WarrantGraph
 
 
 def reference():
@@ -18,6 +19,20 @@ def reference():
             key, value = line.split("=", 1)
             out[key] = tuple(int(x) for x in value.split(",") if x)
     return out
+
+
+def warrant_fixture():
+    graph = WarrantGraph()
+    a = graph.append(Node("fact", {"name": "a"}))
+    b = graph.append(Node("fact", {"name": "b"}, (a,)))
+    graph.append(Node("fact", {"name": "c"}, (b,)))
+    graph.append(Node("fact", {"name": "independent"}))
+    return graph, b
+
+
+def live_positions(graph):
+    positions = {node_id: i for i, node_id in enumerate(graph.ids)}
+    return tuple(positions[node_id] for node_id in graph.live_ids())
 
 
 class DifferentialTests(unittest.TestCase):
@@ -39,6 +54,17 @@ class DifferentialTests(unittest.TestCase):
         )
         self.assertEqual(ref["IDEMPOTENT"], (1,))
         self.assertEqual(ref["COMPILED_EXACT"], (1,))
+
+        graph, b = warrant_fixture()
+        self.assertEqual(
+            ref["WARRANT_BASELINE"],
+            live_positions(graph),
+        )
+        graph.append(Node("revoke", {"target": b}))
+        self.assertEqual(
+            ref["WARRANT_REVOKED"],
+            live_positions(graph),
+        )
 
 
 if __name__ == "__main__":
