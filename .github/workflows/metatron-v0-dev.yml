@@ -1,0 +1,25 @@
+name: Metatron V0 Dev Lean
+
+on:
+  push:
+    branches: [metatron-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lean-dev:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Fetch pinned Mathlib
+        run: |
+          lake update
+          lake exe cache get
+      - name: Compile Fixture interface test
+        run: lake env lean formal/Metatron/FixtureTest.lean
