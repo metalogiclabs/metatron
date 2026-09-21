@@ -3,6 +3,7 @@ import unittest
 from runtime.metatron.machine import Machine, RevokedCapabilityError
 from runtime.metatron.model import Query, STEP_TABLE, State
 from runtime.metatron.serialization import dump_machine, load_machine
+from runtime.metatron.views import affected
 
 
 class GraphBackedCompatibilityTests(unittest.TestCase):
