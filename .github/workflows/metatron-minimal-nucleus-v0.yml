@@ -3,10 +3,12 @@ name: Metatron Minimal Nucleus V0
 on:
   push:
     branches: [metatron-minimal-warrant-graph-v0]
+    paths-ignore:
+      - 'evidence/qualified-runs/minimal-warrant-graph-v0-latest.json'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: metatron-minimal-nucleus-v0-${{ github.ref }}
@@ -80,6 +82,9 @@ jobs:
               },
               "nucleus": {
                   "file": "runtime/metatron/nucleus.py",
+                  "sha256": __import__("hashlib").sha256(
+                      Path("runtime/metatron/nucleus.py").read_bytes()
+                  ).hexdigest(),
                   "semantic_lines": len(semantic_lines),
                   "line_budget": 120,
                   "runtime_dependencies": "python-standard-library-only",
@@ -100,3 +105,55 @@ jobs:
           name: metatron-minimal-nucleus-v0
           path: /tmp/metatron-minimal-nucleus-v0.json
           if-no-files-found: error
+
+      - name: Persist exact-head qualification record
+        env:
+          QUALIFY_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          test "$QUALIFY_STATUS" = "success"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          attestation = json.loads(
+              Path("/tmp/metatron-minimal-nucleus-v0.json").read_text()
+          )
+          record = {
+              "schema_version": 1,
+              "name": "Metatron Minimal Warrant Log — Pure Immutable Head",
+              "status": "QUALIFIED_IMPLEMENTATION",
+              "qualified_implementation_sha": os.environ["GITHUB_SHA"],
+              "qualified_implementation_run": {
+                  "id": int(os.environ["GITHUB_RUN_ID"]),
+                  "conclusion": "success",
+                  "url": (
+                      f'{os.environ["GITHUB_SERVER_URL"]}/'
+                      f'{os.environ["GITHUB_REPOSITORY"]}/actions/runs/'
+                      f'{os.environ["GITHUB_RUN_ID"]}'
+                  ),
+              },
+              "nucleus": attestation["nucleus"],
+              "previous_qualified_implementation_sha": (
+                  attestation.get("previous_qualified_implementation_sha")
+              ),
+              "claim": (
+                  "Metatron runtime authority is a pure immutable tuple of "
+                  "content-addressed warranted nodes; append is the only "
+                  "state transition, and live closure/revocation are derived."
+              ),
+          }
+          path = Path(
+              "evidence/qualified-runs/"
+              "minimal-warrant-graph-v0-latest.json"
+          )
+          path.write_text(
+              json.dumps(record, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add evidence/qualified-runs/minimal-warrant-graph-v0-latest.json
+          git commit -m "evidence: qualify pure immutable warrant log" || exit 0
+          git push origin HEAD:metatron-minimal-warrant-graph-v0
