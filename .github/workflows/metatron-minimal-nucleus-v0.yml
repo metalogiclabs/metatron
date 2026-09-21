@@ -1,0 +1,93 @@
+name: Metatron Minimal Nucleus V0
+
+on:
+  push:
+    branches: [metatron-minimal-warrant-graph-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate existing evidence
+        run: |
+          python scripts/check_manifest.py
+          python -m unittest tests.test_manifest -v
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Fetch pinned Mathlib
+        run: |
+          lake update
+          lake exe cache get
+
+      - name: Reject local proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|constant|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+
+      - name: Build Lean reference semantics
+        run: |
+          lake build Metatron
+          lake build metatron_reference
+          lake env lean formal/Metatron/FixtureTest.lean
+
+      - name: Run full historical and minimal-nucleus suite
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Attest minimal nucleus
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          source = Path("runtime/metatron/nucleus.py").read_text().splitlines()
+          semantic_lines = [
+              line for line in source
+              if line.strip() and not line.lstrip().startswith("#")
+          ]
+          record = {
+              "schema_version": 1,
+              "head_sha": os.environ["GITHUB_SHA"],
+              "workflow_run": {
+                  "id": int(os.environ["GITHUB_RUN_ID"]),
+                  "url": (
+                      f'{os.environ["GITHUB_SERVER_URL"]}/'
+                      f'{os.environ["GITHUB_REPOSITORY"]}/actions/runs/'
+                      f'{os.environ["GITHUB_RUN_ID"]}'
+                  ),
+                  "conclusion": "success",
+              },
+              "nucleus": {
+                  "file": "runtime/metatron/nucleus.py",
+                  "semantic_lines": len(semantic_lines),
+                  "line_budget": 180,
+                  "runtime_dependencies": "python-standard-library-only",
+                  "authoritative_persistence": "canonical-jsonl-event-log",
+                  "primitive_runtime_types": ["Node", "WarrantGraph"],
+                  "primitive_mutation": "WarrantGraph.append(Node)",
+              },
+          }
+          Path("/tmp/metatron-minimal-nucleus-v0.json").write_text(
+              json.dumps(record, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: metatron-minimal-nucleus-v0
+          path: /tmp/metatron-minimal-nucleus-v0.json
+          if-no-files-found: error
