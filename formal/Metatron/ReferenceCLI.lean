@@ -44,3 +44,5 @@ def referenceMain : IO Unit := do
 end Metatron
 
 def main : IO Unit := Metatron.referenceMain
+
+def main : IO Unit := Metatron.referenceMain
