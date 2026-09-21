@@ -111,7 +111,7 @@ class GraphBackedCompatibilityTests(unittest.TestCase):
             cert.id,
             live=True,
         )[0]
-        cone = machine.graph.affected((certificate_node,))
+        cone = affected(machine.graph, (certificate_node,))
 
         self.assertGreaterEqual(len(cone), 3)
         self.assertTrue(any(
