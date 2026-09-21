@@ -17,8 +17,6 @@ def _canonical(value) -> str:
 
 @dataclass(frozen=True, init=False)
 class Node:
-    """Immutable canonical content plus prerequisite node IDs."""
-
     body: str
     premises: tuple[str, ...]
 
