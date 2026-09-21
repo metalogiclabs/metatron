@@ -136,7 +136,7 @@ V0 demonstrates this finite developmental shape only. It does not establish a
 general Nucleus universal property, universal minimal repair, arbitrary
 representation discovery, or open-ended productivity.
 
-The next gate is Lean reference semantics for these exact finite laws, followed
+Restart is deterministic: the active presentation is reconstructed from persisted lineage and authority without replaying discovery.\n\nThe next gate is Lean reference semantics for these exact finite laws, followed
 by replacement of the fixture-specific lift with the smallest generic
 generator/continuation construction that survives theorem, falsifier, and
 ablation.
