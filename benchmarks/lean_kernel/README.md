@@ -42,3 +42,15 @@ request:
 `V8 STAGE_FOR_EXTERNAL → V9 REPLACE_STAGED → V10 REPLACE_STAGED`.
 
 Thus only V10 should consume the next scarce external PMU run.
+
+
+### V11 staging update
+
+The universal part-size-1 identity was promoted into the local representation:
+
+`partAux 1 m = 1`.
+
+Partition V11 is universally proved and canonically accepted and reduces the
+frozen local replay total from V10's 0.282958007s to 0.249743756s. This is
+local proxy evidence only, so V5 remains the external PMU champion while V11
+replaces V10 as the sole staged external-measurement contender.
