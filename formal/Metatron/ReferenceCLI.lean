@@ -32,7 +32,7 @@ def compiledExactFlag : Nat :=
   boolCode (allStates.all (fun s =>
     decide (execInstr Instr.step s = step s)))
 
-def main : IO Unit := do
+def referenceMain : IO Unit := do
   IO.println s!"STEP={renderNatList stepTable}"
   IO.println s!"Q0={renderNatList q0Table}"
   IO.println s!"Q1={renderNatList q1Table}"
@@ -42,3 +42,5 @@ def main : IO Unit := do
   IO.println s!"COMPILED_EXACT={compiledExactFlag}"
 
 end Metatron
+
+def main : IO Unit := Metatron.referenceMain
