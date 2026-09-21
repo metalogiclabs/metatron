@@ -31,11 +31,6 @@ jobs:
           curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
-      - name: Fetch pinned Mathlib
-        run: |
-          lake update
-          lake exe cache get
-
       - name: Reject local proof placeholders
         run: |
           set -euo pipefail
@@ -78,6 +73,7 @@ jobs:
                   "semantic_lines": len(semantic_lines),
                   "line_budget": 120,
                   "runtime_dependencies": "python-standard-library-only",
+                  "formal_dependencies": "Lean core only",
                   "authoritative_persistence": "canonical-jsonl-event-log",
                   "authoritative_in_memory_store": "immutable WarrantGraph._log tuple",
                   "public_runtime_types": ["Node", "WarrantGraph"],
