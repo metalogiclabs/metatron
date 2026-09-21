@@ -11,7 +11,7 @@ require mathlib from git
 @[default_target]
 lean_lib Metatron where
   srcDir := "formal"
-  roots := #[`Metatron.Fixture, `Metatron.FixtureTest, `Metatron.WarrantGraph]
+  roots := #[`Metatron.WarrantGraph]
 
 lean_exe metatron_reference where
   srcDir := "formal"

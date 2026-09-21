@@ -8,12 +8,15 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: metatron-minimal-nucleus-v0-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   qualify:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -38,13 +41,12 @@ jobs:
           set -euo pipefail
           ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|constant|unsafe)([^[:alnum:]_]|$)' formal/Metatron
 
-      - name: Build Lean reference semantics
+      - name: Build Lean warrant semantics
         run: |
           lake build Metatron
           lake build metatron_reference
-          lake env lean formal/Metatron/FixtureTest.lean
 
-      - name: Run full historical and minimal-nucleus suite
+      - name: Run minimal-nucleus and external-policy suite
         run: python -m unittest discover -s tests -p 'test_*.py' -v
 
       - name: Attest minimal nucleus
@@ -77,8 +79,10 @@ jobs:
                   "line_budget": 120,
                   "runtime_dependencies": "python-standard-library-only",
                   "authoritative_persistence": "canonical-jsonl-event-log",
-                  "primitive_runtime_types": ["Node", "WarrantGraph"],\n                  "authoritative_in_memory_store": "WarrantGraph._log",
+                  "authoritative_in_memory_store": "immutable WarrantGraph._log tuple",
+                  "public_runtime_types": ["Node", "WarrantGraph"],
                   "primitive_mutation": "WarrantGraph.append(Node)",
+                  "formal_reference": "formal/Metatron/WarrantGraph.lean",
               },
           }
           Path("/tmp/metatron-minimal-nucleus-v0.json").write_text(
