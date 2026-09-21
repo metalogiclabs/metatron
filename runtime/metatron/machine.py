@@ -53,6 +53,10 @@ def certify_no_resolution(active_tables, target):
 class NonCongruentProjectionError(RuntimeError):
     pass
 
+
+class RevokedCapabilityError(RuntimeError):
+    pass
+
 class UncertifiedResidualError(RuntimeError):
     pass
 
@@ -251,6 +255,15 @@ class Machine:
         kind = "REGROW" if len(new) > len(old) else "PROJECT"
         self.lineage.append(LineageEvent(kind, {"partition": [list(block) for block in new]}))
 
+    def revoke(self, certificate_id):
+        if certificate_id not in self.live_certificates:
+            raise ValueError("cannot revoke unknown certificate")
+        self.revoked_certificates.add(certificate_id)
+        self.lineage.append(LineageEvent(
+            "REVOKE",
+            {"certificate": certificate_id},
+        ))
+
     def execute(self, name, state):
         try:
             capability = self.capabilities[name]
@@ -259,5 +272,5 @@ class Machine:
         if capability.certificate_id not in self.live_certificates:
             raise UnverifiedCertificateError("capability certificate is not live")
         if capability.certificate_id in self.revoked_certificates:
-            raise ValueError("capability certificate is revoked")
+            raise RevokedCapabilityError(name)
         return State(capability.table[int(state)])
