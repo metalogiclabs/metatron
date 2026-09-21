@@ -73,25 +73,25 @@ def build_log():
         "values": [396369526, 1167256227, 2982486899],
         "total": 4546112652, "tier": "external", "run_id": 198,
     }, (p5, p5v))
-    log, p12 = _add(log, "candidate", {
-        "problem": "partition", "name": "v12-two-seed", "repo": "heathsanchez/test",
-        "branch": "lkc-partition-two-seed-v12",
-        "commit": "e2383de625fe380bf2dbaf540e3434adcb1b199a",
-        "source_sha256": "e2e234dea49ad7a4876676fa0894c70704c5a597ae584f358df63d4afe56690b",
+    log, p13 = _add(log, "candidate", {
+        "problem": "partition", "name": "v13-three-compiled", "repo": "heathsanchez/test",
+        "branch": "lkc-partition-three-compiled-v13",
+        "commit": "ebcc890db3098f1a238c6419fc1ed9eddfcaaf2d",
+        "source_sha256": "bcb6325b9d0ca5c7259b0de76d903ba5cb20e05fdb60938b5201745d00491085",
     }, (problems["partition"],))
-    log, p12v = _add(log, "verification", {
-        "subject": "v12-two-seed", "universal": True, "canonical": True,
-        "axioms": ["propext", "Quot.sound"], "run_id": 35650701319,
-    }, (p12,))
-    log, p12m = _add(log, "measurement", {
-        "subject": "v12-two-seed", "metric": "wall_seconds",
-        "cohort": "frozen-local-partition", "value": 0.2066626, "tier": "local",
-    }, (p12, p12v))
+    log, p13v = _add(log, "verification", {
+        "subject": "v13-three-compiled", "universal": True, "canonical": True,
+        "axioms": ["propext", "Quot.sound"], "run_id": 35660577434,
+    }, (p13,))
+    log, p13m = _add(log, "measurement", {
+        "subject": "v13-three-compiled", "metric": "wall_seconds",
+        "cohort": "frozen-local-partition", "value": 0.182697394, "tier": "local",
+    }, (p13, p13v))
     log, _ = _add(log, "decision", {
         "problem": "partition", "action": "CONTINUE_VERIFIED_COMPRESSION",
-        "external_champion": "v5-natfold", "staged": "v12-two-seed",
-        "reason": "keep compounding theorem-to-runtime compression before spending the next external PMU run",
-    }, (p5m, p12m))
+        "external_champion": "v5-natfold", "staged": "v13-three-compiled",
+        "reason": "V13 is universally proved and reduces the local proxy again; continue compounding before spending the next external PMU run",
+    }, (p5m, p13m))
 
     # Mertens: bitset family refuted.
     log, m6 = _add(log, "candidate", {
