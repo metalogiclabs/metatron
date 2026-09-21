@@ -3,6 +3,7 @@ import unittest
 from pathlib import Path
 
 from runtime.metatron.nucleus import Node, WarrantGraph
+from runtime.metatron.views import affected, root_digest
 
 
 class MinimalWarrantGraphTests(unittest.TestCase):
