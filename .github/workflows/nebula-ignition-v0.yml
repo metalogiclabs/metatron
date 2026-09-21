@@ -1,0 +1,46 @@
+name: Nebula Ignition V0
+
+on:
+  push:
+    branches: [nebula-ignition-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ignition:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run Genesis regression gate
+        run: python -m unittest tests.test_nucleus_genesis -v
+
+      - name: Run Nebula ignition gate
+        run: python -m unittest tests.test_nebula_ignition -v
+
+      - name: Reject preloaded generations
+        run: |
+          set -euo pipefail
+          ! grep -nE 'is_1|is_2|is_3|generation[[:space:]]*==' runtime/metatron/nebula.py
+          python - <<'PY'
+          from runtime.metatron.nebula import NebulaMachine, TerminalRequirement
+
+          machine = NebulaMachine.genesis(size=5)
+          assert machine.generation == 0
+          assert machine.requirement is None
+
+          n = machine.ignite(TerminalRequirement())
+          assert n == 3
+          assert machine.partition == ((0,), (1,), (2,), (3,), (4,))
+
+          promotions = [
+              e.subject for e in machine.lineage if e.kind == "PROMOTE"
+          ]
+          assert promotions == ["is_1", "is_2", "is_3"]
+          print("NEBULA_IGNITION_THREE_GENERATIONS")
+          PY
