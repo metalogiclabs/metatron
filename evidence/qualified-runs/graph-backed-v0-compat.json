@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "name": "Metatron graph-backed V0 compatibility",
+  "status": "QUALIFIED",
+  "commit": "1191b06b17a28dbc29de37e8ba72f67cbe3d2598",
+  "run": {
+    "id": 35655948565,
+    "conclusion": "success",
+    "url": "https://github.com/metalogiclabs/metatron/actions/runs/35655948565"
+  },
+  "artifact": {
+    "id": 10663883037,
+    "name": "metatron-minimal-nucleus-v0",
+    "digest": "sha256:2dce660a98866bb6cbd5b54fdd76f3dfc6f0709f5ea8d0201acc5a18cc3dc5ed"
+  },
+  "claim": "The retained Metatron V0 public lifecycle and full historical test suite pass when Machine has only one authoritative mutable field, the WarrantGraph. Legacy capability, certificate, residual, relation, query, projection, revocation and lineage stores are derived views. Canonical graph JSONL is the sole persisted authority.",
+  "additional_live_view_result": "Revoking the step capability warrant removes the dependent relation from the live consequential view while preserving the historical relation record.",
+  "purpose": "This record freezes the compatibility bridge so later minimal-nucleus commits may remove the duplicated legacy facade without losing the evidence that the transition preserved the retained V0 behavior."
+}
