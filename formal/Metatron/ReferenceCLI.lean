@@ -1,4 +1,5 @@
 import Metatron.Fixture
+import Metatron.WarrantGraph
 
 namespace Metatron
 
@@ -40,6 +41,8 @@ def referenceMain : IO Unit := do
   IO.println s!"Q0_STEP={renderNatList q0StepTable}"
   IO.println s!"IDEMPOTENT={idempotentFlag}"
   IO.println s!"COMPILED_EXACT={compiledExactFlag}"
+  IO.println s!"WARRANT_BASELINE={renderNatList (warrantLive warrantBaseline)}"
+  IO.println s!"WARRANT_REVOKED={renderNatList (warrantLive warrantRevokedFixture)}"
 
 end Metatron
 
