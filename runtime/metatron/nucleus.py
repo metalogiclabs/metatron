@@ -41,7 +41,7 @@ class WarrantGraph:
     """One append-only log; every other structure is a derived view."""
 
     def __init__(self) -> None:
-        self._log: list[Node] = []
+        self._log: tuple[Node, ...] = ()
 
     def __len__(self) -> int:
         return len(self._log)
@@ -81,7 +81,7 @@ class WarrantGraph:
                 raise ValueError("content-address collision")
             return node_id
 
-        self._log.append(node)
+        self._log += (node,)
         return node_id
 
     def live_ids(self) -> tuple[str, ...]:
