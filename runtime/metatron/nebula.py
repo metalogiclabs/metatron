@@ -332,16 +332,22 @@ class NebulaMachine:
         self.promote(candidate, warrant)
         return True
 
-    def ignite(
-        self,
-        requirement: TerminalRequirement,
-        max_generations: int = 32,
-    ) -> int:
+    def perturb(self, requirement: TerminalRequirement) -> None:
         if self.requirement is not None and self.requirement != requirement:
             raise NebulaError("a different terminal requirement is already active")
         if self.requirement is None:
             self.requirement = requirement
             self._append("PERTURB", requirement.kind)
+
+    def ignite(
+        self,
+        requirement: TerminalRequirement | None = None,
+        max_generations: int = 32,
+    ) -> int:
+        if requirement is not None:
+            self.perturb(requirement)
+        if self.requirement is None:
+            raise NotDerivableError("no terminal requirement is active")
         start = self.generation
         while not self.satisfied():
             if self.generation - start >= max_generations:
@@ -349,7 +355,7 @@ class NebulaMachine:
             self.step()
         self._append(
             "TERMINAL_REQUIREMENT_SATISFIED",
-            requirement.kind,
+            self.requirement.kind,
             generations=self.generation - start,
         )
         return self.generation - start
