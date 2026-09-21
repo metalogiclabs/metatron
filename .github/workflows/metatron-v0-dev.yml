@@ -21,5 +21,7 @@ jobs:
         run: |
           lake update
           lake exe cache get
+      - name: Build Lean reference library
+        run: lake build Metatron
       - name: Compile Fixture interface test
         run: lake env lean formal/Metatron/FixtureTest.lean
