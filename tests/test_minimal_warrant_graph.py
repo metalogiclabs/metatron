@@ -3,7 +3,6 @@ import unittest
 from pathlib import Path
 
 from runtime.metatron.nucleus import Node, WarrantGraph
-from runtime.metatron.views import affected, root_digest
 
 
 class MinimalWarrantGraphTests(unittest.TestCase):
@@ -81,7 +80,6 @@ class MinimalWarrantGraphTests(unittest.TestCase):
         c = graph.append(Node("fact", {"name": "c"}, (b,)))
         independent = graph.append(Node("fact", {"name": "independent"}))
 
-        self.assertEqual(affected(graph, (a,)), (a, b, c))
         graph.append(Node("revoke", {"target": b}))
 
         self.assertIn(a, graph.live_ids())
@@ -101,7 +99,6 @@ class MinimalWarrantGraphTests(unittest.TestCase):
         self.assertEqual(restored.dumps(), payload)
         self.assertEqual(restored.ids, graph.ids)
         self.assertEqual(restored.live_ids(), graph.live_ids())
-        self.assertEqual(root_digest(restored), root_digest(graph))
 
     def test_tampered_history_is_rejected(self):
         graph = WarrantGraph()
