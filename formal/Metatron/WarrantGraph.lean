@@ -2,7 +2,7 @@ namespace Metatron
 
 structure WarrantEntry where
   premises : List Nat
-  revokes : Option Nat := none
+  revokes : Option Nat
   deriving DecidableEq, Repr
 
 def warrantRevoked (log : List WarrantEntry) (i : Nat) : Bool :=
@@ -10,28 +10,29 @@ def warrantRevoked (log : List WarrantEntry) (i : Nat) : Bool :=
 
 def warrantStep
     (log : List WarrantEntry)
-    (live : List Nat)
-    (i : Nat) : List Nat :=
-  match log.get? i with
-  | none => live
-  | some entry =>
-      if entry.revokes.isSome then
-        live
-      else if warrantRevoked log i then
-        live
-      else if entry.premises.all (fun premise => live.contains premise) then
-        live ++ [i]
-      else
-        live
+    (state : Nat × List Nat)
+    (entry : WarrantEntry) : Nat × List Nat :=
+  let i := state.1
+  let live := state.2
+  let nextLive :=
+    if entry.revokes.isSome then
+      live
+    else if warrantRevoked log i then
+      live
+    else if entry.premises.all (fun premise => live.contains premise) then
+      live ++ [i]
+    else
+      live
+  (i + 1, nextLive)
 
 def warrantLive (log : List WarrantEntry) : List Nat :=
-  (List.range log.length).foldl (warrantStep log) []
+  (log.foldl (warrantStep log) (0, [])).2
 
 def warrantBaseline : List WarrantEntry := [
-  ⟨[]⟩,
-  ⟨[0]⟩,
-  ⟨[1]⟩,
-  ⟨[]⟩
+  ⟨[], none⟩,
+  ⟨[0], none⟩,
+  ⟨[1], none⟩,
+  ⟨[], none⟩
 ]
 
 def warrantRevokedFixture : List WarrantEntry :=
