@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "problem": "partition",
+  "protected_consequence": "kernel-replay instruction cost after universal proof and canonical acceptance",
+  "practice_cohort": {
+    "id": "sair-playground-grouped-practice-v1-partition-14-22-32",
+    "metric": "perf_instructions",
+    "measurement_contract": "kernel-replay-v2",
+    "protocol": "KTP/3",
+    "cases": ["P1:0@n=14", "P2:0@n=22", "P3:0@n=32"],
+    "official": false,
+    "scoreable": false
+  },
+  "candidates": {
+    "v4-rowdp": {
+      "universal_proof": true,
+      "canonical_accepted": true,
+      "local_proxy_seconds": 1.877882057,
+      "external": {
+        "run_id": 191,
+        "values": [487757592, 1395165807, 3470753040],
+        "total": 5353676439
+      }
+    },
+    "v5-natfold": {
+      "universal_proof": true,
+      "canonical_accepted": true,
+      "local_proxy_seconds": 1.311141315,
+      "external": {
+        "run_id": 198,
+        "values": [396369526, 1167256227, 2982486899],
+        "total": 4546112652,
+        "improvement_vs_v4_fraction": 0.15084284532347322
+      }
+    },
+    "v6-streaming-list": {
+      "universal_proof": true,
+      "canonical_accepted": true,
+      "local_proxy_seconds": 1.455617047,
+      "external": null,
+      "external_attempt": "HTTP 429 before evaluator run creation; solution 215 saved, no scientific verdict"
+    },
+    "v7-array-streaming": {
+      "universal_proof": true,
+      "canonical_accepted": true,
+      "local_proxy_seconds": 4.648955425,
+      "external": null
+    }
+  },
+  "frontier_reference": {
+    "leaderboard_total_instructions": 1440474,
+    "observed_at": "2026-09-22T00:17:00+12:00",
+    "source": "user-supplied leaderboard screenshot",
+    "same_cohort_as_practice": false,
+    "allowed_use": "qualitative frontier signal only; do not divide practice totals by this value as an official performance ratio"
+  },
+  "decision": {
+    "protected_champion": "v5-natfold",
+    "v6": "REJECT_REGRESSION on local proxy; external PMU unmeasured",
+    "v7": "REJECT_REGRESSION on local proxy",
+    "residual": "V5 improves the same-plan external PMU consequence but remains far from a separately measured leaderboard frontier; representation search remains open"
+  }
+}

@@ -1,0 +1,92 @@
+name: Metatron Lean Kernel Frontier V0
+
+on:
+  push:
+    branches: [metatron-lkc-frontier-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate Metatron V0 evidence
+        run: |
+          python scripts/check_manifest.py
+          python -m unittest tests.test_manifest -v
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Fetch pinned Mathlib
+        run: |
+          lake update
+          lake exe cache get
+
+      - name: Reject local proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|constant|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+
+      - name: Build Lean reference semantics
+        run: |
+          lake build Metatron
+          lake build metatron_reference
+          lake env lean formal/Metatron/FixtureTest.lean
+
+      - name: Run full V0 plus Lean Kernel adapter tests
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Write external-wedge attestation
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          record = {
+              "schema_version": 1,
+              "head_sha": os.environ["GITHUB_SHA"],
+              "workflow_run": {
+                  "id": int(os.environ["GITHUB_RUN_ID"]),
+                  "url": (
+                      f'{os.environ["GITHUB_SERVER_URL"]}/'
+                      f'{os.environ["GITHUB_REPOSITORY"]}/actions/runs/'
+                      f'{os.environ["GITHUB_RUN_ID"]}'
+                  ),
+                  "conclusion": "success",
+              },
+              "metatron_v0": {
+                  "qualified_implementation_sha": "a5b20287ec79f7ad9d51e90c6a72160426a88bc0",
+                  "evidence_closure_sha": "e0a00c03719ab9cc7ecb03b805e3169c8ff6933a",
+              },
+              "external_wedge": {
+                  "name": "Lean Kernel Partition frontier trace V0",
+                  "record": "benchmarks/lean_kernel/records/partition-v4-v7.json",
+                  "claim": (
+                      "Comparable external measurements are promoted only within "
+                      "the same frozen metric/cohort/case plan; proxy regressions "
+                      "may reject candidates but cannot promote them."
+                  ),
+              },
+          }
+          Path("/tmp/metatron-lkc-frontier-v0.json").write_text(
+              json.dumps(record, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+
+      - name: Upload external-wedge attestation
+        uses: actions/upload-artifact@v4
+        with:
+          name: metatron-lkc-frontier-v0
+          path: /tmp/metatron-lkc-frontier-v0.json
+          if-no-files-found: error
