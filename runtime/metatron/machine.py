@@ -15,6 +15,7 @@ from .model import (
     table_digest,
 )
 
+
 def closure(tables) -> frozenset[Table]:
     known = set(tables)
     changed = True
@@ -29,12 +30,15 @@ def closure(tables) -> frozenset[Table]:
                     changed = True
     return frozenset(known)
 
+
 def _tables_digest(tables) -> str:
     payload = b"|".join(bytes(table) for table in sorted(tables))
     return sha256(payload).hexdigest()
 
+
 def authority_digest(active_tables) -> str:
     return _tables_digest(frozenset(active_tables))
+
 
 def certify_no_resolution(active_tables, target):
     active = frozenset(active_tables)
@@ -48,21 +52,27 @@ def certify_no_resolution(active_tables, target):
         authority_digest=authority_digest(active),
     )
 
+
 class UncertifiedResidualError(RuntimeError):
     pass
+
 
 class UnverifiedCertificateError(RuntimeError):
     pass
 
+
 class UnverifiedRelationError(RuntimeError):
     pass
+
 
 class UnknownCapabilityError(KeyError):
     pass
 
+
 def relation_digest(left, right, table) -> str:
     payload = repr((tuple(left), right, tuple(table))).encode()
     return sha256(payload).hexdigest()
+
 
 class Machine:
     def __init__(self) -> None:
