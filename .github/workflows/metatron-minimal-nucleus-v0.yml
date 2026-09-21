@@ -56,9 +56,19 @@ jobs:
               line for line in source
               if line.strip() and not line.lstrip().startswith("#")
           ]
+          qualified_path = Path(
+              "evidence/qualified-runs/minimal-warrant-graph-v0.json"
+          )
+          qualified_sha = None
+          if qualified_path.exists():
+              qualified_sha = json.loads(
+                  qualified_path.read_text()
+              ).get("qualified_implementation_sha")
+
           record = {
               "schema_version": 1,
               "head_sha": os.environ["GITHUB_SHA"],
+              "qualified_implementation_sha": qualified_sha,
               "workflow_run": {
                   "id": int(os.environ["GITHUB_RUN_ID"]),
                   "url": (

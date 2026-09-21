@@ -1,92 +1,98 @@
 # Minimal Warrant Graph V0
 
-Metatron's semantic nucleus is reduced to two runtime concepts:
+Metatron's semantic nucleus has two public runtime concepts:
 
 ```text
 Node(kind, payload, premises)
 WarrantGraph.append(node)
 ```
 
-Everything else is a derived view or an external policy.
+Everything else is either a derived view or an external policy.
 
 ## Law
 
-Every accepted fact is a content-addressed node:
-
-[
-P_1,\ldots,P_n \Longrightarrow C
-]
-
-where `premises` are the IDs of the prerequisite nodes and the node itself is
-the conclusion (C).
-
-The authoritative state is only the append-only node sequence (L). The live
-machine is derived:
-
-[
-M = \operatorname{Live}(L)
-]
-
-A normal node with `kind = "revoke"` and a `target` removes that target from
-the live view. Any descendant whose premises are no longer live disappears from
-the live view as well. Nothing is deleted from history.
-
-## What disappeared from the nucleus
-
-These remain useful domain words, but are no longer required as distinct kernel
-types:
-
-- residual certificate;
-- capability certificate;
-- relation certificate;
-- measurement;
-- candidate;
-- promotion event;
-- stage event;
-- lineage event;
-- dependency index;
-- mutable serialization snapshot.
-
-They are represented by `Node.kind`, `Node.payload`, and `Node.premises`.
-
-For example:
+For a node with premise IDs `P₁ ... Pₙ`, the graph records the warranted edge
 
 ```text
-residual
-   └── verification
-          └── capability
-                 └── relation verification
-                        └── relation
+P₁, ..., Pₙ  ->  C
 ```
 
-is one ordinary dependency DAG. Revoking the capability invalidates the live
-relation automatically while preserving every historical node.
+where `C` is the content-addressed node itself.
 
-## Persistence
-
-The JSONL event log is the sole persisted authority. Startup is replay:
+The authoritative state is one append-only sequence `L`. The active machine
+is derived:
 
 ```text
-events.jsonl -> WarrantGraph.loads -> derived live view
+M = Live(L)
 ```
 
-Indexes, snapshots, reverse dependencies, frontiers, and projections are
-disposable caches.
+A `revoke` node names a target node. The target is absent from the live view,
+and any descendant whose premises cease to be live is absent as well. Historical
+nodes are never deleted.
+
+## One authority, not mirrored stores
+
+The in-memory authority is one immutable tuple, `WarrantGraph._log`.
+The persisted authority is canonical JSONL replay of that same log.
+
+There is no authoritative capability map, certificate map, residual store,
+relation store, revocation set, lineage list, dependency index, frontier, or
+snapshot. Such structures may be derived and discarded.
+
+Reverse dependencies, affected cones, and history digests live in
+`runtime/metatron/views.py`; they are explicitly not authority.
+
+## What was removed
+
+The earlier V0 runtime represented capabilities, certificates, residual
+certificates, relations, lineage events, query state and serialization
+snapshots as separate mutable structures.
+
+A graph-backed compatibility implementation reduced all of those to derived
+views over one warrant graph and passed the retained lifecycle and historical
+suite at:
+
+```text
+commit 1191b06b17a28dbc29de37e8ba72f67cbe3d2598
+run    35655948565
+```
+
+That result is sealed in
+`evidence/qualified-runs/graph-backed-v0-compat.json`.
+
+After that gate, the duplicated compatibility facade and its old finite-fixture
+runtime were deleted from this branch. Git history remains the provenance.
+
+## Formal reference
+
+`formal/Metatron/WarrantGraph.lean` independently defines the live-log rule
+using abstract numeric node positions and proves the retained fixture facts:
+
+- without revocation, a dependency chain and an independent node are live;
+- revoking the middle node cuts its dependent suffix from the live view;
+- revocation appends history rather than deleting it.
+
+The Python/Lean differential gate compares the two live views.
+
+The formal reference uses Lean core only. Mathlib is not required.
+
+## Hard budget
+
+`runtime/metatron/nucleus.py` is guarded by CI:
+
+- Python standard library only;
+- at most 120 nonblank, noncomment lines.
+
+The qualified implementation has 114 such lines and is 4,253 bytes. The whole
+runtime package (`__init__.py`, `nucleus.py`, `views.py`) is 5,672 bytes.
 
 ## External systems
 
-Lean, cvc5, egglog, LeanDojo, FloatLib, SAIR evaluators, agents, and laboratory
-systems stay outside the nucleus. They may search, propose, verify, or measure.
-Their accepted outputs become nodes.
+LeanDojo, cvc5, egglog, FloatLib, SAIR evaluators, agents, theorem provers,
+optimizers, and laboratory systems stay outside the nucleus.
 
-The nucleus does not know how a theorem was discovered or how a benchmark was
-run. It knows only the warranted record and its dependencies.
-
-## Development policy stays outside
-
-The Lean Kernel V8 -> V9 -> V10 staging controller remains valid, but it is a
-policy over warranted candidate and measurement nodes, not a primitive semantic
-object.
+They can search, propose, verify, or measure. Metatron stores only accepted
+warranted consequences and dependencies.
 
 Thus:
 
@@ -94,46 +100,19 @@ Thus:
 truth / warrant != search policy != execution strategy
 ```
 
-Changing the policy does not rewrite history.
+The Lean Kernel V8 -> V9 -> V10 controller remains a useful external example:
+local contenders can be collapsed before spending scarce external measurement,
+without turning staging policy into trusted semantics.
 
-## Hard budget
+## Qualified implementation
 
-`runtime/metatron/nucleus.py` is guarded by a test requiring:
+The minimal implementation qualified at:
 
-- standard-library imports only;
-- no more than 120 nonblank, noncomment lines.
+```text
+commit 1d0d962fc3d8894804ced6b510cfaa0f25d10f06
+run    35657194138
+artifact metatron-minimal-nucleus-v0
+```
 
-The existing V0 runtime and Lean Kernel controller are retained on this branch
-as compatibility/reference layers while the warrant graph is qualified. They
-are not part of the proposed minimal trusted nucleus.
-
-## Qualification target
-
-This branch is successful when the full historical suite stays green and the
-new tests establish:
-
-1. canonical content addressing;
-2. fail-closed unknown premises;
-3. complete V0 lifecycle using one node type;
-4. dependency-cone invalidation on revocation;
-5. exact JSONL replay;
-6. tamper detection;
-7. Lean Kernel evidence represented without kernel-specific types;
-8. the explicit size/dependency budget.
-
-
-## Graph-backed compatibility
-
-The former V0 `Machine` API is now a compatibility facade over the warrant
-graph. Its instance dictionary contains only `graph`; legacy capability,
-certificate, residual, relation, query, partition, revocation and lineage
-stores are recomputed from the log.
-
-The old serialization snapshot has also been removed from authority:
-`dump_machine` is exactly the canonical graph JSONL and `load_machine`
-is graph replay.
-
-A causal-equivalence gate freezes the retained V0 lifecycle and simultaneously
-checks the stronger live-view rule: revoking a capability warrant removes its
-dependent relation from active closure while preserving the historical
-relation record.
+The committed qualification record names that implementation head. A later
+workflow artifact attests the evidence-closure head, avoiding self-reference.

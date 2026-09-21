@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "name": "Metatron Minimal Warrant Graph V0",
+  "status": "QUALIFIED_IMPLEMENTATION",
+  "qualified_implementation_sha": "1d0d962fc3d8894804ced6b510cfaa0f25d10f06",
+  "qualified_implementation_run": {
+    "id": 35657194138,
+    "conclusion": "success",
+    "url": "https://github.com/metalogiclabs/metatron/actions/runs/35657194138"
+  },
+  "artifact": {
+    "id": 10665711362,
+    "name": "metatron-minimal-nucleus-v0",
+    "digest": "sha256:58f75b1cb783d38de852135c0cf148260085f211e8f8844ec6ce6bf42dae251e"
+  },
+  "nucleus": {
+    "file": "runtime/metatron/nucleus.py",
+    "bytes": 4253,
+    "semantic_lines": 114,
+    "line_budget": 120,
+    "runtime_package_bytes": 5672,
+    "public_runtime_types": ["Node", "WarrantGraph"],
+    "primitive_mutation": "WarrantGraph.append(Node)",
+    "authoritative_in_memory_store": "immutable WarrantGraph._log tuple",
+    "authoritative_persistence": "canonical JSONL warrant log",
+    "runtime_dependencies": "Python standard library only",
+    "formal_reference": "formal/Metatron/WarrantGraph.lean",
+    "formal_dependencies": "Lean core only"
+  },
+  "compatibility_bridge": {
+    "record": "evidence/qualified-runs/graph-backed-v0-compat.json",
+    "commit": "1191b06b17a28dbc29de37e8ba72f67cbe3d2598",
+    "run_id": 35655948565
+  },
+  "claim": "Metatron's sole runtime authority can be reduced to one content-addressed append-only warrant log with dependency-sensitive live closure and revocation, while the retained V0 behavior is preserved by a separately qualified compatibility bridge.",
+  "evidence_closure": {
+    "mode": "external_workflow_artifact",
+    "artifact_name": "metatron-minimal-nucleus-v0",
+    "note": "The evidence-closure commit cannot contain its own future SHA. The final workflow artifact attests that head and binds it to qualified_implementation_sha."
+  }
+}
