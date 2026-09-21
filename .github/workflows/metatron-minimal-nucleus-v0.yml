@@ -74,10 +74,10 @@ jobs:
               "nucleus": {
                   "file": "runtime/metatron/nucleus.py",
                   "semantic_lines": len(semantic_lines),
-                  "line_budget": 180,
+                  "line_budget": 120,
                   "runtime_dependencies": "python-standard-library-only",
                   "authoritative_persistence": "canonical-jsonl-event-log",
-                  "primitive_runtime_types": ["Node", "WarrantGraph"],
+                  "primitive_runtime_types": ["Node", "WarrantGraph"],\n                  "authoritative_in_memory_store": "WarrantGraph._log",
                   "primitive_mutation": "WarrantGraph.append(Node)",
               },
           }
