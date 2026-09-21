@@ -1,0 +1,28 @@
+{
+  "claim": "Metatron runtime authority is a pure immutable tuple of content-addressed warranted nodes; append is the only state transition, and live closure/revocation are derived.",
+  "name": "Metatron Minimal Warrant Log \u2014 Pure Immutable Head",
+  "nucleus": {
+    "authoritative_state": "immutable tuple[Node, ...]",
+    "file": "runtime/metatron/nucleus.py",
+    "formal_dependencies": "Lean core only",
+    "formal_reference": "formal/Metatron/WarrantGraph.lean",
+    "line_budget": 120,
+    "primitive_transition": "append(Log, Node) -> Log",
+    "public_runtime_types": [
+      "Node",
+      "Log (tuple alias)"
+    ],
+    "runtime_dependencies": "python-standard-library-only",
+    "semantic_lines": 119,
+    "sha256": "13f840fa61ef28803a17a7a7266f80e19fdcbdde90703969dbd83f232f44300d"
+  },
+  "previous_qualified_implementation_sha": "1d0d962fc3d8894804ced6b510cfaa0f25d10f06",
+  "qualified_implementation_run": {
+    "conclusion": "success",
+    "id": 35666760422,
+    "url": "https://github.com/metalogiclabs/metatron/actions/runs/35666760422"
+  },
+  "qualified_implementation_sha": "5934c0f193fb8121ffe5317088bcdbea80b1bedb",
+  "schema_version": 1,
+  "status": "QUALIFIED_IMPLEMENTATION"
+}
