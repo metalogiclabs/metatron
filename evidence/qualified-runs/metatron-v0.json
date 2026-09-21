@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "name": "Metatron V0",
+  "status": "QUALIFIED_IMPLEMENTATION",
+  "qualified_implementation_sha": "a5b20287ec79f7ad9d51e90c6a72160426a88bc0",
+  "qualified_implementation_run": {
+    "id": 35611623257,
+    "conclusion": "success",
+    "url": "https://github.com/metalogiclabs/metatron/actions/runs/35611623257"
+  },
+  "evidence_closure": {
+    "mode": "external_workflow_artifact",
+    "artifact_name": "metatron-v0-evidence-closure",
+    "note": "The evidence-closure commit cannot contain its own future SHA/run. Its exact SHA is attested externally by the final workflow artifact."
+  },
+  "claim": "Finite proof-carrying developmental lifecycle: exact obstruction, issued residual warrant, verifier-bound capability promotion, earned relation, query-relative compression, deterministic restart, revocation, and regrowth.",
+  "excluded_claims": [
+    "GeneratedCongruence(Omega_earned) = PathBehEq",
+    "residualAdjoin_strictLyapunov",
+    "nonlinear support/recombination",
+    "dependency-driven Flash reclosure",
+    "full (state, value, warrant, residual) execution interface",
+    "unrestricted self-improvement",
+    "infinite productivity"
+  ]
+}

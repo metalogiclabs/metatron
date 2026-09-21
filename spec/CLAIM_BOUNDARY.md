@@ -1,6 +1,6 @@
 # Claim Boundary
 
-## Intended V0 qualified claim
+## V0 qualified implementation claim
 
 A finite proof-carrying developmental computer can certify an exact capability
 obstruction, verify and promote a fresh capability, retain append-only lineage,
