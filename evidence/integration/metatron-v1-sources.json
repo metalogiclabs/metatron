@@ -30,9 +30,28 @@
     "authority": "external_evidence_policy"
   },
   "integration_theorem": {
-    "file": "formal/Metatron/ResidualBasis.lean",
-    "bridge": "certifiedResidualBasis_closes",
-    "minimality": "minimumResidualBasis_minimalSufficient"
+    "additive_file": "formal/Metatron/ResidualBasis.lean",
+    "additive_bridge": "certifiedResidualBasis_closes",
+    "additive_minimality": "minimumResidualBasis_minimalSufficient",
+    "interaction_file": "formal/Metatron/ResidualInteractions.lean",
+    "interaction_bridge": "generatedResidualBasis_closes",
+    "interaction_minimality": "minimumGeneratedBasis_minimalSufficient"
   },
-  "integration_rule": "No source component other than the immutable warrant log becomes trusted runtime authority."
+  "integration_rule": "No source component other than the immutable warrant log becomes trusted runtime authority.",
+  "interaction_semantics": {
+    "source_branch": "metatron-v1-integration",
+    "source_head": "0d64de313559f3142a485546303b30d8cb7ae8c7",
+    "qualification_run": 35776238725,
+    "bridge": "generatedResidualBasis_closes",
+    "minimality": "minimumGeneratedBasis_minimalSufficient",
+    "authority": "derived_formal_semantics"
+  },
+  "synergy_falsifier": {
+    "source_branch": "residual-synergy-falsifier-v0",
+    "source_head": "52b720a3ecaf3b3f88595b402c785fd9c5308e5e",
+    "qualification_run": 35774746265,
+    "theorem": "ordinarySingletonCover_fails",
+    "positive": "jointBasis_sufficient",
+    "authority": "derived_falsification_evidence"
+  }
 }
