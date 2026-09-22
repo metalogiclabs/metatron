@@ -184,27 +184,50 @@
     },
     "sha256": {
       "champion": {
-        "name": "v23-frozen"
+        "name": "v25-deferred-normalization-interaction",
+        "repo": "heathsanchez/test",
+        "branch": "lkc-sha-v24-interaction-v25",
+        "commit": "19b4778affad6be8f37f0458dd773341bee32b8a",
+        "qualification_run": 35790009363,
+        "source_sha256": "975d7e6a5c402d565b2976e29a04baa6fd6af1eb868ada12859b006609eb3c3f",
+        "universal_proof": true,
+        "canonical_accepted": true,
+        "runtime_lineage": "v24-deferred-normalization",
+        "local_screen_improvement_pct": 7.439026002209792,
+        "proof_representation": "compositional Mod32Eq interaction shadow"
       },
-      "probe": {
-        "name": "v24-deferred-normalization",
-        "branch": "lkc-flash2-sha-v24",
-        "commit": "f55bae277f4d0aa01718140e5b36bdacba06934a",
-        "proof_status": "unqualified",
-        "screen_run": 35672052561,
-        "comparable_wall_time_improvement_pct": 7.439026002209792
+      "external_champion": {
+        "name": "v25-deferred-normalization-interaction",
+        "external_run_id": 215,
+        "github_run_id": 35790311048,
+        "source_sha256": "975d7e6a5c402d565b2976e29a04baa6fd6af1eb868ada12859b006609eb3c3f",
+        "cohort_id": "sair-playground-grouped-practice-v1-sha256",
+        "metric": "perf_instructions",
+        "measurement_contract": "kernel-replay-v2",
+        "protocol": "KTP/3",
+        "case_values": {
+          "H1:0@4-steps": 440024031,
+          "H2:0@32-steps": 3464313756,
+          "H3:0@512-steps": 55398034973
+        },
+        "external_total_instructions": 59302372760,
+        "official": false,
+        "scoreable": false,
+        "verdict": "accepted",
+        "final_conclusion": "passed"
       },
-      "status": "SCREEN_WIN_PROOF_REQUIRED"
+      "status": "EXTERNAL_PROMOTE_PRACTICE"
     }
   },
   "next_actions": [
-    "Primecount: qualify the odd-only V6 proof-friendly family and compare it against both V3 and the faster unproved V5; pursue a V5 proof only if it remains the resource leader.",
-    "Partition: V13 remains the external practice champion; V14 closed part-size-3 row now requires a universal closed-form bridge before it can be screened.",
-    "SHA256: continue the V24 deferred-normalization proof bridge; the runtime screen remains materially positive and the current residual is proof normalization only.",
-    "Permanent: V7 exact state-counter is now the external practice champion; use its case-level PMU residual before opening the next representation family.",
-    "Mertens: grouped-quotient recurrence is the live new family; compile and screen before proof.",
-    "Fib: retain V2; shift, shared-pair, and Mathlib fastFib families are all resource-refuted.",
+    "Primecount: retain exact packed V5 runtime; proof-friendly unconditional V6 is resource-refuted. Complete the least-factor interaction shadow and universal V5 proof, then measure externally.",
+    "Partition: V13 remains the external practice champion; pursue only proof-carrying V14 representations that eliminate more runtime structure than the current three-row compilation.",
+    "SHA256: V25 deferred-normalization plus modular interaction certificate is now the external practice champion; use its PMU vector as the next residual.",
+    "Permanent: V7 exact state-counter remains the external practice champion; use its case-level PMU residual before opening the next representation family.",
+    "Mertens: retain V6; bitset and grouped-quotient families are resource-refuted.",
+    "Fib: retain V2; shift, shared-pair, and Mathlib fastFib families are resource-refuted.",
     "Rule110: retain external V64; radius-2 superstep V65 is resource-refuted.",
-    "Polydisc: retain V3; pursue only a qualitatively different modular/resultant representation."
+    "Polydisc: retain V3; pursue only a qualitatively different modular/resultant representation.",
+    "Search policy: treat runtime and verification/certificate representation as closure-aware interaction units where singleton screening is not semantically complete."
   ]
 }
