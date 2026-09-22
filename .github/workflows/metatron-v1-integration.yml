@@ -6,6 +6,7 @@ on:
       - metatron-v1-integration
       - causal-linearization-invariance-v0
       - causal-trace-quotient-v0
+      - finite-poset-toposort-connectivity-v0
       - main
   workflow_dispatch:
 
@@ -80,6 +81,10 @@ jobs:
           assert d["causal_trace_quotient"]["qualification_run"] == 35796549933
           assert d["causal_trace_quotient"]["execution_theorem"] == "traceEq_preserves_run"
           assert d["causal_trace_quotient"]["topological_theorem"] == "topological_linearizations_equivalent_if_traceConnected"
+          assert d["finite_poset_connectivity"]["source_head"] == "43da18d8317258f7f421d7cea05e1ca844f800ee"
+          assert d["finite_poset_connectivity"]["qualification_run"] == 35798130149
+          assert d["finite_poset_connectivity"]["connectivity_theorem"] == "all_topological_sorts_traceConnected"
+          assert d["finite_poset_connectivity"]["pes_semantic_theorem"] == "pes_all_topological_sorts_semantically_invariant"
           assert d["search_policy"]["authority"] == "external_policy"
           assert d["external_adapter"]["authority"] == "external_evidence_policy"
           print("INTEGRATION_SOURCE_PINS_OK")
@@ -113,6 +118,7 @@ jobs:
           causal=Path("formal/Metatron/CausalRepairCover.lean").read_text()
           linear=Path("formal/Metatron/CausalLinearization.lean").read_text()
           trace=Path("formal/Metatron/CausalTraceQuotient.lean").read_text()
+          poset=Path("formal/Metatron/FinitePosetConnectivity.lean").read_text()
           spec=Path("spec/METATRON_V1_INTEGRATION.md").read_text()
           for name in (
               "certifiedResidualBasis_closes",
@@ -143,9 +149,17 @@ jobs:
               "ab_same_pes_not_trace_quotiented",
           ):
               assert f"theorem {name}" in trace, name
+          for name in (
+              "all_topological_sorts_traceConnected",
+              "posetTrace_to_semanticTrace",
+              "all_topological_sorts_semantically_invariant",
+              "pes_topological_sorts_traceConnected",
+              "pes_all_topological_sorts_semantically_invariant",
+          ):
+              assert f"theorem {name}" in poset, name
           assert "minimum certified causal repair frontier" in spec
           assert "BLIND_CAUSAL_REPAIR_PASS" in spec
-          assert "finite certified commuting trace equivalence" in spec
+          assert "one semantic trace class" in spec
           assert "No generic property of raw storage-graph geometry is promoted to semantics." in spec
           print("METATRON_V1_INTEGRATION_BOUNDARY_OK")
           PY
@@ -167,6 +181,7 @@ jobs:
             "blind_causal_repair_run":35786529656,
             "causal_linearization_run":35789279601,
             "causal_trace_quotient_run":35796549933,
+            "finite_poset_connectivity_run":35798130149,
             "clc_head":"20844ab1c68b8c4f9d6528a191eb136c0bdce791",
             "blind_v3_run":35761034357,
             "minimal_nucleus_run":35764668476,
