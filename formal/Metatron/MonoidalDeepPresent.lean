@@ -50,7 +50,7 @@ theorem flatTrace_interchange_fails :
   intro h
   have ht := congrArg CertifiedMap.trace h
   change [1, 2, 3, 4] = [1, 3, 2, 4] at ht
-  decide
+  simp at ht
 
 /-!
 Concurrency-aware repair.
