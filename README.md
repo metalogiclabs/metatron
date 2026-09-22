@@ -17,24 +17,27 @@ warrant log
   -> continuation-safe behavioral quotient
   -> future-demanded consequential residual
   -> minimum certified causal repair frontier
-  -> finite certified commuting trace quotient
+  -> finite causal quotient over all swap-safe topological schedules
   -> independent verification
   -> warranted promotion
   -> global reclosure
 
-Blind V3 established the arity-one/separable minimum-basis law. Residual Synergy V0 proved that composition can create distinctions absent from every singleton generator. Blind Causal Repair V1 then recovered the exact planted ordered repair prospectively from anonymous consequences alone.
+Blind V3 established the arity-one/separable minimum-basis law. Residual Synergy V0 proved that composition can create distinctions absent from every singleton generator. Blind Causal Repair V1 then recovered the exact minimum ordered repair prospectively from anonymous consequences alone.
 
 Causal Linearization Invariance V0 proved the primitive two-event rule: independent serializations may be identified only when semantic commutation warrants the swap.
 
-Causal Trace Quotient V0 now lifts that law to arbitrary finite chains of certified adjacent swaps. Execution and observation are invariant across the whole trace equivalence class, while the noncommuting A/B same-PES counterexample remains distinct.
+Causal Trace Quotient V0 lifted that law to arbitrary finite chains of certified adjacent swaps.
 
-So the repair representation is no longer a privileged total schedule. It is a certified causal presentation modulo finite certified commuting trace equivalence.
+Finite Poset Topological-Sort Connectivity V0 now closes the combinatorial gap: any two duplicate-free topological schedules of the same finite event set are connected by adjacent swaps of incomparable events. Combined with commutation certificates for every incomparable pair, every legal topological serialization has identical execution semantics.
+
+So the repair representation is no longer a privileged total schedule. It is a certified finite causal presentation modulo all semantically swap-safe topological schedules.
 
 The Lean Kernel eight-lane controller remains the external engineering wedge: proof, measurement, promotion, rejection, and staging stay outside trusted semantics.
 
 See:
 
 - spec/METATRON_V1_INTEGRATION.md
+- spec/FINITE_POSET_TOPOSORT_CONNECTIVITY_V0.md
 - spec/CAUSAL_TRACE_QUOTIENT_V0.md
 - spec/CAUSAL_LINEARIZATION_INVARIANCE_V0.md
 - spec/CAUSAL_REPAIR_COVER_V0.md
