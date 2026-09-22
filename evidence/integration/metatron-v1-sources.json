@@ -56,5 +56,15 @@
     "residual_pair_count": 32,
     "candidate_repair_count": 42,
     "authority": "external_policy_evidence"
+  },
+  "causal_linearization": {
+    "source_branch": "causal-linearization-invariance-v0",
+    "source_head": "4d964e5e2dfb5e83eed8ec20a0bb841fb398f8f6",
+    "qualification_run": 35789279601,
+    "positive_theorem": "independentSwap_invariant_of_commute",
+    "quotient_theorem": "independent_swapSafe_of_commute",
+    "negative_theorem": "causalStructureAlone_not_enough",
+    "negative_swap_theorem": "ab_not_swapSafe",
+    "authority": "derived_formal_semantics"
   }
 }
