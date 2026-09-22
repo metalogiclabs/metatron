@@ -1,0 +1,68 @@
+name: Causal Linearization Invariance V0
+
+on:
+  push:
+    branches: [causal-linearization-invariance-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  theorem-gate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify trusted Nucleus unchanged
+        run: |
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' \
+            formal/Metatron/CausalLinearization.lean
+
+      - name: Build theorem stack
+        run: lake build Metatron
+
+      - name: Run retained Python suite
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Check theorem package
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lean=Path("formal/Metatron/CausalLinearization.lean").read_text()
+          spec=Path("spec/CAUSAL_LINEARIZATION_INVARIANCE_V0.md").read_text()
+          for name in (
+              "independent2LR_certified",
+              "independent2RL_certified",
+              "independentSwap_invariant_of_commute",
+              "independentObservation_invariant_of_commute",
+              "commuting_fixture",
+              "commuting_linearizations_same_state",
+              "commuting_linearizations_same_observation",
+              "ab_independent_same_causal_signature",
+              "ab_independent_lr_separates",
+              "ab_independent_rl_does_not_separate",
+              "ab_actions_do_not_commute",
+              "causalStructureAlone_not_enough",
+              "independent_swapSafe_of_commute",
+              "ab_not_swapSafe",
+          ):
+              assert f"theorem {name}" in lean, name
+          assert "semantic commutation" in spec
+          assert "raw partial-order isomorphism" in spec
+          print("CAUSAL_LINEARIZATION_INVARIANCE_V0_OK")
+          PY
