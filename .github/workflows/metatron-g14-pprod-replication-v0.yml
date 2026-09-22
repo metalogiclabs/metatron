@@ -1,0 +1,88 @@
+name: Metatron G14 PProd Replication V0
+
+on:
+  push:
+    branches: [metatron-g14-pprod-replication-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: metatron-g14-pprod-replication-v0-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CONSTITUTIONAL_BASE_SHA: f7b27b69b78fdc5b7a4e176dc649239f5f6b1aa0
+
+jobs:
+  preregister:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Prove trusted semantics are untouched
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$CONSTITUTIONAL_BASE_SHA" "$GITHUB_SHA"
+          git diff --exit-code "$CONSTITUTIONAL_BASE_SHA" "$GITHUB_SHA" --             runtime formal benchmarks lakefile.lean lean-toolchain             evidence/manifests/dependencies.yaml
+
+      - name: Run G14 contract falsifiers
+        run: python -m unittest tests.test_g14_replication -v
+
+      - name: Run full retained Python suite
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Build untouched Lean-core semantics
+        run: |
+          lake build Metatron
+          lake build metatron_reference
+
+      - name: Emit preregistration certificate
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          spec = Path("spec/G14_PPROD_REPLICATION_V0.md")
+          checker = Path("scripts/check_g14_replication.py")
+          record = {
+              "schema_version": 1,
+              "name": "G14-001 PProd Replication Contract V0",
+              "status": "PREREGISTERED",
+              "contract_head": os.environ["GITHUB_SHA"],
+              "constitutional_base": os.environ["CONSTITUTIONAL_BASE_SHA"],
+              "sealed_g13_head": "6b50ae9d3a5543528ca815b69b423978dee0ab08",
+              "proposed_delta": [
+                  "sort_polymorphic_parameter_and_result_levels"
+              ],
+              "shared_abstraction_promoted": False,
+              "runtime_authority_changed": False,
+              "spec_sha256": hashlib.sha256(spec.read_bytes()).hexdigest(),
+              "validator_sha256": hashlib.sha256(checker.read_bytes()).hexdigest(),
+              "workflow_run": int(os.environ["GITHUB_RUN_ID"]),
+          }
+          out = Path("/tmp/g14-pprod-replication-preregistration.json")
+          out.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
+          print(out.read_text())
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g14-pprod-replication-preregistration
+          path: /tmp/g14-pprod-replication-preregistration.json
+          if-no-files-found: error
