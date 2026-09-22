@@ -1,0 +1,93 @@
+name: Language Genesis V0
+
+on:
+  push:
+    branches: [language-genesis-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: language-genesis-v0-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualification:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify trusted thin waist
+        run: |
+          set -euo pipefail
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "TRUSTED_THIN_WAIST_IDENTICAL"
+
+      - name: Run language-genesis tests
+        run: |
+          python -m unittest tests.test_language_genesis_v0 -v
+
+      - name: Execute language genesis
+        run: |
+          python -m scripts.language_genesis_v0 --out /tmp/language-genesis-v0.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("/tmp/language-genesis-v0.json").read_text())
+          assert d["verdict"] == "PASS_RESIDUAL_DRIVEN_LANGUAGE_GENESIS"
+          p=d["primary"]
+          assert p["selector_parameters"] == ["residual","installed","schemas","dim"]
+          assert p["selector_has_target_argument"] is False
+          assert p["residual_trace"] == [56,24,8,0]
+          assert p["selected_swaps"] == [[0,1],[0,2],[0,3]]
+          assert p["generation_count"] == 3
+          assert p["final_observations"] == [0,1,2,3]
+          assert p["final_residual_count"] == 0
+          assert all(g["current_language_max_gain"] == 0 for g in p["generations"])
+          assert p["restart"]["same_observations"]
+          assert p["restart"]["residual_count"] == 0
+          assert p["semantic_sham"]["same_observations"]
+          assert p["semantic_sham"]["residual_count"] == 0
+          assert p["knockout"]["restores_seed_interface"]
+          assert all(d["schema_rename_control"]["invariants"].values())
+          print("LANGUAGE_GENESIS_PASS")
+          PY
+
+      - name: Reject hidden repair schedule
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          src=Path("scripts/language_genesis_v0.py").read_text()
+          tree=ast.parse(src)
+          fn=next(
+              n for n in tree.body
+              if isinstance(n,ast.FunctionDef) and n.name=="choose_schema"
+          )
+          args=[a.arg for a in fn.args.args]
+          assert args == ["residual","installed","schemas","dim"], args
+          assert "target" not in args
+          for forbidden in ("repair_map","generation_schedule","expected_swap"):
+              assert forbidden not in src
+          print("NO_RESIDUAL_TO_SCHEMA_TABLE")
+          PY
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Build retained theorem stack
+        run: |
+          lake build Metatron.ResidualBasis Metatron.ResidualInteractions
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: language-genesis-v0
+          path: /tmp/language-genesis-v0.json
