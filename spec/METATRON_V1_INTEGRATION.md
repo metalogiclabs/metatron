@@ -56,6 +56,34 @@ The run sealed:
 
 Thus V1 now has both a formal causal-repair semantics and a blind prospective demonstration that order-sensitive missing composition can be recovered from consequence alone inside a declared repair language.
 
+## Linearization quotient boundary
+
+Causal Linearization Invariance V0 tests when the explicit schedule can be forgotten.
+
+For two events with no causal edge, if their actions commute pointwise, Lean proves:
+
+- independentSwap_invariant_of_commute;
+- independentObservation_invariant_of_commute;
+- independent_swapSafe_of_commute.
+
+So semantically independent events may be swapped without changing execution or observation.
+
+But the same-PES A/B falsifier proves:
+
+- causalStructureAlone_not_enough;
+- ab_actions_do_not_commute;
+- ab_not_swapSafe.
+
+The two repairs have the same event carrier and causal signature, yet A->B and B->A differ observationally.
+
+Therefore V1 does **not** quotient all topological sorts of a PES. The canonical repair object is:
+
+[
+	ext{causal structure modulo certified swap-safe linearizations}.
+]
+
+Partial-order isomorphism is insufficient by itself; every erased serialization distinction must be warranted by semantic commutation/independence evidence.
+
 ## Integrated architecture
 
 warrant log
@@ -63,6 +91,7 @@ warrant log
   -> behavioral quotient
   -> future-demanded consequential residual
   -> minimum certified causal repair frontier
+  -> quotient by certified swap-safe linearizations
   -> independent verification
   -> warranted promotion
   -> global reclosure
@@ -82,10 +111,11 @@ The integration preserves distinct roles:
 - singleton hypergraph: arity-one residual search;
 - certified causal repair: compositional repair semantics;
 - port event structure: causal/wiring structure of developmental history;
+- swap-safety certificate: which independent serializations may be identified;
 - benchmark frontier: external engineering policy.
 
 No generic property of raw storage-graph geometry is promoted to semantics.
 
 ## Claim boundary
 
-V1 does not claim unrestricted event-structure invention, tractable minimum repair search in arbitrary large languages, a complete multidimensional cost theory, generic equivalence under all linearizations of arbitrary partial orders, or any enlargement of Nucleus authority.
+V1 does not claim unrestricted event-structure invention, tractable minimum repair search in arbitrary large languages, a complete multidimensional cost theory, generic linearization invariance for arbitrary finite partial orders, Mazurkiewicz trace completeness, confluence, or any enlargement of Nucleus authority.
