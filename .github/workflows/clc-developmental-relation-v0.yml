@@ -52,11 +52,14 @@ jobs:
               "quotientRelation_comp_oplax",
               "quotientRelation_comp_reverse_of_preserves",
               "quotientRelation_comp_eq_of_preserves",
+              "forgetRefinement_id",
+              "forgetRefinement_comp",
           ]:
               assert f"theorem {name}" in lean, name
           assert "total relations" in spec
           assert "backward forgetful surjection" in spec
           assert "oplax" in spec
-          assert "bundled functor structure" in spec
+          assert "inverse system of quotient views" in spec
+          assert "bundled oplax functor structure" in spec
           print("DEVELOPMENTAL_RELATION_CLAIM_BOUNDARY_OK")
           PY
