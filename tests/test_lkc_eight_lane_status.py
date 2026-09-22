@@ -14,6 +14,9 @@ class EightLaneStatusTests(unittest.TestCase):
         self.assertEqual(d["lanes"]["permanent"]["status"],"EXTERNAL_PROMOTE_PRACTICE")
         self.assertTrue(d["lanes"]["permanent"]["champion"]["universal_proof"])
         self.assertEqual(d["lanes"]["permanent"]["external_champion"]["external_run_id"],213)
+        self.assertEqual(d["lanes"]["sha256"]["status"],"EXTERNAL_PROMOTE_PRACTICE")
+        self.assertTrue(d["lanes"]["sha256"]["champion"]["universal_proof"])
+        self.assertEqual(d["lanes"]["sha256"]["external_champion"]["external_run_id"],215)
 
 if __name__=="__main__":
     unittest.main()
