@@ -2,55 +2,49 @@
 
 **Metatron is a proof-carrying developmental computer.**
 
-The minimal nucleus is intentionally tiny:
+The trusted runtime is deliberately tiny:
 
 ```text
 Node(kind, payload, premises)
-WarrantGraph.append(node)
+Log = tuple[Node, ...]
+append(Log, Node) -> Log
 ```
 
-A node is content-addressed. The authoritative state is one append-only log.
-The current machine is the deterministic live view of that log: revoked nodes
-and descendants whose premises are no longer live disappear from execution,
-while history remains intact.
+The append-only warrant log is the sole authority. `Live(Log)` derives the
+current machine; revocation retracts authority and dependent consequences
+without deleting history.
 
-## Minimal Warrant Graph V0
+## V1 integrated architecture
 
-Branch: `metatron-minimal-warrant-graph-v0`
+Everything richer remains a derived semantic layer or external policy:
 
-Qualified implementation:
+```text
+warrant log
+  -> lawful future observations
+  -> continuation-safe behavioral quotient
+  -> future-demanded consequential residual
+  -> minimum separating generator frontier (tau)
+  -> independent verification
+  -> warranted promotion
+  -> global reclosure
+```
 
-- commit: `1d0d962fc3d8894804ced6b510cfaa0f25d10f06`
-- run: `35657194138`
-- `runtime/metatron/nucleus.py`: 4,253 bytes / 114 nonblank, noncomment lines
-- complete runtime package: 5,672 bytes
-- Python standard library only
-- Lean core only; Mathlib is not a dependency
-- public runtime types: `Node`, `WarrantGraph`
-- sole authoritative mutation: `WarrantGraph.append(Node)`
+The formal CLC stack now reaches proof-relevant, port-aware finite causal event
+structures. Developmental refinement is relational/oplax in general, with
+canonical backward forgetting maps between refined quotient views.
 
-The qualification record is
-`evidence/qualified-runs/minimal-warrant-graph-v0.json`.
+The separating-hypergraph policy has passed historical, preregistered, and blind
+commit-predict-reveal tests. It is a search policy, **not** trusted authority.
 
-## Compatibility evidence
+The Lean Kernel eight-lane controller is the current external engineering wedge:
+proof, measurement, promotion, rejection, and staging remain cleanly separated
+from semantics.
 
-Before deleting the duplicated V0 runtime facade, the graph-backed replacement
-was run against the retained V0 lifecycle and historical suite. That bridge is
-sealed at commit `1191b06b17a28dbc29de37e8ba72f67cbe3d2598`, run
-`35655948565`, and recorded in
-`evidence/qualified-runs/graph-backed-v0-compat.json`.
+See:
 
-The old `Machine`, capability/certificate stores, mutable snapshot
-serialization, and finite-fixture runtime have therefore been removed from this
-branch. Their qualified history remains in Git and in the evidence records.
-
-## Boundary
-
-Search, theorem proving, optimization, benchmarking, staging, and policy stay
-outside the nucleus. External systems may propose, verify, or measure; accepted
-results enter as warranted nodes.
-
-The Lean Kernel controller remains an external benchmark/policy example, not
-part of Metatron's trusted semantics.
-
-See `docs/minimal-warrant-graph-v0.md`.
+- `docs/minimal-warrant-graph-v0.md`
+- `spec/METATRON_V1_INTEGRATION.md`
+- `spec/CONSTITUTION.md`
+- `spec/CLC_PORT_EVENT_STRUCTURE_V0.md`
+- `spec/SEPARATING_HYPERGRAPH_BLIND_V3_PREREG.md`
+- `benchmarks/lean_kernel/records/eight-lane-status-v1.json`
