@@ -32,13 +32,12 @@ jobs:
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$CONSTITUTIONAL_BASE_SHA" "$GITHUB_SHA"
-          git diff --exit-code "$CONSTITUTIONAL_BASE_SHA" "$GITHUB_SHA" --             runtime formal benchmarks lakefile.lean lean-toolchain             evidence/manifests/dependencies.yaml
+          git diff --exit-code "$CONSTITUTIONAL_BASE_SHA" "$GITHUB_SHA" -- \
+            runtime formal benchmarks lakefile.lean lean-toolchain \
+            evidence/manifests/dependencies.yaml
 
       - name: Run G14 contract falsifiers
         run: python -m unittest tests.test_g14_replication -v
-
-      - name: Run full retained Python suite
-        run: python -m unittest discover -s tests -p 'test_*.py' -v
 
       - name: Install Lean
         run: |
@@ -49,6 +48,9 @@ jobs:
         run: |
           lake build Metatron
           lake build metatron_reference
+
+      - name: Run full retained Python suite
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
 
       - name: Emit preregistration certificate
         run: |
