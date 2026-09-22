@@ -67,15 +67,15 @@ jobs:
           print("INTEGRATION_SOURCE_PINS_OK")
           PY
 
-      - name: Validate retained Python suite
-        run: |
-          python scripts/check_manifest.py
-          python -m unittest discover -s tests -p 'test_*.py' -v
-
       - name: Install Lean
         run: |
           curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Validate retained Python suite
+        run: |
+          python scripts/check_manifest.py
+          python -m unittest discover -s tests -p 'test_*.py' -v
 
       - name: Reject proof placeholders
         run: |
