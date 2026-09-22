@@ -11,7 +11,7 @@ class EightLaneStatusTests(unittest.TestCase):
         self.assertEqual(d["lanes"]["partition"]["status"],"EXTERNAL_PROMOTE_PRACTICE")
         self.assertFalse(d["lanes"]["primecount"]["screen_candidate"]["universal_proof"])
         self.assertEqual(d["lanes"]["mertens"]["status"],"REFUTED_RESOURCE")
-        self.assertEqual(d["lanes"]["permanent"]["status"],"MEASURE_PROBE_FIRST")
+        self.assertEqual(d["lanes"]["permanent"]["status"],"REFUTED_RESOURCE")
 
 if __name__=="__main__":
     unittest.main()

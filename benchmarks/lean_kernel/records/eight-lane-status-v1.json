@@ -113,9 +113,33 @@
         "commit": "216c0e5973e8bd6a66c80e5aa86392a8c8e3bdc9",
         "proof_status": "unqualified",
         "screen_run": 35672093364,
-        "wall_time_improvement_pct": 1.7039125961111123
+        "wall_time_improvement_pct": 1.7039125961111123,
+        "proof_run": 35672522770,
+        "source_sha256": "76432df96c983d05565dc6fb447ff508d571423b52f358299df05347e210c91e",
+        "universal_proof": true,
+        "canonical_accepted": true
       },
-      "status": "SCREEN_WIN_PROOF_IN_PROGRESS"
+      "status": "EXTERNAL_PROMOTE_PRACTICE",
+      "external_champion": {
+        "name": "v64-generic-step-dispatch",
+        "external_run_id": 207,
+        "github_run_id": 35672711729,
+        "source_sha256": "76432df96c983d05565dc6fb447ff508d571423b52f358299df05347e210c91e",
+        "cohort_id": "sair-playground-grouped-practice-v1-ca-rule110",
+        "metric": "perf_instructions",
+        "measurement_contract": "kernel-replay-v2",
+        "protocol": "KTP/3",
+        "case_values": {
+          "C1:0": 2691464,
+          "C2:0": 3344389,
+          "C3:0": 4523000
+        },
+        "external_total_instructions": 10558853,
+        "official": false,
+        "scoreable": false,
+        "verdict": "accepted",
+        "final_conclusion": "passed"
+      }
     },
     "permanent": {
       "champion": {
