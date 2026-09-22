@@ -1,6 +1,6 @@
 # Metatron V1 Integration
 
-**Status:** integration seal / theorem line  
+**Status:** integration candidate / theorem line  
 **Branch:** `metatron-v1-integration`
 
 This branch joins the strongest qualified lines without enlarging the trusted
@@ -8,23 +8,21 @@ Nucleus.
 
 ## Pinned source lines
 
-The exact source heads are recorded in
+Exact heads and qualification runs are recorded in
 `evidence/integration/metatron-v1-sources.json`.
 
 The four roles are:
 
 1. **Minimal Warrant Log** — sole trusted runtime authority.
-2. **CLC Port Event derived semantics** — future-safe identity and
-   proof-relevant causal history.
+2. **CLC Port Event semantics** — future-safe identity and proof-relevant causal history.
 3. **Blind-qualified separating hypergraph** — external repair/search policy.
-4. **Lean Kernel eight-lane adapter** — external proof/measurement/promotion
-   boundary.
+4. **Lean Kernel eight-lane adapter** — external proof/measurement/promotion boundary.
 
 Only (1) is runtime authority.
 
 ## Thin waist
 
-The integration must preserve byte-identical trusted semantics:
+The integration preserves byte-identical trusted semantics:
 
 ```text
 runtime/metatron/nucleus.py
@@ -34,95 +32,82 @@ formal/Metatron/WarrantGraph.lean
   git blob d2affc0a57a1815f303f6f1859941465c69e7d32
 ```
 
+The current pure-log qualification is pinned to implementation
+`13b1f6b52ee4724e33a6063c18c4a105f20bb0bc`, run `35764668476`,
+with 119 semantic lines under the 120-line budget.
+
 No residual store, hypergraph, port-event graph, benchmark frontier, search
-controller, capability map, or external measurement state may become
-authoritative runtime state.
+controller, capability map, or external measurement state becomes authoritative
+runtime state.
 
 ## Integrated developmental picture
 
 For append-only history (L_t),
 
 [
-Gamma_t = operatorname{Live}(L_t).
+Gamma_t=operatorname{Live}(L_t).
 ]
 
-The derived semantics determines lawful future observations and the current
+Derived CLC semantics determines lawful future observations and
 continuation-safe equivalence
 
 [
-R_t = alpha(mu mathcal L_t)=
-u mathcal B_t,
-]
-
-with active interface
-
-[
+R_t=alpha(mumathcal L_t)=
+umathcal B_t,
+qquad
 Q_t=X_t/R_t.
 ]
 
-Given a frozen future-demand target family (T), define the consequential
-residual
+Given a frozen target future relation (T), the consequential residual is the
+set of pairs still identified by the current view but separated by (T).
 
-[
-U(P,T)=
-{{x,y}:xequiv_P ylandexists tin T,;t(x)
-e t(y)}.
-]
+A candidate generator induces a hyperedge over the residual. Search policy may
+retain multiple exact minimum bases; it does not privilege a syntactic realizer
+unless later warranted evidence distinguishes them.
 
-A candidate generator (g) induces the hyperedge
-
-[
-E_g={{x,y}in U(P,T):g(x)
-e g(y)}.
-]
-
-The minimum missing behavioral basis is
-
-[
-	au(P,T)=
-min{|B|:igcup_{gin B}E_g=U(P,T)}.
-]
-
-This determines a **behavioral capability class**, not a privileged syntactic
-realizer. Search policy may retain multiple minimum bases. Independent
-verification and the frozen admissibility order decide which realizer may be
-warranted.
-
-Installation appends warranted causal lineage and triggers derived reclosure.
-For pure refinement, the new view canonically forgets to the old one:
+Independent verification is still required before installation. Installation
+appends warrant lineage and triggers derived reclosure. Under pure refinement,
+the new quotient canonically forgets to the old view:
 
 [
 Q_{t+1}	woheadrightarrow Q_t.
 ]
 
-## Integration theorem target
+## Integration bridge theorem
 
-The first theorem package on this branch is:
+`formal/Metatron/ResidualBasis.lean` now proves
 
 [
-oxed{	exttt{certifiedResidualBasis\_closes}}
+oxed{	exttt{certifiedResidualBasis_closes}}
 ]
 
-with the intended finite statement:
+stating:
 
-> A candidate basis covers every future-demanded residual pair iff adding the
-> basis makes the resulting observational quotient sufficient for the frozen
-> target family.
+> A declared candidate basis covers every future-demanded residual pair iff the
+> relation refined by that basis is sufficient for the frozen target relation.
 
-The minimum-cover corollary should then establish that no smaller candidate
-basis from the declared language can yield target sufficiency.
+It also proves
 
-This is a theorem about the **declared finite candidate language**. It is not a
-claim of unrestricted generator invention.
+[
+oxed{	exttt{minimumResidualBasis_minimalSufficient}}
+]
+
+so exact minimum residual cover transfers directly to minimum target
+sufficiency by basis length.
+
+A positive Boolean fixture and an empty-basis negative fixture are included.
+
+This is the mathematical bridge between CLC's semantics of identity and the
+blind-qualified (	au) search policy.
 
 ## Representation discipline
 
-The integration preserves the distinction between:
+The integration preserves distinct roles:
 
 - warrant DAG — why a result is authorized;
 - behavioral quotient — what may currently be identified;
 - separating hypergraph — what future-demanded distinction is missing;
-- port event structure — how warranted developmental histories compose;
+- port event structure — how warranted histories compose;
 - benchmark frontier — what external candidate should be tested.
 
 No generic property of raw storage-graph geometry is promoted to semantics.
@@ -131,9 +116,9 @@ No generic property of raw storage-graph geometry is promoted to semantics.
 
 V1 integration does not claim:
 
-- open-ended ontology invention;
-- universal minimum repair outside a declared candidate language;
-- generic finite-port-event category laws beyond the qualified fixtures;
+- unrestricted generator invention outside a declared candidate language;
+- universal minimum repair for arbitrary infinite systems;
+- generic category laws for all finite port-event structures;
 - automatic promotion of benchmark candidates;
 - a larger trusted runtime;
-- empirical or ontological conclusions.
+- empirical or ontological universality.
