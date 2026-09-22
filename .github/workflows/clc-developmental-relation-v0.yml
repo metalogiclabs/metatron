@@ -47,7 +47,7 @@ jobs:
               "quotientRelation_not_functional_of_split",
               "forgetRefinement_surjective",
               "forgetRefinement_not_injective_of_strict",
-              "laxFixture_relation_not_functional",
+              "protectedGrowth_relation_not_functional",
           ]:
               assert f"theorem {name}" in lean, name
           assert "total relations" in spec
