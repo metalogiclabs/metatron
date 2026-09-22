@@ -1,0 +1,30 @@
+name: Separating Obstruction Hypergraph V0
+
+on:
+  push:
+    branches:
+      - separating-obstruction-hypergraph-v0
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-finite-diagnostic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run exact hypergraph tests
+        run: python -m unittest discover -s tests -p 'test_separating_obstruction_hypergraph.py' -v
+      - name: Emit exact report
+        run: |
+          python -m scripts.separating_obstruction_hypergraph > separating-obstruction-hypergraph-v0.json
+          cat separating-obstruction-hypergraph-v0.json
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: separating-obstruction-hypergraph-v0
+          path: separating-obstruction-hypergraph-v0.json
