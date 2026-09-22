@@ -93,9 +93,16 @@ A green branch establishes:
 - descent/naturality of exact strict transports through the saturated quotient;
 - preservation of the protected split law after saturation.
 
+The branch also contains `laxRefinement_compatiblePullback_fails`: a concrete
+information-gaining refinement satisfying a one-way information law whose
+target-compatible test pulls back to a source test that is **not** compatible
+with the source behavioral quotient. Thus ordinary saturated reflection does
+not extend to lax developmental refinement merely by weakening equality to
+information refinement.
+
 It does **not** yet establish:
 
-- reflection for information-gaining developmental refinements;
+- the correct enriched/lax universal property for developmental refinements;
 - certificate-object uniqueness/factorization;
 - a reflection theorem for evolving authority snapshots;
 - empirical or ontological conclusions.
