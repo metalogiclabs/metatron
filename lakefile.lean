@@ -7,7 +7,7 @@ package metatron where
 @[default_target]
 lean_lib Metatron where
   srcDir := "formal"
-  roots := #[`Metatron.WarrantGraph]
+  roots := #[`Metatron.WarrantGraph, `Metatron.FutureObservations]
 
 lean_exe metatron_reference where
   srcDir := "formal"
