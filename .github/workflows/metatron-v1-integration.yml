@@ -92,6 +92,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           lean=Path("formal/Metatron/ResidualBasis.lean").read_text()
+          interactions=Path("formal/Metatron/ResidualInteractions.lean").read_text()
           spec=Path("spec/METATRON_V1_INTEGRATION.md").read_text()
           for name in (
               "certifiedResidualBasis_closes",
@@ -100,8 +101,21 @@ jobs:
               "bool_empty_basis_fails",
           ):
               assert f"theorem {name}" in lean, name
+          for name in (
+              "generatedResidualBasis_closes",
+              "minimumGeneratedBasis_minimalSufficient",
+              "atomicGenerated_cover_iff",
+              "synergy_atomic_hypergraph_fails",
+              "synergy_pair_generated_covers",
+              "synergy_pair_target_sufficient",
+              "synergy_pair_is_minimum_generated_basis",
+              "synergy_minimum_target_sufficient",
+          ):
+              assert f"theorem {name}" in interactions, name
           assert "Only (1) is runtime authority." in spec
           assert "mathematical bridge" in spec
+          assert "ordinary hypergraph cover is **not complete" in spec
+          assert "GeneratedSeparates" in spec
           assert "declared candidate language" in spec
           assert "No generic property of raw storage-graph geometry is promoted to semantics." in spec
           print("METATRON_V1_INTEGRATION_BOUNDARY_OK")
@@ -119,6 +133,8 @@ jobs:
             "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
             "trusted_authority":"pure append-only warrant log",
             "bridge_theorem":"certifiedResidualBasis_closes",
+            "interaction_bridge_theorem":"generatedResidualBasis_closes",
+            "synergy_falsifier":"synergy_atomic_hypergraph_fails",
             "clc_head":"20844ab1c68b8c4f9d6528a191eb136c0bdce791",
             "blind_v3_run":35761034357,
             "minimal_nucleus_run":35764668476,
