@@ -3,8 +3,8 @@
 **Status:** theorem experiment  
 **Branch:** `future-observations-galois-v0`
 
-This branch tests three claims that connect Metatron/CLC continuation-safe identity
-to standard observation/equivalence duality.
+This branch tests four claims that connect Metatron/CLC continuation-safe identity
+to observation/equivalence duality and residual-driven refinement.
 
 ## 1. Observation/equivalence Galois law
 
@@ -69,6 +69,30 @@ It does **not** yet prove that the full CLC transport object reflects through th
 quotient. The next question is whether backward test transformers, protected-test
 lifts, and certificate-carrying transport also factor uniquely.
 
+## 4. Residual-driven strict refinement
+
+Let (P_{old}\subseteq P_{new}) be protected-test languages. Because
+`FutureEq` quantifies over protected tests, enlarging the language can only
+refine the continuation-safe relation.
+
+The theorem `residualAdjoin_strictLyapunov` proves the stronger strict case:
+if a newly protected test separates a pair that was continuation-safe equivalent
+before, then
+
+[
+\operatorname{FutureEq}_{new}
+\subsetneq
+\operatorname{FutureEq}_{old}.
+]
+
+This is a genuine Lyapunov descent when the Lyapunov value is taken in the
+poset of continuation-safe relations ordered by refinement.
+
+It is **not yet** the stronger scalar theorem that a chosen natural-number
+defect measure strictly decreases for every admissible residual repair. In finite
+models such a scalar can be obtained from a strictly monotone rank, e.g. pair
+count or partition defect, but that corollary remains a separate theorem.
+
 ## Finite differential fixture
 
 CI independently computes, for the three-state Nucleus Genesis world:
@@ -83,6 +107,8 @@ The two partitions must agree:
 - with only `IS_ZERO`: `((0,), (1,2))`;
 - after protecting `IS_ONE`: `((0,), (1,), (2,))`.
 
+The second case is also the concrete strict-refinement witness.
+
 ## Claim boundary
 
 This branch does not claim:
@@ -90,8 +116,9 @@ This branch does not claim:
 - a full heterogeneous CLC adjunction;
 - categorical reflection of certificate-bearing transports;
 - a universal theorem for arbitrary evolving test languages;
-- `residualAdjoin_strictLyapunov`;
+- a general scalar natural-number Lyapunov theorem for arbitrary repairs;
 - empirical or ontological conclusions.
 
 The proved core is the observation/equivalence law, greatest continuation-safe
-relation theorem, and ordinary quotient universal property.
+relation theorem, ordinary quotient universal property, and strict
+residual-driven refinement in the relation order.
