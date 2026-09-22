@@ -49,11 +49,14 @@ jobs:
               "behavioralQuotientMap_mk",
               "strictTransport_saturatedQuotient_naturality",
               "saturatedProtected_split",
+              "laxRefinement_law",
+              "laxRefinement_compatiblePullback_fails",
           ]:
               assert f"theorem {name}" in lean, name
           assert "full original state-test form does not reflect" in spec
           assert "Galois-closed interface" in spec
           assert "exact strict transports through the saturated quotient" in spec
-          assert "information-gaining developmental refinements" in spec
+          assert "information-gaining refinement" in spec
+          assert "correct enriched/lax universal property" in spec
           print("FIXEDPOINT_REFLECTION_CLAIM_BOUNDARY_OK")
           PY
