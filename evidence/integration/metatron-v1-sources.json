@@ -1,0 +1,27 @@
+{
+  "schema": "metatron.v1.integration.sources.v0",
+  "branch": "metatron-v1-integration",
+  "trusted_core": {
+    "source_branch": "metatron-minimal-warrant-graph-v0",
+    "source_head": "d48d84ad02477bc3bc7793d0e4fffca305aeb503",
+    "runtime_nucleus_blob": "d9d4293e54471714bf098593bf4018c3f6403273",
+    "formal_warrant_graph_blob": "d2affc0a57a1815f303f6f1859941465c69e7d32"
+  },
+  "semantics": {
+    "source_branch": "clc-port-event-structure-v0",
+    "source_head": "20844ab1c68b8c4f9d6528a191eb136c0bdce791"
+  },
+  "search_policy": {
+    "source_branch": "separating-hypergraph-blind-v3",
+    "source_head": "b2dc8d1599add03bf6e6d0a3cd6aa4555257512b",
+    "qualification_run": 35761034357,
+    "verdict": "BLIND_PROSPECTIVE_PASS",
+    "authority": "external_policy"
+  },
+  "external_adapter": {
+    "source_branch": "metatron-lkc-eight-lane-v1",
+    "source_head": "b2d384087e79719f384852688d730cb0d56a1d7d",
+    "authority": "external_evidence_policy"
+  },
+  "integration_rule": "No source component other than the immutable warrant log becomes trusted runtime authority."
+}
