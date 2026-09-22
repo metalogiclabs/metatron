@@ -2,7 +2,9 @@ name: Causal Linearization Invariance V0
 
 on:
   push:
-    branches: [causal-linearization-invariance-v0]
+    branches:
+      - causal-linearization-invariance-v0
+      - main
   workflow_dispatch:
 
 permissions:
