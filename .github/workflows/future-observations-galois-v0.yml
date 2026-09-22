@@ -1,0 +1,125 @@
+name: Future Observations Galois V0
+
+on:
+  push:
+    branches: [future-observations-galois-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: future-observations-galois-v0-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  theorem-gate:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|constant|unsafe)([^[:alnum:]_]|$)' formal/Metatron/FutureObservations.lean
+
+      - name: Build theorem package
+        run: lake build Metatron
+
+      - name: Finite differential fixed-point fixture
+        run: |
+          python - <<'PY'
+          from itertools import product
+
+          states = (0, 1, 2)
+          identity = (0, 1, 2)
+          step = (1, 1, 2)
+
+          def compose(a, b):
+              return tuple(b[a[i]] for i in states)
+
+          def closure(gens):
+              out = set(gens)
+              while True:
+                  nxt = out | {compose(a, b) for a in out for b in out}
+                  if nxt == out:
+                      return tuple(sorted(out))
+                  out = nxt
+
+          conts = closure((identity, step))
+
+          def test(name, x):
+              if name == "IS_ZERO":
+                  return x == 0
+              if name == "IS_ONE":
+                  return x == 1
+              raise KeyError(name)
+
+          def obs_partition(protected):
+              sigs = {}
+              for x in states:
+                  sig = tuple(
+                      test(q, c[x])
+                      for c in conts
+                      for q in protected
+                  )
+                  sigs.setdefault(sig, []).append(x)
+              return tuple(tuple(v) for _, v in sorted(
+                  sigs.items(), key=lambda kv: kv[1][0]
+              ))
+
+          def gfp_partition(protected):
+              rel = {(x, y) for x in states for y in states}
+
+              while True:
+                  nxt = set()
+                  for x, y in rel:
+                      immediate = all(test(q, x) == test(q, y) for q in protected)
+                      stable = all((c[x], c[y]) in rel for c in conts)
+                      if immediate and stable:
+                          nxt.add((x, y))
+                  if nxt == rel:
+                      break
+                  rel = nxt
+
+              blocks = []
+              unseen = set(states)
+              while unseen:
+                  x = min(unseen)
+                  block = tuple(y for y in states if (x, y) in rel and (y, x) in rel)
+                  blocks.append(block)
+                  unseen -= set(block)
+              return tuple(blocks)
+
+          cases = [
+              (("IS_ZERO",), ((0,), (1, 2))),
+              (("IS_ZERO", "IS_ONE"), ((0,), (1,), (2,))),
+          ]
+
+          for protected, expected in cases:
+              lhs = obs_partition(protected)
+              rhs = gfp_partition(protected)
+              assert lhs == expected, (protected, lhs, expected)
+              assert rhs == expected, (protected, rhs, expected)
+              assert lhs == rhs, (protected, lhs, rhs)
+              print(protected, lhs, "OK")
+
+          print("FINITE_ALPHA_MU_EQ_NU_B_OK")
+          PY
+
+      - name: Claim-boundary check
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text = Path("spec/FUTURE_OBSERVATIONS_GALOIS_V0.md").read_text()
+          assert "state-map universal property only" in text
+          assert "full heterogeneous CLC adjunction" in text
+          assert "residualAdjoin_strictLyapunov" in text
+          print("CLAIM_BOUNDARY_OK")
+          PY
