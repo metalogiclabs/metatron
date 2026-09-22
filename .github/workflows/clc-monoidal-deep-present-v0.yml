@@ -43,6 +43,7 @@ jobs:
               "parallelHistory_tensor",
               "flatTrace_interchange_fails",
               "serialParallel_interchange",
+              "layered_async_interchange_fails",
               "causalReentry_feedback",
               "causalReentry_feedback_requires_live_loop",
               "deepPresent_compatibleCone",
@@ -55,6 +56,7 @@ jobs:
           ]:
               assert f"theorem {name}" in lean, name
           assert "flat lists are too strict" in spec
+          assert "partial order / independence" in spec
           assert "compatible-cone interpretation" in spec
           assert "Galois closure" in spec
           assert "full traced-monoidal axioms" in spec
