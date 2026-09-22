@@ -30,7 +30,7 @@ def QuotientRelation
     quotientMap actB evalB protB (mapState x) = qb
 
 def Functional
-    {A B : Type}
+    {A : Type u} {B : Type v}
     (R : A → B → Prop) : Prop :=
   ∀ a b₁ b₂, R a b₁ → R a b₂ → b₁ = b₂
 
@@ -319,22 +319,29 @@ theorem forgetRefinement_not_injective_of_strict
   exact hNew (Quotient.exact hnewq)
 
 /--
-The earlier lax-refinement fixture is genuinely relational: its source
-behavioral class branches into distinct target behavioral classes.
+Concrete boundary-growth witness: the old quotient merges false/true, while
+protecting all tests makes the target quotient distinguish them. The induced
+developmental quotient relation is therefore genuinely one-to-many.
 -/
-theorem laxFixture_relation_not_functional :
+def allTinyProtected (_ : Bool) : Prop := True
+
+theorem tinyAll_not_futureEq :
+    ¬ FutureEq tinyAct tinyEval allTinyProtected false true := by
+  intro h
+  have hnow := h [] true trivial
+  change false = true at hnow
+  cases hnow
+
+theorem protectedGrowth_relation_not_functional :
     ¬ Functional
       (QuotientRelation
-        laxAAct laxAEval laxAProtected
-        laxBAct laxBEval laxBProtected
-        laxMapState) := by
-  apply quotientRelation_not_functional_of_split
-    laxAAct laxAEval laxAProtected
-    laxBAct laxBEval laxBProtected
-    laxMapState false true laxAFutureEq
-  intro h
-  have hnow := futureEq_immediate
-    laxBAct laxBEval laxBProtected () () h () trivial
-  exact Bool.noConfusion hnow
+        tinyAct tinyEval tinyProtected
+        tinyAct tinyEval allTinyProtected
+        (fun x => x)) := by
+  exact quotientRelation_not_functional_of_split
+    tinyAct tinyEval tinyProtected
+    tinyAct tinyEval allTinyProtected
+    (fun x => x)
+    false true tinyFutureEq tinyAll_not_futureEq
 
 end Metatron.DevelopmentalRelation
