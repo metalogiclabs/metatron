@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "experiment": "residual-driven-interface-v0",
+  "implementation_head": "17b0980d3e682d86d1e83afd81d042699eda8366",
+  "qualification_run": 35789492664,
+  "qualification_job": 106954295322,
+  "verdict": "PASS_RESIDUAL_ONLY_NEXT_INTERFACE",
+  "trusted_core": {
+    "runtime_nucleus_blob": "d9d4293e54471714bf098593bf4018c3f6403273",
+    "formal_warrant_graph_blob": "d2affc0a57a1815f303f6f1859941465c69e7d32"
+  },
+  "result": {
+    "state_count": 16,
+    "candidate_atom_count": 8,
+    "generation_count": 3,
+    "residual_trace": [56, 24, 8, 0],
+    "process_sizes": [2, 2, 2],
+    "selector_parameters": ["residual", "installed", "semantics"],
+    "selector_has_target_argument": false,
+    "restart_pass": true,
+    "semantic_sham_pass": true,
+    "g1_knockout_restores_seed": true,
+    "candidate_rename_invariant": true
+  },
+  "claim_boundary": "Finite declared candidate semantics; no unrestricted generator invention or globally optimal multi-generation planning is claimed."
+}
