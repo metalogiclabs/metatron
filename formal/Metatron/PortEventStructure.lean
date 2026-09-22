@@ -5,11 +5,12 @@ namespace Metatron.PortEventStructure
 universe u v w z
 
 /--
-A finite port-aware causal presentation. `beforeB` is interpreted as the
-already-closed strict causal relation on events. The generic constructors below
-work for arbitrary finite event types; well-formedness is tested separately.
+A finite port-aware causal presentation. The explicit event list is the finite
+carrier. `beforeB` is interpreted as the already-closed strict causal relation
+on those events.
 -/
 structure PES (E : Type u) where
+  events : List E
   beforeB : E → E → Bool
   inputPort : E → Option Nat
   outputPort : E → Option Nat
@@ -27,27 +28,25 @@ def portMatch (a b : Option Nat) : Bool :=
 
 def wiredB
     {E : Type u} {F : Type v}
-    [Fintype E] [DecidableEq E]
-    [Fintype F] [DecidableEq F]
+    [DecidableEq E] [DecidableEq F]
     (p : PES E) (q : PES F)
     (a : E) (b : F) : Bool :=
-  Finset.univ.any (fun o =>
+  p.events.any (fun o =>
     leB p a o &&
-      Finset.univ.any (fun i =>
+      q.events.any (fun i =>
         portMatch (p.outputPort o) (q.inputPort i) &&
           leB q i b))
 
 /--
 Serial gluing hides the internal interface. Causal influence crosses only when
-an exposed output port of the left side matches an exposed input port of the
-right side.
+a reachable left output matches a reachable right input.
 -/
 def serial
     {E : Type u} {F : Type v}
-    [Fintype E] [DecidableEq E]
-    [Fintype F] [DecidableEq F]
+    [DecidableEq E] [DecidableEq F]
     (p : PES E) (q : PES F) :
     PES (Sum E F) where
+  events := p.events.map Sum.inl ++ q.events.map Sum.inr
   beforeB := fun x y =>
     match x, y with
     | .inl a, .inl b => p.beforeB a b
@@ -78,6 +77,7 @@ def tensor
     {E : Type u} {F : Type v}
     (p : PES E) (q : PES F) :
     PES (Sum E F) where
+  events := p.events.map Sum.inl ++ q.events.map Sum.inr
   beforeB := fun x y =>
     match x, y with
     | .inl a, .inl b => p.beforeB a b
@@ -97,54 +97,43 @@ def tensor
     | .inr b => q.cert b
 
 def certBefore
-    {E : Type u} [Fintype E] [DecidableEq E]
+    {E : Type u}
     (p : PES E) (ca cb : Nat) : Bool :=
-  Finset.univ.any (fun a =>
+  p.events.any (fun a =>
     (p.cert a == ca) &&
-      Finset.univ.any (fun b =>
+      p.events.any (fun b =>
         (p.cert b == cb) && p.beforeB a b))
 
 def hasInput
-    {E : Type u} [Fintype E] [DecidableEq E]
+    {E : Type u}
     (p : PES E) (c port : Nat) : Bool :=
-  Finset.univ.any (fun e =>
+  p.events.any (fun e =>
     (p.cert e == c) && decide (p.inputPort e = some port))
 
 def hasOutput
-    {E : Type u} [Fintype E] [DecidableEq E]
+    {E : Type u}
     (p : PES E) (c port : Nat) : Bool :=
-  Finset.univ.any (fun e =>
+  p.events.any (fun e =>
     (p.cert e == c) && decide (p.outputPort e = some port))
 
 def causalSignature
-    {E : Type u} [Fintype E] [DecidableEq E]
+    {E : Type u}
     (p : PES E) (ids : List Nat) : List Bool :=
   ids.flatMap (fun a => ids.map (fun b => certBefore p a b))
 
-def inputSignature
-    {E : Type u} [Fintype E] [DecidableEq E]
-    (p : PES E) (ids ports : List Nat) : List Bool :=
-  ids.flatMap (fun c => ports.map (fun k => hasInput p c k))
-
-def outputSignature
-    {E : Type u} [Fintype E] [DecidableEq E]
-    (p : PES E) (ids ports : List Nat) : List Bool :=
-  ids.flatMap (fun c => ports.map (fun k => hasOutput p c k))
-
 def isoCheck
     {E : Type u} {F : Type v}
-    [Fintype E] [DecidableEq E]
-    [Fintype F] [DecidableEq F]
+    [DecidableEq E] [DecidableEq F]
     (p : PES E) (q : PES F)
     (f : E → F) (g : F → E) : Bool :=
-  Finset.univ.all (fun e =>
+  p.events.all (fun e =>
     decide (g (f e) = e) &&
     decide (p.cert e = q.cert (f e)) &&
     decide (p.inputPort e = q.inputPort (f e)) &&
     decide (p.outputPort e = q.outputPort (f e)) &&
-    Finset.univ.all (fun e' =>
+    p.events.all (fun e' =>
       decide (p.beforeB e e' = q.beforeB (f e) (f e')))) &&
-  Finset.univ.all (fun x => decide (f (g x) = x))
+  q.events.all (fun x => decide (f (g x) = x))
 
 /-!
 Non-series-parallel finite DAG fixtures.
@@ -153,6 +142,7 @@ Non-series-parallel finite DAG fixtures.
 def diamond
     (base inPort outPort : Nat) :
     PES (Fin 4) where
+  events := [0, 1, 2, 3]
   beforeB := fun a b =>
     decide (
       (a.val = 0 ∧ b.val = 1) ∨
@@ -167,6 +157,7 @@ def diamond
 def fork3
     (base inPort outPort : Nat) :
     PES (Fin 3) where
+  events := [0, 1, 2]
   beforeB := fun a b =>
     decide (
       (a.val = 0 ∧ b.val = 1) ∨
@@ -178,6 +169,7 @@ def fork3
 def chain3
     (base inPort outPort : Nat) :
     PES (Fin 3) where
+  events := [0, 1, 2]
   beforeB := fun a b =>
     decide (
       (a.val = 0 ∧ b.val = 1) ∨
@@ -265,6 +257,7 @@ composition.
 -/
 
 def atomPES (cert inPort outPort : Nat) : PES Unit where
+  events := [()]
   beforeB := fun _ _ => false
   inputPort := fun _ => some inPort
   outputPort := fun _ => some outPort
@@ -274,9 +267,9 @@ def supportA := serial (atomPES 11 1 2) (atomPES 22 2 3)
 def supportB := serial (atomPES 12 1 2) (atomPES 22 2 3)
 
 def liveB
-    {E : Type u} [Fintype E] [DecidableEq E]
+    {E : Type u}
     (revoked : Nat) (p : PES E) : Bool :=
-  Finset.univ.all (fun e => decide (p.cert e ≠ revoked))
+  p.events.all (fun e => decide (p.cert e ≠ revoked))
 
 theorem revocation_selective :
     liveB 11 supportA = false ∧
