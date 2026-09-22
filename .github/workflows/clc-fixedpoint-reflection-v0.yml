@@ -1,0 +1,54 @@
+name: CLC Fixed-Point Reflection V0
+
+on:
+  push:
+    branches: [clc-fixedpoint-reflection-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clc-fixedpoint-reflection-v0-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  theorem-gate:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' \
+            formal/Metatron/FixedPointReflection.lean
+
+      - name: Build theorem package
+        run: lake build Metatron
+
+      - name: Check theorem names and claim boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lean = Path("formal/Metatron/FixedPointReflection.lean").read_text()
+          spec = Path("spec/CLC_FIXEDPOINT_REFLECTION_V0.md").read_text()
+          for name in [
+              "muObs_fixed",
+              "muObs_least",
+              "nuB_fixed",
+              "alpha_mu_eq_nu_b",
+              "fullEvaluatorDescent_impossible",
+              "compatibleQuotientEval_mk",
+          ]:
+              assert f"theorem {name}" in lean, name
+          assert "full original state-test form does not reflect" in spec
+          assert "Galois-closed interface" in spec
+          print("FIXEDPOINT_REFLECTION_CLAIM_BOUNDARY_OK")
+          PY
