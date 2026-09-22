@@ -7,7 +7,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from runtime.metalogic.nucleus import Node, append, dumps, live, loads
+from runtime.metatron.nucleus import Node, append, dumps, live, loads
 
 
 State = int
