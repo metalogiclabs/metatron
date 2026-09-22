@@ -62,6 +62,9 @@ jobs:
           assert d["search_policy"]["qualification_run"] == 35761034357
           assert d["search_policy"]["verdict"] == "BLIND_PROSPECTIVE_PASS"
           assert d["external_adapter"]["source_head"] == "b2d384087e79719f384852688d730cb0d56a1d7d"
+          assert d["causal_repair"]["source_head"] == "31dfdef5f733455037df200256c3b487c6a38aae"
+          assert d["causal_repair"]["qualification_run"] == 35776123412
+          assert d["causal_repair"]["theorem"] == "causalRepairCover_iff_targetSufficient"
           assert d["search_policy"]["authority"] == "external_policy"
           assert d["external_adapter"]["authority"] == "external_evidence_policy"
           print("INTEGRATION_SOURCE_PINS_OK")
@@ -91,18 +94,24 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          lean=Path("formal/Metatron/ResidualBasis.lean").read_text()
+          additive=Path("formal/Metatron/ResidualBasis.lean").read_text()
+          causal=Path("formal/Metatron/CausalRepairCover.lean").read_text()
           spec=Path("spec/METATRON_V1_INTEGRATION.md").read_text()
           for name in (
               "certifiedResidualBasis_closes",
               "minimumResidualBasis_minimalSufficient",
-              "bool_singleton_basis_covers",
-              "bool_empty_basis_fails",
           ):
-              assert f"theorem {name}" in lean, name
-          assert "Only (1) is runtime authority." in spec
-          assert "mathematical bridge" in spec
-          assert "declared candidate language" in spec
+              assert f"theorem {name}" in additive, name
+          for name in (
+              "causalRepairCover_iff_targetSufficient",
+              "minimumCausalRepair_minimalSufficient",
+              "singleton_support_is_arity_one",
+              "ab_causal_repair_covers",
+              "ba_causal_repair_fails_cover",
+          ):
+              assert f"theorem {name}" in causal, name
+          assert "minimum certified causal repair frontier" in spec
+          assert "arity-one/separable special case" in spec
           assert "No generic property of raw storage-graph geometry is promoted to semantics." in spec
           print("METATRON_V1_INTEGRATION_BOUNDARY_OK")
           PY
@@ -118,7 +127,9 @@ jobs:
             "head_sha":os.environ["GITHUB_SHA"],
             "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
             "trusted_authority":"pure append-only warrant log",
-            "bridge_theorem":"certifiedResidualBasis_closes",
+            "bridge_theorem":"causalRepairCover_iff_targetSufficient",
+            "additive_special_case":"certifiedResidualBasis_closes",
+            "causal_repair_run":35776123412,
             "clc_head":"20844ab1c68b8c4f9d6528a191eb136c0bdce791",
             "blind_v3_run":35761034357,
             "minimal_nucleus_run":35764668476,
