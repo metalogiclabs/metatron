@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "status": "BOUNDED_POSITIVE",
+  "name": "Sustained Nebula Ignition V41R1",
+  "claim": "Bounded three-generation endogenous developmental recurrence under frozen food/trust and developmental law.",
+  "source": {
+    "repo": "metalogiclabs/mathgraph-lean-kernel",
+    "branch": "msi-sustained-nebula-ignition-v41r1",
+    "commit": "c9d2d6f868f449e35568d6014b8f45d3094e465a",
+    "run_id": 35673648421,
+    "artifact_id": 10672716409,
+    "artifact_sha256": "dd6f021fb5d426189db72135459e2672d74400705e8d9da0ea4060980b45ba40"
+  },
+  "frozen": {
+    "food_sha256": "b407306c209280ac51cd43cc1724a0b9a578cff0758e225328dc655fb7561dba",
+    "developmental_law_sha256": "966f773b425a6556c55ad71d2c9ab54311bd7d730fbae864abf36f0c96c6eaf9",
+    "pinned_base_sha": "08ddb26718c86213262943ca19ae8cf1b03fa922",
+    "corpus_sha256": {
+      "acquisition_std2m": "161c5eb5dfc5defe8dff691ff0c0f483b540ccc0931d4672c03b477e7c393e26",
+      "heldout_std3m": "0f53817a11cd7f5fb7fc8ec2737114e5f5504cd3dec08f2651a94032431ab2b5",
+      "heldout_cedar1m": "4a47d2fcfd85aba27dcae0a4da1c0c5f0918141736ea41a43cfcfc72643b65ac"
+    },
+    "n2_infer_sha256": "85ac6e5848f4b1c5195d82a2aff1af0694c6a496508d9bd6a1ade19beee52c3a",
+    "g3_selection_sha256": "20c785abdd6eeab7f0d9f6cd86a4ec0e25b67a70e14a1f9f9d7acf827abb4610",
+    "g3_preintervention_opportunities": 2652314,
+    "developmental_scripts_sha256": {
+      "apply_msi_semantic_rediscovery_frontier_v36.py": "0a7c7d05beaed6ea43dbc02910375774854c1b4d428c5a8686a63e3d9b93270b",
+      "select_blind_kernel_interface_v38.py": "28cbff67e337be8c5d8c013a1ec0e41ed51fe373a8d36b2c05aaf915017a19ef",
+      "apply_blind_kernel_interface_v38.py": "db09c7c3e9a43da084e7896731fc115fa03ffe2832875481b3f6d3b2890f5769",
+      "apply_msi_sort_interface_regenesis_v37.py": "dcb2bc4c5cb07745e75cfb346ec9e6738ef87fe78f43b696b19078cbf715802e",
+      "apply_post_g1_residual_probe_v41.py": "daea2cd7f0ed9ac612f146b36864dbb84c9e1e29a77629f41ba8352c4f89f5b4",
+      "select_g2_realizer_v41.py": "ba0e9d992f8efb7b2db6b6c6f4cb5b4bb64d4e5ee6927afd7865ced62c4b8b71",
+      "apply_recursive_second_interface_v40.py": "055eb6c8159e3d72505051e2afddd1272f76992109f014cd1177cd6194d04779",
+      "apply_post_g2_continuation_probe_v41.py": "fb606b00b3d378967311e4ec2f467919c87be069c532ae8bdd04c90ca52e2f87",
+      "select_g3_realizer_v41.py": "dd6b4108f155d24eb126ad8839e731dd888dcf9f840e587e1267159aed488c87",
+      "apply_g3_realizer_v41.py": "177e1a9382baaaf1e6bf04e8843d12eb160d547c890720f5dff8b52e4833eb7e"
+    },
+    "food_manifest": {
+      "pinned_base_sha": "08ddb26718c86213262943ca19ae8cf1b03fa922",
+      "corpora": {
+        "acquire": "161c5eb5dfc5defe8dff691ff0c0f483b540ccc0931d4672c03b477e7c393e26",
+        "heldout_std": "0f53817a11cd7f5fb7fc8ec2737114e5f5504cd3dec08f2651a94032431ab2b5",
+        "heldout_cedar": "4a47d2fcfd85aba27dcae0a4da1c0c5f0918141736ea41a43cfcfc72643b65ac"
+      }
+    }
+  },
+  "chain": [
+    {
+      "genesis": "G1: sort interface genesis",
+      "nucleus_before": "N0",
+      "nucleus_after": "N1",
+      "next_residual": "rho2: post-G1 Pi/inductive rediscovery pressure",
+      "next_realizer": "K2: c1/pi",
+      "residual_newly_available": true,
+      "realizer_newly_available": true,
+      "realizer_satisfies_developmental_law": true
+    },
+    {
+      "genesis": "G2: Pi interface genesis",
+      "nucleus_before": "N1",
+      "nucleus_after": "N2",
+      "next_residual": "rho3: Pi continuation pressure",
+      "next_realizer": "K3: c3/pi_continuation",
+      "residual_newly_available": true,
+      "realizer_newly_available": true,
+      "realizer_satisfies_developmental_law": true
+    }
+  ],
+  "terminal_generation": {
+    "genesis": "G3: pi_continuation realizer installed",
+    "frozen_preintervention_opportunities": 2652314,
+    "real_local_opportunities": 2652348,
+    "real_bypasses": 2652348,
+    "sham_local_opportunities": 2652553,
+    "sham_bypasses": 0
+  },
+  "controls": {
+    "future_withholding": "PASS",
+    "knockout": "PASS",
+    "semantic_sham": "PASS",
+    "restart": "PASS",
+    "sealed_semantics": "IDENTICAL"
+  },
+  "evidence": {
+    "g1": {
+      "winner_id": "c0",
+      "winner_materializer": "sort",
+      "selection_uses_heldout": false
+    },
+    "g2": {
+      "winner_id": "c1",
+      "winner_materializer": "pi",
+      "selection_uses_heldout": false,
+      "gap": 7290
+    },
+    "g3": {
+      "winner_id": "c3",
+      "winner_materializer": "pi_continuation",
+      "selection_uses_heldout": false,
+      "new_direct_opportunities": 2652314
+    },
+    "no_post_t0_semantic_additions": "PASS",
+    "pinned_execution_substrate": "PASS"
+  },
+  "boundary": [
+    "bounded three-generation recurrence only",
+    "not open-ended self-improvement",
+    "verifier/trust substrate remains external and frozen",
+    "Nebula/Genesis/Aha are not new trusted runtime types"
+  ]
+}
