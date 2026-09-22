@@ -98,7 +98,75 @@ sufficiency by basis length.
 A positive Boolean fixture and an empty-basis negative fixture are included.
 
 This is the mathematical bridge between CLC's semantics of identity and the
-blind-qualified (	au) search policy.
+blind-qualified (\tau) search policy.
+
+## Synergy falsifier and generalization
+
+The singleton-hypergraph bridge is exact only when the effect of a basis is the
+union of effects already attributable to its selected members.
+
+`formal/Metatron/ResidualInteractions.lean` now contains a RED-first
+two-generator counterexample in which neither generator separates the residual
+alone, but their joint lawful closure does.
+
+For generators `left` and `right`:
+
+[
+E_{left}=E_{right}=\varnothing,
+]
+
+so ordinary singleton-hyperedge set cover says the pair cannot close the
+residual. But the generated family semantics satisfies
+
+[
+E_{\{left,right\}}=U,
+]
+
+and the two-generator family is target-sufficient while every basis of size
+less than two fails.
+
+Thus ordinary hypergraph cover is **not complete in the presence of genuine
+generator synergy**.
+
+The repaired theorem is
+
+[
+\boxed{\texttt{generatedResidualBasis\_closes}}
+]
+
+which replaces singleton-union coverage by a closure-aware predicate
+
+[
+\operatorname{GeneratedSeparates}(B,x,y).
+]
+
+It proves, without assuming additivity,
+
+[
+B\text{ generated-covers }U
+\iff
+Q_B\text{ is target-sufficient}.
+]
+
+The earlier hypergraph theorem is recovered exactly as the additive special
+case
+
+[
+\operatorname{GeneratedSeparates}(B,x,y)
+\equiv
+\exists g\in B,\;E_g(x,y).
+]
+
+The corresponding minimum-by-generator-count theorem is
+`minimumGeneratedBasis_minimalSufficient`.
+
+This changes the search interpretation:
+
+- singleton separating hypergraph is sufficient for additive candidate
+  languages;
+- interaction-aware search must score **candidate families after closure**;
+- the natural eventual realization of such a family is a certified causal
+  event structure, not merely a bag of independent generators.
 
 ## Representation discipline
 
