@@ -6,9 +6,24 @@
   "lanes": {
     "partition": {
       "external_champion": {
-        "name": "v5-natfold",
-        "external_run_id": 198,
-        "external_total_instructions": 4546112652
+        "name": "v13-three-compiled",
+        "external_run_id": 206,
+        "github_run_id": 35672006623,
+        "source_sha256": "bcb6325b9d0ca5c7259b0de76d903ba5cb20e05fdb60938b5201745d00491085",
+        "cohort_id": "sair-playground-grouped-practice-v1-partition-14-22-32",
+        "metric": "perf_instructions",
+        "measurement_contract": "kernel-replay-v2",
+        "protocol": "KTP/3",
+        "case_values": {
+          "P1:0@n=14": 75221175,
+          "P2:0@n=22": 197200815,
+          "P3:0@n=32": 443764613
+        },
+        "external_total_instructions": 716186603,
+        "official": false,
+        "scoreable": false,
+        "verdict": "accepted",
+        "final_conclusion": "passed"
       },
       "best_local": {
         "name": "v13-three-compiled",
@@ -19,13 +34,18 @@
         "source_sha256": "bcb6325b9d0ca5c7259b0de76d903ba5cb20e05fdb60938b5201745d00491085",
         "universal_proof": true,
         "canonical_accepted": true,
-        "axioms": ["propext", "Quot.sound"],
+        "axioms": [
+          "propext",
+          "Quot.sound"
+        ],
         "local_proxy_seconds": 0.182697394
       },
-      "status": "REQUEST_EXTERNAL"
+      "status": "EXTERNAL_PROMOTE_PRACTICE"
     },
     "primecount": {
-      "external_champion": {"name": "v3-structural"},
+      "external_champion": {
+        "name": "v3-structural"
+      },
       "screen_candidate": {
         "name": "v5-bitset-probe",
         "branch": "lkc-flash2-primecount-v5-bitset",
@@ -37,7 +57,9 @@
       "status": "SCREEN_WIN_PROOF_REQUIRED"
     },
     "mertens": {
-      "champion": {"name": "v6-structural"},
+      "champion": {
+        "name": "v6-structural"
+      },
       "rejected_probe": {
         "name": "v9-bitset-probe",
         "branch": "lkc-flash2-mertens-v9-bitset",
@@ -48,7 +70,9 @@
       "status": "REFUTED_RESOURCE"
     },
     "fib": {
-      "champion": {"name": "v2-bitwise"},
+      "champion": {
+        "name": "v2-bitwise"
+      },
       "rejected_probe": {
         "name": "v4-shift-probe",
         "branch": "lkc-flash2-fib-v4-shift",
@@ -67,7 +91,9 @@
       "status": "CHAMPION_RETAINED_PUBLIC_FAMILIES_INGESTED"
     },
     "polydisc": {
-      "champion": {"name": "v3-frozen"},
+      "champion": {
+        "name": "v3-frozen"
+      },
       "probe": {
         "name": "v4-fixed-shape",
         "branch": "lkc-flash2-polydisc-v4",
@@ -78,7 +104,9 @@
       "status": "FLAT_AND_UNQUALIFIED"
     },
     "ca-rule110": {
-      "champion": {"name": "v60-frozen"},
+      "champion": {
+        "name": "v60-frozen"
+      },
       "probe": {
         "name": "v64-generic-step-dispatch",
         "branch": "lkc-flash2-rule110-v64",
@@ -88,7 +116,9 @@
       "status": "MEASURE_AND_QUALIFY_PROBE"
     },
     "permanent": {
-      "champion": {"name": "v5-frozen"},
+      "champion": {
+        "name": "v5-frozen"
+      },
       "probe": {
         "name": "v6-reverse-row-order",
         "branch": "lkc-flash2-permanent-v6",
@@ -98,7 +128,9 @@
       "status": "MEASURE_PROBE_FIRST"
     },
     "sha256": {
-      "champion": {"name": "v23-frozen"},
+      "champion": {
+        "name": "v23-frozen"
+      },
       "probe": {
         "name": "v24-deferred-normalization",
         "branch": "lkc-flash2-sha-v24",
@@ -109,9 +141,9 @@
     }
   },
   "next_actions": [
-    "Primecount: turn v5 bitset screen winner into universally proved candidate before any external measurement.",
-    "Partition: keep v13 staged locally; external PMU only when no stronger local successor remains.",
-    "Rule110/Permanent/SHA: run isolated measurement gates on current probes before proof investment.",
-    "Mertens/Fib/Polydisc: do not revisit rejected/flat families; open new representation families."
+    "Primecount: turn v5 bitset screen winner into a universally proved candidate before any external measurement.",
+    "Partition: V13 is the external practice champion; continue local search only for a V14 that beats 0.182697394s before another PMU run.",
+    "Rule110/Permanent/SHA: adjudicate the live probe screens; prove only screen winners.",
+    "Mertens/Fib/Polydisc: do not revisit rejected/flat families; open qualitatively different representation families."
   ]
 }

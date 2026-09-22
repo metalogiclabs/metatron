@@ -16,6 +16,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Validate minimal nucleus evidence
         run: |
           python scripts/check_manifest.py
@@ -40,7 +44,7 @@ jobs:
             "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
             "record":"benchmarks/lean_kernel/records/eight-lane-status-v1.json",
             "minimal_nucleus_qualified_sha":"1d0d962fc3d8894804ced6b510cfaa0f25d10f06",
-            "partition_local_contender":"v13-three-compiled",
+            "partition_external_champion":"v13-three-compiled",
             "primecount_state":"screen-win-proof-required"
           }
           Path("/tmp/metatron-lkc-eight-lane-v1.json").write_text(json.dumps(d,indent=2,sort_keys=True)+"\n")
