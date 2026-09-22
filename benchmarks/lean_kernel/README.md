@@ -31,38 +31,52 @@ This is the intended developmental discipline:
 The second Partition trace (V8→V10) exposed a necessary distinction between
 an **externally warranted champion** and a **locally qualified contender**.
 
-V5 remains the external champion because it is the newest candidate with a
-comparable frozen SAIR PMU measurement. V8, V9, and V10 are all universally
-proved and canonically accepted, but currently carry only the frozen local
-wall-time proxy. They therefore cannot displace V5 externally.
+V5 remained the external champion while V8, V9, V10 and then V11 carried only
+frozen local proxy evidence. Local wins can replace the staged contender, but
+cannot displace the external champion without a comparable external PMU run.
 
-The staging controller collapses the three local wins into one measurement
-request:
+The staging controller therefore compressed the local sequence to one scarce
+measurement target:
 
-`V8 STAGE_FOR_EXTERNAL → V9 REPLACE_STAGED → V10 REPLACE_STAGED`.
-
-Thus only V10 should consume the next scarce external PMU run.
+`V8 STAGE_FOR_EXTERNAL → V9 REPLACE_STAGED → V10 REPLACE_STAGED → V11 REPLACE_STAGED`.
 
 
-### V11 staging update
+### V11 external adjudication
 
-The universal part-size-1 identity was promoted into the local representation:
+V11's generated source is sealed by SHA-256
+`a34c08cabd7e33982dd1fc9549cf4289589a6bcb25f769e7f1c60bf75659b24f`.
+The originally requested workflow run `35654150065` was retried after the SAIR
+quota reset, but attempt 2 stopped before evaluator creation because the saved
+solution name already existed. The retry harness was changed only to make the
+solution name unique; the generated V11 source hash stayed identical.
 
-`partAux 1 m = 1`.
+The successful external measurement is GitHub Actions run `35670542314`, job
+`106565780348`, SAIR playground run `205`. It was accepted on the exact frozen
+grouped-practice plan:
 
-Partition V11 is universally proved and canonically accepted and reduces the
-frozen local replay total from V10's 0.282958007s to 0.249743756s. This is
-local proxy evidence only, so V5 remains the external PMU champion while V11
-replaces V10 as the sole staged external-measurement contender.
+- P1:0 at n=14: 89,551,151 instructions
+- P2:0 at n=22: 228,568,046 instructions
+- P3:0 at n=32: 503,669,677 instructions
+
+V11's comparable three-case total is **821,788,874** instructions versus V5's
+**4,546,112,652**, a reduction of **3,724,323,778 instructions (81.9233%)**.
+The two-tier controller therefore records `EXTERNAL_PROMOTE`: V11 becomes the
+externally warranted champion.
+
+This claim is deliberately narrow. The evidence is practice-only, non-official
+and non-scoreable; it says only that V11 strictly improves V5 on this exact
+metric/cohort/case plan. It is not an official leaderboard claim and is not an
+external verdict on V12.
 
 
 ### V12 staging update
 
-A second universal early-row identity is now compiled into the local contender:
+A second universal early-row identity is compiled into the local contender:
 
 `partAux 2 m = m / 2 + 1`.
 
 Partition V12 is universally proved and canonically accepted. Its frozen local
 replay total is 0.206662600s, down from V11's 0.249743756s (17.2501% lower).
-The external/local boundary is unchanged: V5 remains the external PMU champion,
-while V12 replaces V11 as the sole staged external-measurement contender.
+After V11's external promotion, V12 remains the sole staged local contender and
+next external-measurement candidate. No external performance claim is made for
+V12 until it is measured on the same frozen boundary.
