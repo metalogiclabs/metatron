@@ -327,16 +327,16 @@ def forkB : List Nat := [1, 0, 2]
 
 theorem forkA_topological :
     Topo forkRelation forkA := by
-  decide
+  simp [forkA, Topo, forkRelation]
 
 theorem forkB_topological :
     Topo forkRelation forkB := by
-  decide
+  simp [forkB, Topo, forkRelation]
 
 theorem fork_permutation :
     forkA.Perm forkB := by
   simpa [forkA, forkB] using
-    List.Perm.swap 0 1 [2]
+    (List.Perm.swap 0 1 [2]).symm
 
 theorem fork_topological_sorts_connected :
     PosetTrace forkRelation forkA forkB :=
