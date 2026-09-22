@@ -77,6 +77,17 @@ Q_{new}\twoheadrightarrow Q_{old},
 
 not a canonical forward function (Q_{old}\to Q_{new}).
 
+The branch additionally proves identity and composition laws for these forgetful
+maps. A chain of protected-language refinements therefore forms an **inverse
+system of quotient views**:
+
+[
+\cdots \to Q_2 \to Q_1 \to Q_0.
+]
+
+Each later view can remember more distinctions while still projecting
+canonically to every earlier coarser view.
+
 ## Interpretation
 
 The correct "lax reflection" is therefore not ordinary Set-valued reflection.
@@ -114,10 +125,10 @@ legs.
 ## Claim boundary
 
 A green branch establishes the finite deterministic theorem package above,
-including identity and oplax composition laws. It does not yet prove:
+including identity and oplax composition laws, plus inverse-system laws for same-carrier refinement. It does not yet prove:
 
 - a fully packaged category/2-category of certificate-carrying developmental relations;
-- associativity/unit laws as a bundled functor structure;
+- associativity/unit laws as a bundled oplax functor structure;
 - interaction with authority snapshots and revocation;
 - a universal property for certificates;
 - empirical or ontological conclusions.
