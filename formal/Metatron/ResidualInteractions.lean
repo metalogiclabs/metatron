@@ -188,7 +188,7 @@ theorem synergy_atomic_hypergraph_fails :
       [SynGen.left, SynGen.right] := by
   intro h
   have hres : ResidualPair synCurrent synTarget false true := by
-    exact ⟨trivial, by decide⟩
+    exact ⟨trivial, by simp [synTarget]⟩
   rcases h false true hres with ⟨g, hg, hsep⟩
   exact hsep
 
@@ -269,7 +269,7 @@ theorem synergy_pair_is_minimum_generated_basis :
   · intro other hlt
     intro hcover
     have hres : ResidualPair synCurrent synTarget false true := by
-      exact ⟨trivial, by decide⟩
+      exact ⟨trivial, by simp [synTarget]⟩
     have hsep := hcover false true hres
     have hl : SynGen.left ∈ other := hsep.1
     have hr : SynGen.right ∈ other := hsep.2.1
