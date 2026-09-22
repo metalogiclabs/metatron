@@ -1,6 +1,6 @@
 # Metatron V1 Integration
 
-**Status:** integrated theorem line
+**Status:** integrated theorem + blind causal discovery line
 
 Metatron V1 keeps one trusted thin waist and layers all richer mathematics outside it.
 
@@ -22,28 +22,39 @@ For pure same-carrier refinement the canonical map remains Q_new ->> Q_old. Gene
 
 ## Discovery and repair
 
-The blind separating-hypergraph line established a useful arity-one search law: for separable candidate generators, exact minimum residual cover identifies a minimum sufficient behavioral basis.
+The blind separating-hypergraph line established the arity-one search law for separable candidate generators.
 
-Residual Synergy V0 then proved the limitation: two generators may be individually inert yet jointly sufficient because causal composition creates a new observation. A->B can separate while B->A does not.
+Residual Synergy V0 proved the limitation: two generators may be individually inert yet jointly sufficient because causal composition creates a new observation, with A->B sufficient while B->A is not.
 
-The general repair object is therefore a certified causal repair carrying:
+The general repair object is therefore a certified causal repair carrying a finite port-aware causal event structure, executable schedule, generator labels, and certification that the schedule covers the event carrier exactly and respects every causal edge.
 
-- a finite port-aware causal event structure;
-- an executable schedule;
-- generator labels;
-- certification that the schedule covers the event carrier exactly and respects every causal edge.
-
-Ordinary generators embed as one-event causal repairs. Thus ordinary tau is preserved as the arity-one/separable special case.
+Ordinary generators embed as one-event causal repairs. Ordinary tau is therefore the arity-one/separable special case.
 
 ## General bridge theorem
 
-formal/Metatron/CausalRepairCover.lean proves causalRepairCover_iff_targetSufficient:
+formal/Metatron/CausalRepairCover.lean proves causalRepairCover_iff_targetSufficient and minimumCausalRepair_minimalSufficient.
 
-> A family of certified causal repairs covers every future-demanded residual pair iff the relation refined by those repairs is sufficient for the frozen target relation.
+The qualified A->B / B->A theorem fixture proves causal structure is semantically relevant.
 
-It also proves minimumCausalRepair_minimalSufficient, transferring exact minimum repair count to minimum target sufficiency.
+## Blind causal-repair qualification
 
-The qualified A->B / B->A fixture proves causal structure is semantically relevant: the same reusable generators can differ solely by causal order, with only A->B closing the target residual.
+Blind Causal Repair V1 then tested discovery rather than explanation.
+
+On a fresh hidden 16-state world with six anonymous reusable actions, the public-only predictor searched all 6 one-event repairs and all 36 ordered two-event chains.
+
+It committed before reveal to the unique minimum repair g04 -> g01 with event count 2. After reveal, the planted hidden repair was exactly g04 -> g01. The reverse g01 -> g04 was insufficient.
+
+The run sealed:
+
+- residual pairs: 32;
+- candidate causal repairs: 42;
+- maximum singleton coverage: 16/32;
+- minimum event count: 2;
+- minimum causal capability class size: 1;
+- all reveal gates C1-C9 passed;
+- verdict: BLIND_CAUSAL_REPAIR_PASS.
+
+Thus V1 now has both a formal causal-repair semantics and a blind prospective demonstration that order-sensitive missing composition can be recovered from consequence alone inside a declared repair language.
 
 ## Integrated architecture
 
