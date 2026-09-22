@@ -1,0 +1,71 @@
+name: Metatron V1 Integration Seal
+
+on:
+  push:
+    branches: [metatron-v1-integration]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: metatron-v1-integration-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integration-seal:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify trusted thin waist
+        run: |
+          set -euo pipefail
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "TRUSTED_THIN_WAIST_IDENTICAL"
+
+      - name: Verify integration source pins
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          p = Path("evidence/integration/metatron-v1-sources.json")
+          d = json.loads(p.read_text())
+          assert d["trusted_core"]["source_head"] == "d48d84ad02477bc3bc7793d0e4fffca305aeb503"
+          assert d["semantics"]["source_head"] == "20844ab1c68b8c4f9d6528a191eb136c0bdce791"
+          assert d["search_policy"]["source_head"] == "b2dc8d1599add03bf6e6d0a3cd6aa4555257512b"
+          assert d["search_policy"]["qualification_run"] == 35761034357
+          assert d["search_policy"]["verdict"] == "BLIND_PROSPECTIVE_PASS"
+          assert d["external_adapter"]["source_head"] == "b2d384087e79719f384852688d730cb0d56a1d7d"
+          assert d["search_policy"]["authority"] == "external_policy"
+          assert d["external_adapter"]["authority"] == "external_evidence_policy"
+          print("INTEGRATION_SOURCE_PINS_OK")
+          PY
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+
+      - name: Build retained formal stack
+        run: lake build Metatron
+
+      - name: Verify claim boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s = Path("spec/METATRON_V1_INTEGRATION.md").read_text()
+          assert "Only (1) is runtime authority." in s
+          assert "behavioral capability class" in s
+          assert "declared finite candidate language" in s
+          assert "No generic property of raw storage-graph geometry is promoted to semantics." in s
+          print("METATRON_V1_INTEGRATION_BOUNDARY_OK")
+          PY
