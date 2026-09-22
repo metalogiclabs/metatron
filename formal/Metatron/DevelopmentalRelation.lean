@@ -344,4 +344,153 @@ theorem protectedGrowth_relation_not_functional :
     (fun x => x)
     false true tinyFutureEq tinyAll_not_futureEq
 
+
+/-!
+Composition law.
+
+Developmental quotient semantics is not strictly functorial in general. The
+direct quotient relation of a composite is always contained in relational
+composition. The reverse inclusion is recovered when the second state map
+preserves the intermediate continuation-safe equivalence.
+-/
+
+def RelComp
+    {A : Type u} {B : Type v} {C : Type w}
+    (R : A → B → Prop)
+    (S : B → C → Prop) :
+    A → C → Prop :=
+  fun a c => ∃ b, R a b ∧ S b c
+
+theorem quotientRelation_id_iff_eq
+    {State : Type u} {Step Test Val : Type}
+    (act : Step → State → State)
+    (eval : Test → State → Val)
+    (prot : Test → Prop)
+    (qa qb : BehavioralQuotient act eval prot) :
+    QuotientRelation
+      act eval prot act eval prot (fun x => x) qa qb ↔
+    qa = qb := by
+  constructor
+  · intro h
+    rcases h with ⟨x, hqa, hqb⟩
+    exact hqa.symm.trans hqb
+  · intro h
+    subst qb
+    refine Quotient.inductionOn qa ?_
+    intro x
+    exact ⟨x, rfl, rfl⟩
+
+theorem quotientRelation_comp_oplax
+    {AState : Type u} {BState : Type v} {CState : Type w}
+    {AStep BStep CStep ATest BTest CTest Val : Type}
+    (actA : AStep → AState → AState)
+    (evalA : ATest → AState → Val)
+    (protA : ATest → Prop)
+    (actB : BStep → BState → BState)
+    (evalB : BTest → BState → Val)
+    (protB : BTest → Prop)
+    (actC : CStep → CState → CState)
+    (evalC : CTest → CState → Val)
+    (protC : CTest → Prop)
+    (f : AState → BState)
+    (g : BState → CState)
+    (qa : BehavioralQuotient actA evalA protA)
+    (qc : BehavioralQuotient actC evalC protC) :
+    QuotientRelation
+      actA evalA protA actC evalC protC (fun x => g (f x)) qa qc →
+    RelComp
+      (QuotientRelation
+        actA evalA protA actB evalB protB f)
+      (QuotientRelation
+        actB evalB protB actC evalC protC g)
+      qa qc := by
+  intro h
+  rcases h with ⟨x, hqa, hqc⟩
+  refine ⟨quotientMap actB evalB protB (f x), ?_, ?_⟩
+  · exact ⟨x, hqa, rfl⟩
+  · exact ⟨f x, rfl, hqc⟩
+
+theorem quotientRelation_comp_reverse_of_preserves
+    {AState : Type u} {BState : Type v} {CState : Type w}
+    {AStep BStep CStep ATest BTest CTest Val : Type}
+    (actA : AStep → AState → AState)
+    (evalA : ATest → AState → Val)
+    (protA : ATest → Prop)
+    (actB : BStep → BState → BState)
+    (evalB : BTest → BState → Val)
+    (protB : BTest → Prop)
+    (actC : CStep → CState → CState)
+    (evalC : CTest → CState → Val)
+    (protC : CTest → Prop)
+    (f : AState → BState)
+    (g : BState → CState)
+    (hg :
+      ∀ x y,
+        FutureEq actB evalB protB x y →
+        FutureEq actC evalC protC (g x) (g y))
+    (qa : BehavioralQuotient actA evalA protA)
+    (qc : BehavioralQuotient actC evalC protC) :
+    RelComp
+      (QuotientRelation
+        actA evalA protA actB evalB protB f)
+      (QuotientRelation
+        actB evalB protB actC evalC protC g)
+      qa qc →
+    QuotientRelation
+      actA evalA protA actC evalC protC (fun x => g (f x)) qa qc := by
+  intro h
+  rcases h with ⟨qb, hfrel, hgrel⟩
+  rcases hfrel with ⟨x, hqa, hfb⟩
+  rcases hgrel with ⟨y, hyb, hyc⟩
+  have hmid :
+      quotientMap actB evalB protB (f x) =
+      quotientMap actB evalB protB y := by
+    exact hfb.trans hyb.symm
+  have hB : FutureEq actB evalB protB (f x) y :=
+    Quotient.exact hmid
+  have hC :
+      quotientMap actC evalC protC (g (f x)) =
+      quotientMap actC evalC protC (g y) :=
+    Quotient.sound (hg (f x) y hB)
+  exact ⟨x, hqa, hC.trans hyc⟩
+
+/--
+If the second leg is strict with respect to continuation-safe identity, quotient
+relation semantics composes exactly.
+-/
+theorem quotientRelation_comp_eq_of_preserves
+    {AState : Type u} {BState : Type v} {CState : Type w}
+    {AStep BStep CStep ATest BTest CTest Val : Type}
+    (actA : AStep → AState → AState)
+    (evalA : ATest → AState → Val)
+    (protA : ATest → Prop)
+    (actB : BStep → BState → BState)
+    (evalB : BTest → BState → Val)
+    (protB : BTest → Prop)
+    (actC : CStep → CState → CState)
+    (evalC : CTest → CState → Val)
+    (protC : CTest → Prop)
+    (f : AState → BState)
+    (g : BState → CState)
+    (hg :
+      ∀ x y,
+        FutureEq actB evalB protB x y →
+        FutureEq actC evalC protC (g x) (g y)) :
+    QuotientRelation
+      actA evalA protA actC evalC protC (fun x => g (f x)) =
+    RelComp
+      (QuotientRelation
+        actA evalA protA actB evalB protB f)
+      (QuotientRelation
+        actB evalB protB actC evalC protC g) := by
+  funext qa qc
+  apply propext
+  constructor
+  · exact quotientRelation_comp_oplax
+      actA evalA protA actB evalB protB
+      actC evalC protC f g qa qc
+  · exact quotientRelation_comp_reverse_of_preserves
+      actA evalA protA actB evalB protB
+      actC evalC protC f g hg qa qc
+
 end Metatron.DevelopmentalRelation
