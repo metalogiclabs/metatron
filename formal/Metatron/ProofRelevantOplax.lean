@@ -485,7 +485,7 @@ theorem flash_alternative_support_survives :
     TraceLive 11 (closureTrace flashCert flashPath₂) := by
   change TraceLive 11 [12, 22]
   intro c hc
-  simp only [List.mem_cons, List.mem_singleton] at hc
+  simp only [List.mem_cons, List.not_mem_nil, or_false] at hc
   rcases hc with h | h
   · subst c
     decide
