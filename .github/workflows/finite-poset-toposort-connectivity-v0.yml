@@ -2,7 +2,9 @@ name: Finite Poset Toposort Connectivity V0
 
 on:
   push:
-    branches: [finite-poset-toposort-connectivity-v0]
+    branches:
+      - finite-poset-toposort-connectivity-v0
+      - main
   workflow_dispatch:
 
 permissions:
