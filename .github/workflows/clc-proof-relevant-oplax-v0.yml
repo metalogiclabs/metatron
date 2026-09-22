@@ -51,6 +51,7 @@ jobs:
               "reentry_evidence_path",
               "reentry_evidence_trace",
               "reentry_no_direct_evidence",
+              "flash_reclosure_carries_reentry",
               "closure_contains",
               "closure_trans",
               "closure_least",
@@ -61,6 +62,7 @@ jobs:
               assert f"theorem {name}" in lean, name
           assert "causal re-entry" in spec
           assert "proof-lifted reclosure" in spec
+          assert "consumable by the same proof-lifted reclosure mechanism" in spec
           assert "alternative support" in spec
           assert "fully bundled bicategory" in spec
           print("PROOF_RELEVANT_OPLAX_CLAIM_BOUNDARY_OK")
