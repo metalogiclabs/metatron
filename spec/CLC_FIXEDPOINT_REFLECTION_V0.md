@@ -62,6 +62,26 @@ in the category of arbitrary original forms, but in a behaviorally saturated /
 Galois-closed interface whose tests are exactly those compatible with the
 continuation-safe boundary.
 
+## D. Strict transports do descend after saturation
+
+For an exact transport with:
+
+- a state map preserving continuation-safe equivalence;
+- a contravariant test pullback;
+- exact evaluation preservation;
+
+the theorem `strictTransport_saturatedQuotient_naturality` proves that the
+state map descends covariantly to behavioral quotients, compatible tests pull
+back contravariantly, and quotient evaluation commutes with transport.
+
+If the transport also carries a protected-test lift satisfying the CLC split
+law, `saturatedProtected_split` proves that the split survives in the
+compatible-test interface.
+
+So the obstruction is now precise: arbitrary original test languages do not
+reflect, but the behaviorally saturated interface supports the strict CLC
+transport structure.
+
 ## Claim boundary
 
 A green branch establishes:
@@ -69,12 +89,13 @@ A green branch establishes:
 - the literal deterministic same-form theorem
   `alpha(mu L) = nu B`;
 - failure of evaluator descent for arbitrary unprotected tests;
-- well-defined evaluator descent after restricting to compatible tests.
+- well-defined evaluator descent after restricting to compatible tests;
+- descent/naturality of exact strict transports through the saturated quotient;
+- preservation of the protected split law after saturation.
 
 It does **not** yet establish:
 
-- heterogeneous CLC reflection across arbitrary certified transports;
-- unique descent of backward test transformers or protected lifts;
-- certificate-object factorization;
+- reflection for information-gaining developmental refinements;
+- certificate-object uniqueness/factorization;
 - a reflection theorem for evolving authority snapshots;
 - empirical or ontological conclusions.
