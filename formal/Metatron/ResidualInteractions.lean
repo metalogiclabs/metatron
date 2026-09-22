@@ -273,20 +273,24 @@ theorem synergy_pair_is_minimum_generated_basis :
     have hsep := hcover false true hres
     have hl : SynGen.left ∈ other := hsep.1
     have hr : SynGen.right ∈ other := hsep.2.1
-    have hne : SynGen.left ≠ SynGen.right := by decide
-    have htwo : 2 ≤ other.length := by
-      have hrightInErase :
-          SynGen.right ∈ other.erase SynGen.left := by
-        exact List.mem_erase_iff_of_mem hl |>.2 ⟨hne.symm, hr⟩
-      have hlenErase : 1 ≤ (other.erase SynGen.left).length :=
-        List.length_pos.2 (by
-          intro hempty
-          simp [hempty] at hrightInErase)
-      have hlen :
-          other.length = (other.erase SynGen.left).length + 1 := by
-        exact (List.length_erase_add_one hl).symm
-      omega
-    omega
+    cases other with
+    | nil =>
+        simpa using hl
+    | cons a tail =>
+        cases tail with
+        | nil =>
+            cases a with
+            | left =>
+                simpa using hr
+            | right =>
+                simpa using hl
+        | cons b rest =>
+            have hge : 2 ≤ ([a, b] ++ rest).length := by
+              simp
+            have hlen :
+                (a :: b :: rest).length = ([a, b] ++ rest).length := by
+              rfl
+            exact (Nat.not_lt_of_ge (by simpa [hlen] using hge)) hlt
 
 theorem synergy_minimum_target_sufficient :
     GeneratedTargetSufficient
