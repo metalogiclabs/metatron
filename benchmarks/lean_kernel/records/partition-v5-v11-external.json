@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "problem": "partition",
+  "controller": "two-tier-frontier-v2",
+  "protected_consequence": "kernel-replay instruction cost after universal proof and canonical acceptance",
+  "comparison_boundary": {
+    "cohort_id": "sair-playground-grouped-practice-v1-partition-14-22-32",
+    "metric": "perf_instructions",
+    "measurement_contract": "kernel-replay-v2",
+    "protocol": "KTP/3",
+    "cases": ["P1:0@n=14", "P2:0@n=22", "P3:0@n=32"],
+    "official": false,
+    "scoreable": false
+  },
+  "incumbent": {
+    "name": "v5-natfold",
+    "sair_run_id": 198,
+    "values": [396369526, 1167256227, 2982486899],
+    "total_instructions": 4546112652
+  },
+  "candidate": {
+    "name": "v11-one-seed",
+    "family": "closed-form-part-size-1-seed",
+    "repo": "heathsanchez/test",
+    "branch": "lkc-partition-one-seed-v11",
+    "qualification_commit": "5572e7d6223e18669b83b4c35d3b11db2399022f",
+    "qualification_run": 35649976292,
+    "source_sha256": "a34c08cabd7e33982dd1fc9549cf4289589a6bcb25f769e7f1c60bf75659b24f",
+    "universal_proof": true,
+    "canonical_accepted": true,
+    "axioms": ["propext", "Quot.sound"],
+    "local_proxy_seconds": 0.249743756,
+    "requested_workflow_run": 35654150065,
+    "requested_retry_attempt": 2,
+    "requested_retry_job": 106565462565,
+    "requested_retry_result": "SOLUTION_NAME_CONFLICT before evaluator run creation; no PMU verdict",
+    "retry_harness_commit": "eed9b2e2ef911d247e2a099916b856fadccf0eb5",
+    "retry_harness_change": "workflow-only unique solution naming; generated V11 source hash unchanged",
+    "successful_workflow_run": 35670542314,
+    "successful_job": 106565780348,
+    "artifact_id": 10670529750,
+    "artifact_digest": "sha256:8ed8f3d14aae31e86df1b05252b61f2ed9f8f79a40e9c49bb985a3f329113531",
+    "sair_run_id": 205,
+    "solution_id": 223,
+    "snapshot_id": 236,
+    "verdict": "accepted",
+    "final_conclusion": "passed",
+    "values": [89551151, 228568046, 503669677],
+    "total_instructions": 821788874,
+    "correctness_replay_instructions": 2815508906
+  },
+  "decision": {
+    "action": "EXTERNAL_PROMOTE",
+    "external_champion_before": "v5-natfold",
+    "external_champion_after": "v11-one-seed",
+    "instruction_reduction": 3724323778,
+    "improvement_vs_v5_fraction": 0.8192326198431389,
+    "reason": "same metric, frozen cohort and exact three-case plan; V11 strictly lowers the comparable external instruction total"
+  },
+  "claim_boundaries": [
+    "This adjudication compares V11 only with V5 on the exact frozen SAIR grouped-practice cohort and case plan.",
+    "The measurement is practice-only, non-official and non-scoreable; it is not an official leaderboard claim.",
+    "No external performance claim is made here for V12 or any other later contender.",
+    "The separate public leaderboard total is not comparable to this practice total and is not used in the promotion decision."
+  ]
+}
