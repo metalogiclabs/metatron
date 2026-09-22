@@ -66,5 +66,15 @@
     "negative_theorem": "causalStructureAlone_not_enough",
     "negative_swap_theorem": "ab_not_swapSafe",
     "authority": "derived_formal_semantics"
+  },
+  "causal_trace_quotient": {
+    "source_branch": "causal-trace-quotient-v0",
+    "source_head": "9c9d2578039cd718326a7487484ff2690251bd88",
+    "qualification_run": 35796549933,
+    "execution_theorem": "traceEq_preserves_run",
+    "observation_theorem": "traceEq_preserves_observation",
+    "topological_theorem": "topological_linearizations_equivalent_if_traceConnected",
+    "negative_retention": "ab_same_pes_not_trace_quotiented",
+    "authority": "derived_formal_semantics"
   }
 }
