@@ -363,4 +363,132 @@ theorem compatibleQuotientEval_mk
       test q.1 x := by
   rfl
 
+
+/-!
+Positive repair for strict transports.
+
+Once the quotient interface keeps only boundary-compatible tests, an exact
+transport whose state map preserves continuation-safe equivalence descends in
+both directions: states covariantly and tests contravariantly.
+-/
+
+def pullCompatibleTest
+    {AState : Type u} {BState : Type v}
+    {AStep : Type w} {BStep : Type z}
+    {ATest : Type} {BTest : Type} {Val : Type}
+    (actA : AStep → AState → AState)
+    (evalA : ATest → AState → Val)
+    (protA : ATest → Prop)
+    (actB : BStep → BState → BState)
+    (evalB : BTest → BState → Val)
+    (protB : BTest → Prop)
+    (mapState : AState → BState)
+    (pullTest : BTest → ATest)
+    (mapFuture :
+      ∀ x y,
+        FutureEq actA evalA protA x y →
+        FutureEq actB evalB protB (mapState x) (mapState y))
+    (exactEval :
+      ∀ x q, evalA (pullTest q) x = evalB q (mapState x))
+    (q : CompatibleTest actB evalB protB) :
+    CompatibleTest actA evalA protA :=
+  ⟨pullTest q.1, by
+    intro x y hxy
+    calc
+      evalA (pullTest q.1) x = evalB q.1 (mapState x) := exactEval x q.1
+      _ = evalB q.1 (mapState y) := q.2 _ _ (mapFuture x y hxy)
+      _ = evalA (pullTest q.1) y := (exactEval y q.1).symm⟩
+
+def behavioralQuotientMap
+    {AState : Type u} {BState : Type v}
+    {AStep : Type w} {BStep : Type z}
+    {ATest : Type} {BTest : Type} {Val : Type}
+    (actA : AStep → AState → AState)
+    (evalA : ATest → AState → Val)
+    (protA : ATest → Prop)
+    (actB : BStep → BState → BState)
+    (evalB : BTest → BState → Val)
+    (protB : BTest → Prop)
+    (mapState : AState → BState)
+    (mapFuture :
+      ∀ x y,
+        FutureEq actA evalA protA x y →
+        FutureEq actB evalB protB (mapState x) (mapState y)) :
+    BehavioralQuotient actA evalA protA →
+      BehavioralQuotient actB evalB protB :=
+  Quotient.map mapState (by
+    intro x y hxy
+    exact mapFuture x y hxy)
+
+/--
+Exact strict transports satisfy the quotient state/test commuting law after
+saturating the test language to compatible observations.
+-/
+theorem strictTransport_saturatedQuotient_naturality
+    {AState : Type u} {BState : Type v}
+    {AStep : Type w} {BStep : Type z}
+    {ATest : Type} {BTest : Type} {Val : Type}
+    (actA : AStep → AState → AState)
+    (evalA : ATest → AState → Val)
+    (protA : ATest → Prop)
+    (actB : BStep → BState → BState)
+    (evalB : BTest → BState → Val)
+    (protB : BTest → Prop)
+    (mapState : AState → BState)
+    (pullTest : BTest → ATest)
+    (mapFuture :
+      ∀ x y,
+        FutureEq actA evalA protA x y →
+        FutureEq actB evalB protB (mapState x) (mapState y))
+    (exactEval :
+      ∀ x q, evalA (pullTest q) x = evalB q (mapState x))
+    (qx : BehavioralQuotient actA evalA protA)
+    (q : CompatibleTest actB evalB protB) :
+    compatibleQuotientEval actB evalB protB
+      (behavioralQuotientMap
+        actA evalA protA actB evalB protB mapState mapFuture qx) q =
+    compatibleQuotientEval actA evalA protA qx
+      (pullCompatibleTest
+        actA evalA protA actB evalB protB
+        mapState pullTest mapFuture exactEval q) := by
+  refine Quotient.inductionOn qx ?_
+  intro x
+  exact (exactEval x q.1).symm
+
+/--
+A protected lift with the CLC split law remains a split after embedding protected
+tests into the saturated compatible-test interface.
+-/
+theorem saturatedProtected_split
+    {AState : Type u} {BState : Type v}
+    {AStep : Type w} {BStep : Type z}
+    {ATest : Type} {BTest : Type} {Val : Type}
+    (actA : AStep → AState → AState)
+    (evalA : ATest → AState → Val)
+    (protA : ATest → Prop)
+    (actB : BStep → BState → BState)
+    (evalB : BTest → BState → Val)
+    (protB : BTest → Prop)
+    (mapState : AState → BState)
+    (pullTest : BTest → ATest)
+    (liftProtect : ATest → BTest)
+    (mapFuture :
+      ∀ x y,
+        FutureEq actA evalA protA x y →
+        FutureEq actB evalB protB (mapState x) (mapState y))
+    (exactEval :
+      ∀ x q, evalA (pullTest q) x = evalB q (mapState x))
+    (liftProtected :
+      ∀ p, protA p → protB (liftProtect p))
+    (split :
+      ∀ p, protA p → pullTest (liftProtect p) = p)
+    (p : ATest)
+    (hp : protA p) :
+    (pullCompatibleTest
+      actA evalA protA actB evalB protB
+      mapState pullTest mapFuture exactEval
+      (protectedCompatible
+        actB evalB protB (liftProtect p) (liftProtected p hp))).1 = p := by
+  exact split p hp
+
 end Metatron.FixedPointReflection
