@@ -477,6 +477,16 @@ theorem strictTransport_saturatedQuotient_naturality
         mapState pullTest mapFuture exactEval q) := by
   refine Quotient.inductionOn qx ?_
   intro x
+  change
+    compatibleQuotientEval actB evalB protB
+      (behavioralQuotientMap
+        actA evalA protA actB evalB protB mapState mapFuture
+        (quotientMap actA evalA protA x)) q =
+    compatibleQuotientEval actA evalA protA
+      (quotientMap actA evalA protA x)
+      (pullCompatibleTest
+        actA evalA protA actB evalB protB
+        mapState pullTest mapFuture exactEval q)
   rw [behavioralQuotientMap_mk]
   rw [compatibleQuotientEval_mk, compatibleQuotientEval_mk]
   exact (exactEval x q.1).symm
