@@ -44,5 +44,17 @@
     "minimum_theorem": "minimumCausalRepair_minimalSufficient",
     "singleton_special_case": "singleton_support_is_arity_one",
     "authority": "external_policy_semantics"
+  },
+  "blind_causal_repair": {
+    "source_branch": "blind-causal-repair-v1",
+    "source_head": "6e80f6bfcde314cbc81624c8f432ed1d100dab20",
+    "preregistration_commit": "fe78b5bb256a20eecfe3195f4bed1a65f45ca1b9",
+    "qualification_run": 35786529656,
+    "verdict": "BLIND_CAUSAL_REPAIR_PASS",
+    "minimum_event_count": 2,
+    "minimum_causal_class_count": 1,
+    "residual_pair_count": 32,
+    "candidate_repair_count": 42,
+    "authority": "external_policy_evidence"
   }
 }
