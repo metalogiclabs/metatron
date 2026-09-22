@@ -1,0 +1,67 @@
+name: Causal Trace Quotient V0
+
+on:
+  push:
+    branches: [causal-trace-quotient-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  theorem-gate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify trusted Nucleus unchanged
+        run: |
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' \
+            formal/Metatron/CausalTraceQuotient.lean
+
+      - name: Build theorem stack
+        run: lake build Metatron
+
+      - name: Run retained Python suite
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Check theorem package
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lean=Path("formal/Metatron/CausalTraceQuotient.lean").read_text()
+          spec=Path("spec/CAUSAL_TRACE_QUOTIENT_V0.md").read_text()
+          for name in (
+              "run_append",
+              "adjacent_commuting_swap_preserves_run",
+              "traceEq_preserves_run",
+              "traceEq_preserves_observation",
+              "repair_traceEq_swapSafe",
+              "topological_linearizations_equivalent_if_traceConnected",
+              "topological_observations_equivalent_if_traceConnected",
+              "t0_trace_t1",
+              "t1_trace_t2",
+              "t0_trace_t2",
+              "three_event_trace_same_state",
+              "three_event_trace_same_observation",
+              "ab_same_pes_not_trace_quotiented",
+          ):
+              assert f"theorem {name}" in lean, name
+          assert "finite certified commuting trace equivalence" in spec
+          assert "does not yet prove" in spec
+          print("CAUSAL_TRACE_QUOTIENT_V0_OK")
+          PY
