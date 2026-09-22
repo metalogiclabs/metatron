@@ -60,7 +60,7 @@ theorem independent2RL_certified
   · simp [independent2RL]
   constructor
   · intro e
-    change (e = 0 ∨ e = 1) ↔ (e = 1 ∨ e = 0)
+    simp only [independent2RL, independent2PES, List.mem_cons, List.mem_singleton]
     constructor
     · intro h
       cases h with
@@ -225,7 +225,7 @@ theorem ab_not_swapSafe :
   intro hsafe
   have hob : true = false := by
     simpa [abIndependentLR, abIndependentRL, independent2LR, independent2RL,
-      execute, CausalRepair.support, act, y] using
+      execute, CausalRepair.support, run, act, y] using
       congrArg State.observed (hsafe y)
   cases hob
 
