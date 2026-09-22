@@ -8,7 +8,7 @@ class EightLaneStatusTests(unittest.TestCase):
         expected={"partition","primecount","mertens","fib","polydisc","ca-rule110","permanent","sha256"}
         self.assertEqual(set(d["lanes"]),expected)
         self.assertTrue(d["lanes"]["partition"]["best_local"]["universal_proof"])
-        self.assertEqual(d["lanes"]["partition"]["status"],"REQUEST_EXTERNAL")
+        self.assertEqual(d["lanes"]["partition"]["status"],"EXTERNAL_PROMOTE_PRACTICE")
         self.assertFalse(d["lanes"]["primecount"]["screen_candidate"]["universal_proof"])
         self.assertEqual(d["lanes"]["mertens"]["status"],"REFUTED_RESOURCE")
         self.assertEqual(d["lanes"]["permanent"]["status"],"MEASURE_PROBE_FIRST")
