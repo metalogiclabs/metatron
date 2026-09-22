@@ -2,7 +2,9 @@ name: Blind Causal Repair V1
 
 on:
   push:
-    branches: [blind-causal-repair-v1]
+    branches:
+      - blind-causal-repair-v1
+      - main
   workflow_dispatch:
 
 permissions:
