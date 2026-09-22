@@ -76,5 +76,15 @@
     "topological_theorem": "topological_linearizations_equivalent_if_traceConnected",
     "negative_retention": "ab_same_pes_not_trace_quotiented",
     "authority": "derived_formal_semantics"
+  },
+  "finite_poset_connectivity": {
+    "source_branch": "finite-poset-toposort-connectivity-v0",
+    "source_head": "43da18d8317258f7f421d7cea05e1ca844f800ee",
+    "qualification_run": 35798130149,
+    "connectivity_theorem": "all_topological_sorts_traceConnected",
+    "semantic_theorem": "all_topological_sorts_semantically_invariant",
+    "pes_connectivity_theorem": "pes_topological_sorts_traceConnected",
+    "pes_semantic_theorem": "pes_all_topological_sorts_semantically_invariant",
+    "authority": "derived_formal_semantics"
   }
 }
