@@ -1,6 +1,6 @@
 # Metatron V1 Integration
 
-**Status:** integrated theorem + blind causal discovery line
+**Status:** integrated theorem + blind causal discovery + finite trace quotient
 
 Metatron V1 keeps one trusted thin waist and layers all richer mathematics outside it.
 
@@ -38,27 +38,17 @@ The qualified A->B / B->A theorem fixture proves causal structure is semanticall
 
 ## Blind causal-repair qualification
 
-Blind Causal Repair V1 then tested discovery rather than explanation.
+Blind Causal Repair V1 tested discovery rather than explanation.
 
 On a fresh hidden 16-state world with six anonymous reusable actions, the public-only predictor searched all 6 one-event repairs and all 36 ordered two-event chains.
 
-It committed before reveal to the unique minimum repair g04 -> g01 with event count 2. After reveal, the planted hidden repair was exactly g04 -> g01. The reverse g01 -> g04 was insufficient.
+It committed before reveal to the unique minimum ordered repair with event count 2, and reveal confirmed the exact planted direction while the reverse order was insufficient.
 
-The run sealed:
+The run sealed BLIND_CAUSAL_REPAIR_PASS with all C1-C9 gates true.
 
-- residual pairs: 32;
-- candidate causal repairs: 42;
-- maximum singleton coverage: 16/32;
-- minimum event count: 2;
-- minimum causal capability class size: 1;
-- all reveal gates C1-C9 passed;
-- verdict: BLIND_CAUSAL_REPAIR_PASS.
+## Two-event linearization boundary
 
-Thus V1 now has both a formal causal-repair semantics and a blind prospective demonstration that order-sensitive missing composition can be recovered from consequence alone inside a declared repair language.
-
-## Linearization quotient boundary
-
-Causal Linearization Invariance V0 tests when the explicit schedule can be forgotten.
+Causal Linearization Invariance V0 established the primitive swap law.
 
 For two events with no causal edge, if their actions commute pointwise, Lean proves:
 
@@ -66,23 +56,46 @@ For two events with no causal edge, if their actions commute pointwise, Lean pro
 - independentObservation_invariant_of_commute;
 - independent_swapSafe_of_commute.
 
-So semantically independent events may be swapped without changing execution or observation.
-
 But the same-PES A/B falsifier proves:
 
 - causalStructureAlone_not_enough;
 - ab_actions_do_not_commute;
 - ab_not_swapSafe.
 
-The two repairs have the same event carrier and causal signature, yet A->B and B->A differ observationally.
+Thus raw partial-order isomorphism is insufficient. Every erased serialization distinction must be warranted by semantic commutation evidence.
 
-Therefore V1 does **not** quotient all topological sorts of a PES. The canonical repair object is:
+## Finite causal trace quotient
 
-[
-	ext{causal structure modulo certified swap-safe linearizations}.
-]
+Causal Trace Quotient V0 lifts the primitive swap law to arbitrary finite schedules.
 
-Partial-order isomorphism is insufficient by itself; every erased serialization distinction must be warranted by semantic commutation/independence evidence.
+It defines TraceEq as the reflexive/symmetric/transitive closure of adjacent swaps
+
+pre ++ g :: h :: post
+<-> 
+pre ++ h :: g :: post
+
+where each swap carries a Commute certificate.
+
+Lean proves:
+
+- adjacent_commuting_swap_preserves_run;
+- traceEq_preserves_run;
+- traceEq_preserves_observation;
+- repair_traceEq_swapSafe;
+- topological_linearizations_equivalent_if_traceConnected;
+- topological_observations_equivalent_if_traceConnected.
+
+A three-event fixture proves invariance through multiple certified swaps, while ab_same_pes_not_trace_quotiented retains the noncommuting negative case.
+
+The canonical repair representation is therefore:
+
+certified causal presentation
+/
+finite certified commuting trace equivalence.
+
+This is the general finite semantic quotient for any pair of certified schedules connected by a warranted commuting trace.
+
+The remaining combinatorial boundary is separate: V1 does not yet prove that every pair of topological sorts of every finite poset is connected by adjacent swaps of incomparable events, nor that such incomparable events automatically commute semantically.
 
 ## Integrated architecture
 
@@ -91,7 +104,7 @@ warrant log
   -> behavioral quotient
   -> future-demanded consequential residual
   -> minimum certified causal repair frontier
-  -> quotient by certified swap-safe linearizations
+  -> finite certified commuting trace quotient
   -> independent verification
   -> warranted promotion
   -> global reclosure
@@ -111,11 +124,11 @@ The integration preserves distinct roles:
 - singleton hypergraph: arity-one residual search;
 - certified causal repair: compositional repair semantics;
 - port event structure: causal/wiring structure of developmental history;
-- swap-safety certificate: which independent serializations may be identified;
+- trace certificate: which finite serializations may be identified;
 - benchmark frontier: external engineering policy.
 
 No generic property of raw storage-graph geometry is promoted to semantics.
 
 ## Claim boundary
 
-V1 does not claim unrestricted event-structure invention, tractable minimum repair search in arbitrary large languages, a complete multidimensional cost theory, generic linearization invariance for arbitrary finite partial orders, Mazurkiewicz trace completeness, confluence, or any enlargement of Nucleus authority.
+V1 does not claim unrestricted event-structure invention, tractable minimum repair search in arbitrary large languages, a complete multidimensional cost theory, automatic topological-sort connectivity for arbitrary finite posets, automatic semantic commutation of incomparable events, confluence, conflict semantics, feedback, or any enlargement of Nucleus authority.
