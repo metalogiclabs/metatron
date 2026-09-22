@@ -20,7 +20,7 @@ def futureObservationEval
 
 /--
 The least observation family generated from protected tests by lawful
-one-step prefixing. This is the concrete μL used in this theorem package.
+one-step prependObsing. This is the concrete μL used in this theorem package.
 -/
 inductive MuObs
     {Step : Type v} {Test : Type w}
@@ -32,7 +32,7 @@ inductive MuObs
       (ho : MuObs Protected o) :
       MuObs Protected ⟨s :: o.steps, o.query⟩
 
-def prefix
+def prependObs
     {Step : Type v} {Test : Type w}
     (s : Step) (o : FutureObservation Step Test) :
     FutureObservation Step Test :=
@@ -45,7 +45,7 @@ def LOp
     (S : FutureObservation Step Test → Prop)
     (o : FutureObservation Step Test) : Prop :=
   (o.steps = [] ∧ Protected o.query) ∨
-    ∃ s prior, S prior ∧ o = prefix s prior
+    ∃ s prior, S prior ∧ o = prependObs s prior
 
 theorem muObs_all
     {Step : Type v} {Test : Type w}
@@ -112,7 +112,7 @@ theorem muObs_least
   | base q hq =>
       exact hclosed ⟨[], q⟩ (Or.inl ⟨rfl, hq⟩)
   | step s o ho ih =>
-      exact hclosed (prefix s o) (Or.inr ⟨s, o, ih, rfl⟩)
+      exact hclosed (prependObs s o) (Or.inr ⟨s, o, ih, rfl⟩)
 
 /--
 Indistinguishability by μL is exactly finite-path continuation-safe identity.
