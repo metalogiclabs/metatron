@@ -34,6 +34,12 @@ A concurrency-aware repair uses **layered traces**:
 For synchronized one-step components, Lean proves exact serial/parallel
 interchange.
 
+A second falsifier then uses histories with different causal depths. Interchange
+fails again even with layered traces. So global stage layers are sufficient for
+the synchronized case but still too rigid for arbitrary asynchronous history.
+The next candidate evidence object must preserve **partial order / independence**
+rather than forcing every event into one total sequence of global layers.
+
 ## 2. Causal re-entry as feedback
 
 A proof-relevant feedback operator is defined by existentially hiding a loop
@@ -102,7 +108,11 @@ The experiment distinguishes three structures that should not be conflated:
 3. feedback/re-entry.
 
 Flat provenance lists are adequate for serial composition but fail monoidal
-interchange. Concurrency-aware evidence repairs the simplest synchronized case.
+interchange. Concurrency-aware layers repair the simplest synchronized case,
+but an asynchronous counterexample shows that layers are not the final
+representation. The evidence semantics needs a finer notion of causal
+independence, such as a partial-order/pomset-style trace or an equivalent
+quotient by independent-event commutation.
 
 The refinement tower supports a compatible-cone interpretation of temporal
 depth, while the Galois closure supplies a mathematically exact candidate for
