@@ -1,0 +1,64 @@
+name: Residual Synergy Falsifier V0
+
+on:
+  push:
+    branches: [residual-synergy-falsifier-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  theorem-gate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify trusted Nucleus unchanged
+        run: |
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' \
+            formal/Metatron/ResidualSynergy.lean
+
+      - name: Build theorem stack
+        run: lake build Metatron
+
+      - name: Run retained Python suite
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Check falsifier theorems and boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lean=Path("formal/Metatron/ResidualSynergy.lean").read_text()
+          spec=Path("spec/RESIDUAL_SYNERGY_FALSIFIER_V0.md").read_text()
+          for name in (
+              "singletonA_indistinguishable",
+              "singletonB_indistinguishable",
+              "a_then_b_separates",
+              "b_then_a_does_not_separate",
+              "ordinarySingletonCover_fails",
+              "jointBasis_sufficient",
+              "singletonA_insufficient",
+              "singletonB_insufficient",
+              "pairInteraction_covers",
+              "emptyInteraction_fails",
+          ):
+              assert f"theorem {name}" in lean, name
+          assert "general repair can be synergistic and order-sensitive" in spec
+          assert "arity-one special case" in spec
+          print("RESIDUAL_SYNERGY_FALSIFIER_OK")
+          PY
