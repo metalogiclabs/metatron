@@ -1,0 +1,58 @@
+name: Residual Interaction Bridge V0
+
+on:
+  push:
+    branches: [metatron-v1-integration]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: residual-interaction-bridge-v0-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  theorem-gate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify trusted thin waist
+        run: |
+          set -euo pipefail
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' \
+            formal/Metatron/ResidualBasis.lean \
+            formal/Metatron/ResidualInteractions.lean
+      - name: Build residual bridge stack
+        run: lake build Metatron.ResidualBasis Metatron.ResidualInteractions
+      - name: Check theorem surface
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lean = Path("formal/Metatron/ResidualInteractions.lean").read_text()
+          for name in (
+              "generatedResidualBasis_closes",
+              "minimumGeneratedBasis_minimalSufficient",
+              "atomicGenerated_cover_iff",
+              "atomicGenerated_sufficient_iff",
+              "synergy_atomic_hypergraph_fails",
+              "synergy_pair_generated_covers",
+              "synergy_pair_target_sufficient",
+              "synergy_left_alone_fails",
+              "synergy_right_alone_fails",
+              "synergy_empty_fails",
+              "synergy_pair_is_minimum_generated_basis",
+              "synergy_minimum_target_sufficient",
+          ):
+              assert f"theorem {name}" in lean, name
+          print("RESIDUAL_INTERACTION_BRIDGE_OK")
+          PY
