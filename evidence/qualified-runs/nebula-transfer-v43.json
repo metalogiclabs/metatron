@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "status": "BOUNDED_POSITIVE",
+  "name": "Nebula Cross-Family Transfer V43",
+  "claim": "Bounded cross-family transfer of the inherited G1/G2/G3 lineage to an independently defined semantic conversion-root residual family, with exact checker-output identity, causal K3-vs-sham separation, and held-out Cedar nonreversal.",
+  "source": {
+    "repo": "metalogiclabs/mathgraph-lean-kernel",
+    "branch": "msi-nebula-transfer-v43",
+    "commit": "00af28fdd294ed184938c18d280f809e83db29c5",
+    "run_id": 35687193098,
+    "job_id": 106616433407,
+    "artifact_id": 10678336569,
+    "artifact_sha256": "683024419d2a64c329f0a2a4c68ca790cc4fc14f5ff2c47fbe73394ff0c78e0f"
+  },
+  "predecessor": {
+    "v42_source": "d6b9b6a6b6ee400d1897d8a1b6a71ec1e337d574",
+    "v42_run_id": 35683926864,
+    "v42_artifact_sha256": "2ec38425e67c2d010ba72105735a69e96d0e013870781db53ddc7abad0b831ed",
+    "v42_verdict": "NO_TRANSFER",
+    "reason_for_v43": "Replace the source-line witness that invalidated V42 with a preregistered semantic constructor-pair witness on a second independent residual family; thresholds and causal controls were not weakened."
+  },
+  "frozen": {
+    "pinned_base_sha": "08ddb26718c86213262943ca19ae8cf1b03fa922",
+    "inherited_lineage_source": "c9d2d6f868f449e35568d6014b8f45d3094e465a",
+    "g1": "c0/sort",
+    "g2": "c1/pi",
+    "g3": "c3/pi_continuation"
+  },
+  "semantic_identity": {
+    "mathlib": "IDENTICAL",
+    "cedar": "IDENTICAL"
+  },
+  "independent_target_witness": {
+    "kind": "semantic conversion-root constructor pair",
+    "mathlib": "Rigid/Rigid",
+    "cedar": "Rigid/Rigid",
+    "all_arms_agree": true,
+    "gate": "PASS"
+  },
+  "force_all_counts": {
+    "mathlib": {
+      "cold": 259834108,
+      "warm12": 185536895,
+      "warm123": 45131829,
+      "sham123": 185539308
+    },
+    "cedar": {
+      "cold": 39541239,
+      "warm12": 24536961,
+      "warm123": 4604446,
+      "sham123": 24535265
+    }
+  },
+  "effects": {
+    "mathlib": {
+      "g1_g2_gain_vs_cold": 74297213,
+      "g3_causal_marginal_vs_warm12": 140405066,
+      "real_g3_gain_vs_sham": 140407479,
+      "total_gain_vs_cold": 214702279
+    },
+    "cedar": {
+      "g1_g2_gain_vs_cold": 15004278,
+      "g3_causal_marginal_vs_warm12": 19932515,
+      "real_g3_gain_vs_sham": 19930819,
+      "total_gain_vs_cold": 34936793
+    }
+  },
+  "gates": {
+    "independent_target_witness": "PASS",
+    "warm123_strict_acquisition_gain": "PASS",
+    "inherited_causal_marginal": "PASS",
+    "k3_real_vs_sham": "PASS",
+    "heldout_nonreversal": "PASS"
+  },
+  "verdict": "NEBULA_TRANSFER_V43=BOUNDED_POSITIVE",
+  "boundary": [
+    "bounded evidence on the measured Mathlib acquisition and Cedar held-out corpora only",
+    "not a claim of universal transfer",
+    "not a claim of open-ended self-improvement",
+    "no trusted runtime types or transitions are added by this certificate",
+    "Metatron runtime authority remains the existing minimal immutable warrant log"
+  ]
+}
