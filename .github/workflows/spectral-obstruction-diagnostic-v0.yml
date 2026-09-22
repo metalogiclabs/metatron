@@ -1,0 +1,30 @@
+name: Spectral Obstruction Diagnostic V0
+
+on:
+  push:
+    branches:
+      - spectral-obstruction-diagnostic-v0
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  falsification:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run spectral diagnostic tests
+        run: python -m unittest discover -s tests -p 'test_spectral_obstruction_diagnostic.py' -v
+      - name: Emit diagnostic report
+        run: |
+          python scripts/spectral_obstruction_diagnostic.py > spectral-obstruction-v0.json
+          cat spectral-obstruction-v0.json
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: spectral-obstruction-v0
+          path: spectral-obstruction-v0.json
