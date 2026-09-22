@@ -62,6 +62,12 @@ boundary can hide a distinction which a later boundary reactivates.
 
 ## D. Flash-style proof-lifted closure
 
+The causal-re-entry fixture is also lifted directly into the closure layer:
+the two certified quotient edges form a `ProofClosure` path from source to
+target with exact trace `[101,202]`. Thus the extra path exposed by oplax
+composition is consumable by the same proof-lifted reclosure mechanism rather
+than existing only as a bare relational artifact.
+
 `ProofClosure` is an inductive Type-valued transitive closure of certified
 edges. Its Prop support is proved to be the least transitive relation containing
 the base edges.
@@ -106,6 +112,7 @@ A green branch establishes:
 - exact support/evidence correspondence;
 - direct-to-composed evidence inclusion with trace preservation;
 - a strict causal-re-entry counterexample to reverse inclusion;
+- direct causal-re-entry integration into proof-lifted reclosure;
 - least proof-lifted transitive closure;
 - retention of alternative supports under selective revocation.
 
