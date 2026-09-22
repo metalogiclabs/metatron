@@ -476,13 +476,20 @@ def TraceLive (revoked : Nat) (trace : List Nat) : Prop :=
 
 theorem flash_revocation_removes_one_support :
     ¬ TraceLive 11 (closureTrace flashCert flashPath₁) := by
+  change ¬ TraceLive 11 [11, 22]
   intro h
-  exact (h 11 (by simp)) rfl
+  have hm : 11 ∈ [11, 22] := by decide
+  exact (h 11 hm) rfl
 
 theorem flash_alternative_support_survives :
     TraceLive 11 (closureTrace flashCert flashPath₂) := by
+  change TraceLive 11 [12, 22]
   intro c hc
-  simp [closureTrace, flashCert] at hc
-  rcases hc with rfl | rfl <;> decide
+  simp only [List.mem_cons, List.mem_singleton] at hc
+  rcases hc with h | h
+  · subst c
+    decide
+  · subst c
+    decide
 
 end Metatron.ProofRelevantOplax
