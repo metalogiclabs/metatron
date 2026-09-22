@@ -15,7 +15,8 @@ lean_lib Metatron where
     `Metatron.ProofRelevantOplax,
     `Metatron.MonoidalDeepPresent,
     `Metatron.WiredPomset,
-    `Metatron.PortEventStructure
+    `Metatron.PortEventStructure,
+    `Metatron.ResidualBasis
   ]
 
 lean_exe metatron_reference where
