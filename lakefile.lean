@@ -20,7 +20,8 @@ lean_lib Metatron where
     `Metatron.ResidualSynergy,
     `Metatron.CausalRepairCover,
     `Metatron.CausalLinearization,
-    `Metatron.CausalTraceQuotient
+    `Metatron.CausalTraceQuotient,
+    `Metatron.FinitePosetConnectivity
   ]
 
 lean_exe metatron_reference where
