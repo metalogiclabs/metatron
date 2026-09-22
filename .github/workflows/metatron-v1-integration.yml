@@ -2,7 +2,9 @@ name: Metatron V1 Integration Seal
 
 on:
   push:
-    branches: [metatron-v1-integration]
+    branches:
+      - metatron-v1-integration
+      - main
   workflow_dispatch:
 
 permissions:
@@ -15,26 +17,46 @@ concurrency:
 jobs:
   integration-seal:
     runs-on: ubuntu-24.04
-
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       - name: Verify trusted thin waist
         run: |
           set -euo pipefail
           test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
           test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
-          echo "TRUSTED_THIN_WAIST_IDENTICAL"
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          p=Path("runtime/metatron/nucleus.py")
+          src=p.read_text()
+          semantic=[x for x in src.splitlines() if x.strip() and not x.lstrip().startswith("#")]
+          assert len(semantic) == 119, len(semantic)
+          tree=ast.parse(src)
+          roots=set()
+          for n in ast.walk(tree):
+              if isinstance(n,ast.Import):
+                  roots.update(a.name.split(".")[0] for a in n.names)
+              elif isinstance(n,ast.ImportFrom) and n.module:
+                  roots.add(n.module.split(".")[0])
+          assert roots <= {"dataclasses","hashlib","json","__future__"}, roots
+          for token in ("NebulaMachine","Aha","tau","PortEventStructure"):
+              assert token not in src
+          print("TRUSTED_THIN_WAIST_IDENTICAL")
+          PY
 
       - name: Verify integration source pins
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-
-          p = Path("evidence/integration/metatron-v1-sources.json")
-          d = json.loads(p.read_text())
-          assert d["trusted_core"]["source_head"] == "d48d84ad02477bc3bc7793d0e4fffca305aeb503"
+          d=json.loads(Path("evidence/integration/metatron-v1-sources.json").read_text())
+          assert d["trusted_core"]["source_branch_head"] == "c14b74929e64f6c819d320698079147356480b16"
+          assert d["trusted_core"]["qualified_implementation_sha"] == "13b1f6b52ee4724e33a6063c18c4a105f20bb0bc"
+          assert d["trusted_core"]["qualification_run"] == 35764668476
           assert d["semantics"]["source_head"] == "20844ab1c68b8c4f9d6528a191eb136c0bdce791"
           assert d["search_policy"]["source_head"] == "b2dc8d1599add03bf6e6d0a3cd6aa4555257512b"
           assert d["search_policy"]["qualification_run"] == 35761034357
@@ -44,6 +66,11 @@ jobs:
           assert d["external_adapter"]["authority"] == "external_evidence_policy"
           print("INTEGRATION_SOURCE_PINS_OK")
           PY
+
+      - name: Validate retained Python suite
+        run: |
+          python scripts/check_manifest.py
+          python -m unittest discover -s tests -p 'test_*.py' -v
 
       - name: Install Lean
         run: |
@@ -55,17 +82,134 @@ jobs:
           set -euo pipefail
           ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron
 
-      - name: Build retained formal stack
-        run: lake build Metatron
+      - name: Build integrated formal stack
+        run: |
+          lake build Metatron
+          lake build metatron_reference
 
-      - name: Verify claim boundary
+      - name: Verify bridge theorem and claim boundary
         run: |
           python - <<'PY'
           from pathlib import Path
-          s = Path("spec/METATRON_V1_INTEGRATION.md").read_text()
-          assert "Only (1) is runtime authority." in s
-          assert "behavioral capability class" in s
-          assert "declared finite candidate language" in s
-          assert "No generic property of raw storage-graph geometry is promoted to semantics." in s
+          lean=Path("formal/Metatron/ResidualBasis.lean").read_text()
+          spec=Path("spec/METATRON_V1_INTEGRATION.md").read_text()
+          for name in (
+              "certifiedResidualBasis_closes",
+              "minimumResidualBasis_minimalSufficient",
+              "bool_singleton_basis_covers",
+              "bool_empty_basis_fails",
+          ):
+              assert f"theorem {name}" in lean, name
+          assert "Only (1) is runtime authority." in spec
+          assert "mathematical bridge" in spec
+          assert "declared candidate language" in spec
+          assert "No generic property of raw storage-graph geometry is promoted to semantics." in spec
           print("METATRON_V1_INTEGRATION_BOUNDARY_OK")
           PY
+
+      - name: Emit integration attestation
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          d={
+            "schema_version":1,
+            "status":"QUALIFIED_INTEGRATION_CANDIDATE",
+            "head_sha":os.environ["GITHUB_SHA"],
+            "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
+            "trusted_authority":"pure append-only warrant log",
+            "bridge_theorem":"certifiedResidualBasis_closes",
+            "clc_head":"20844ab1c68b8c4f9d6528a191eb136c0bdce791",
+            "blind_v3_run":35761034357,
+            "minimal_nucleus_run":35764668476,
+            "lkc_record":"benchmarks/lean_kernel/records/eight-lane-status-v1.json"
+          }
+          Path("/tmp/metatron-v1-integration.json").write_text(
+              json.dumps(d,indent=2,sort_keys=True)+"\n")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: metatron-v1-integration
+          path: /tmp/metatron-v1-integration.json
+
+  blind-generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Generate fresh sealed challenge
+        run: |
+          mkdir -p out/public out/hidden
+          python -m scripts.blind_hypergraph_v3_generate \
+            --public out/public/public.json \
+            --hidden out/hidden/hidden.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: integration-blind-public
+          path: out/public/public.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: integration-blind-hidden
+          path: out/hidden/hidden.json
+
+  blind-predict:
+    needs: blind-generate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: integration-blind-public
+          path: in/public
+      - name: Prove hidden artifact is absent
+        run: test ! -e in/hidden
+      - name: Commit public-only prediction
+        run: |
+          mkdir -p out
+          python -m scripts.blind_hypergraph_v3_predict \
+            --public in/public/public.json \
+            --prediction out/prediction.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: integration-blind-prediction
+          path: out/prediction.json
+
+  blind-reveal:
+    needs:
+      - blind-generate
+      - blind-predict
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: integration-blind-public
+          path: in/public
+      - uses: actions/download-artifact@v4
+        with:
+          name: integration-blind-hidden
+          path: in/hidden
+      - uses: actions/download-artifact@v4
+        with:
+          name: integration-blind-prediction
+          path: in/prediction
+      - name: Reveal and verify blind prediction
+        run: |
+          mkdir -p out
+          python -m scripts.blind_hypergraph_v3_reveal \
+            --public in/public/public.json \
+            --hidden in/hidden/hidden.json \
+            --prediction in/prediction/prediction.json \
+            --report out/reveal.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: integration-blind-reveal
+          path: out/reveal.json
