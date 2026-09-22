@@ -1,0 +1,69 @@
+name: Certified Causal Repair Cover V0
+
+on:
+  push:
+    branches: [causal-repair-cover-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  theorem-gate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify trusted Nucleus unchanged
+        run: |
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' \
+            formal/Metatron/CausalRepairCover.lean \
+            formal/Metatron/ResidualSynergy.lean
+
+      - name: Build integrated formal stack
+        run: lake build Metatron
+
+      - name: Run retained Python suite
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Check causal repair theorem package
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lean=Path("formal/Metatron/CausalRepairCover.lean").read_text()
+          spec=Path("spec/CAUSAL_REPAIR_COVER_V0.md").read_text()
+          for name in (
+              "causalRepairCover_iff_targetSufficient",
+              "minimumCausalRepair_minimalSufficient",
+              "singletonRepair_certified",
+              "singleton_support_is_arity_one",
+              "chain2Repair_certified",
+              "ab_port_order",
+              "ba_port_order",
+              "ab_repair_separates_xy",
+              "ba_repair_does_not_separate_xy",
+              "ordinary_singletons_still_fail",
+              "ab_causal_repair_covers",
+              "ab_causal_repair_sufficient",
+              "ba_causal_repair_fails_cover",
+              "ab_is_minimum_one_repair",
+          ):
+              assert f"theorem {name}" in lean, name
+          assert "one-event special case" in spec
+          assert "Causal structure is semantically relevant." in spec
+          print("CAUSAL_REPAIR_COVER_V0_OK")
+          PY
