@@ -416,9 +416,11 @@ def behavioralQuotientMap
         FutureEq actB evalB protB (mapState x) (mapState y)) :
     BehavioralQuotient actA evalA protA →
       BehavioralQuotient actB evalB protB :=
-  Quotient.map mapState (by
-    intro x y hxy
-    exact mapFuture x y hxy)
+  Quotient.lift
+    (fun x => quotientMap actB evalB protB (mapState x))
+    (by
+      intro x y hxy
+      exact Quotient.sound (mapFuture x y hxy))
 
 /--
 Exact strict transports satisfy the quotient state/test commuting law after
@@ -453,7 +455,12 @@ theorem strictTransport_saturatedQuotient_naturality
         mapState pullTest mapFuture exactEval q) := by
   refine Quotient.inductionOn qx ?_
   intro x
-  exact (exactEval x q.1).symm
+  simpa [
+    behavioralQuotientMap,
+    compatibleQuotientEval,
+    pullCompatibleTest,
+    quotientMap
+  ] using (exactEval x q.1).symm
 
 /--
 A protected lift with the CLC split law remains a split after embedding protected
