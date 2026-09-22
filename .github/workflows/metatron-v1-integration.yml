@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - metatron-v1-integration
+      - causal-linearization-invariance-v0
       - main
   workflow_dispatch:
 
@@ -70,6 +71,10 @@ jobs:
           assert d["blind_causal_repair"]["verdict"] == "BLIND_CAUSAL_REPAIR_PASS"
           assert d["blind_causal_repair"]["minimum_event_count"] == 2
           assert d["blind_causal_repair"]["minimum_causal_class_count"] == 1
+          assert d["causal_linearization"]["source_head"] == "4d964e5e2dfb5e83eed8ec20a0bb841fb398f8f6"
+          assert d["causal_linearization"]["qualification_run"] == 35789279601
+          assert d["causal_linearization"]["positive_theorem"] == "independentSwap_invariant_of_commute"
+          assert d["causal_linearization"]["negative_theorem"] == "causalStructureAlone_not_enough"
           assert d["search_policy"]["authority"] == "external_policy"
           assert d["external_adapter"]["authority"] == "external_evidence_policy"
           print("INTEGRATION_SOURCE_PINS_OK")
@@ -101,6 +106,7 @@ jobs:
           from pathlib import Path
           additive=Path("formal/Metatron/ResidualBasis.lean").read_text()
           causal=Path("formal/Metatron/CausalRepairCover.lean").read_text()
+          linear=Path("formal/Metatron/CausalLinearization.lean").read_text()
           spec=Path("spec/METATRON_V1_INTEGRATION.md").read_text()
           for name in (
               "certifiedResidualBasis_closes",
@@ -115,9 +121,17 @@ jobs:
               "ba_causal_repair_fails_cover",
           ):
               assert f"theorem {name}" in causal, name
+          for name in (
+              "independentSwap_invariant_of_commute",
+              "independentObservation_invariant_of_commute",
+              "independent_swapSafe_of_commute",
+              "causalStructureAlone_not_enough",
+              "ab_not_swapSafe",
+          ):
+              assert f"theorem {name}" in linear, name
           assert "minimum certified causal repair frontier" in spec
           assert "BLIND_CAUSAL_REPAIR_PASS" in spec
-          assert "unique minimum repair g04 -> g01" in spec
+          assert "causal structure modulo certified swap-safe linearizations" in spec
           assert "No generic property of raw storage-graph geometry is promoted to semantics." in spec
           print("METATRON_V1_INTEGRATION_BOUNDARY_OK")
           PY
@@ -137,6 +151,7 @@ jobs:
             "additive_special_case":"certifiedResidualBasis_closes",
             "causal_repair_run":35776123412,
             "blind_causal_repair_run":35786529656,
+            "causal_linearization_run":35789279601,
             "clc_head":"20844ab1c68b8c4f9d6528a191eb136c0bdce791",
             "blind_v3_run":35761034357,
             "minimal_nucleus_run":35764668476,
