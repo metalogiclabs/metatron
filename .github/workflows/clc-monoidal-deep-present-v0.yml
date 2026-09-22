@@ -1,0 +1,62 @@
+name: CLC Monoidal Deep Present V0
+
+on:
+  push:
+    branches: [clc-monoidal-deep-present-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clc-monoidal-deep-present-v0-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  theorem-gate:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' \
+            formal/Metatron/MonoidalDeepPresent.lean
+
+      - name: Build theorem package
+        run: lake build Metatron
+
+      - name: Check theorem names and claim boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lean = Path("formal/Metatron/MonoidalDeepPresent.lean").read_text()
+          spec = Path("spec/CLC_MONOIDAL_DEEP_PRESENT_V0.md").read_text()
+          for name in [
+              "parallelHistory_tensor",
+              "flatTrace_interchange_fails",
+              "serialParallel_interchange",
+              "causalReentry_feedback",
+              "causalReentry_feedback_requires_live_loop",
+              "deepPresent_compatibleCone",
+              "deepPresent_direct_projection",
+              "obsClosure_extensive",
+              "obsClosure_monotone",
+              "obsClosure_idempotent",
+              "obsClosure_preserves_boundary",
+              "ostium_admission_closure",
+          ]:
+              assert f"theorem {name}" in lean, name
+          assert "flat lists are too strict" in spec
+          assert "compatible-cone interpretation" in spec
+          assert "Galois closure" in spec
+          assert "full traced-monoidal axioms" in spec
+          print("MONOIDAL_DEEP_PRESENT_CLAIM_BOUNDARY_OK")
+          PY
