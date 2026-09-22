@@ -1,0 +1,67 @@
+name: CLC Proof-Relevant Oplax V0
+
+on:
+  push:
+    branches: [clc-proof-relevant-oplax-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clc-proof-relevant-oplax-v0-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  theorem-gate:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' \
+            formal/Metatron/ProofRelevantOplax.lean
+
+      - name: Build theorem package
+        run: lake build Metatron
+
+      - name: Check theorem names and claim boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lean = Path("formal/Metatron/ProofRelevantOplax.lean").read_text()
+          spec = Path("spec/CLC_PROOF_RELEVANT_OPLAX_V0.md").read_text()
+          for name in [
+              "ccomp_id_left",
+              "ccomp_id_right",
+              "ccomp_assoc",
+              "same_map_different_certificate",
+              "qEvidence_nonempty_iff_relation",
+              "directEvidence_trace_preserved",
+              "reentry_composed_relation",
+              "reentry_not_direct",
+              "reentry_evidence_path",
+              "reentry_evidence_trace",
+              "reentry_no_direct_evidence",
+              "closure_contains",
+              "closure_trans",
+              "closure_least",
+              "flash_alternative_traces",
+              "flash_revocation_removes_one_support",
+              "flash_alternative_support_survives",
+          ]:
+              assert f"theorem {name}" in lean, name
+          assert "causal re-entry" in spec
+          assert "proof-lifted reclosure" in spec
+          assert "alternative support" in spec
+          assert "fully bundled bicategory" in spec
+          print("PROOF_RELEVANT_OPLAX_CLAIM_BOUNDARY_OK")
+          PY
