@@ -91,13 +91,33 @@ This places the developmental layer naturally in a relation-enriched setting
 (`Rel`, or equivalently a powerset/Kleisli style semantics), while the strict
 subcategory remains ordinary functional transport.
 
+## D. Composition is oplax in general
+
+Let (R_f) and (R_g) be the quotient relations induced by consecutive state
+maps. The branch proves
+
+[
+R_{g\circ f}\subseteq R_f;R_g.
+]
+
+The inclusion can be strict because relational composition may re-choose a
+different representative of an intermediate behavioral class before applying
+the second developmental map.
+
+If the second map preserves continuation-safe equivalence, the reverse
+inclusion also holds and composition becomes exact.
+
+So, with relation homs ordered by inclusion, the quotient construction has the
+shape of an **oplax** functor into `Rel`, becoming strict on identity-preserving
+legs.
+
 ## Claim boundary
 
-A green branch establishes only the finite deterministic theorem package above.
-It does not yet prove:
+A green branch establishes the finite deterministic theorem package above,
+including identity and oplax composition laws. It does not yet prove:
 
-- full composition/functoriality of quotient relations;
-- a category/2-category of certificate-carrying developmental relations;
+- a fully packaged category/2-category of certificate-carrying developmental relations;
+- associativity/unit laws as a bundled functor structure;
 - interaction with authority snapshots and revocation;
 - a universal property for certificates;
 - empirical or ontological conclusions.
