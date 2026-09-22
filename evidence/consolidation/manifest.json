@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "preexisting_branch_count": 30,
+  "consolidation_branch": "consolidated/current-v1",
+  "policy": {
+    "rule": "One trusted runtime spine; derived semantics and external policies remain non-authoritative.",
+    "negative_results": "Preserve failures/falsifiers as provenance; do not promote by merge.",
+    "consolidation_changes": "Evidence and documentation only; no trusted runtime or formal authority changes."
+  },
+  "integration_spine": {
+    "branch": "metatron-v1-integration",
+    "commit": "f4ed7b360c84bc971a0619c7a69de4586e73f3ac",
+    "run_id": 35789903190,
+    "artifact_id": 10722000410,
+    "artifact_digest": "sha256:f45e1e8f99aac4756e789a0ac959e1c9efe4f64c3c01bc97a74d5baf10f022b1",
+    "status": "QUALIFIED_INTEGRATION_CANDIDATE"
+  },
+  "trusted_runtime": {
+    "source_branch": "metatron-minimal-warrant-graph-v0",
+    "qualified_implementation_sha": "13b1f6b52ee4724e33a6063c18c4a105f20bb0bc",
+    "qualification_run": 35764668476,
+    "runtime_nucleus_blob": "d9d4293e54471714bf098593bf4018c3f6403273",
+    "formal_warrant_graph_blob": "d2affc0a57a1815f303f6f1859941465c69e7d32",
+    "semantic_lines": 119,
+    "line_budget": 120,
+    "authoritative_state": "immutable tuple[Node, ...]",
+    "primitive_transition": "append(Log, Node) -> Log",
+    "authority": "trusted_runtime"
+  },
+  "derived_semantics": {
+    "clc_port_event": {
+      "branch": "clc-port-event-structure-v0",
+      "head": "20844ab1c68b8c4f9d6528a191eb136c0bdce791",
+      "qualification_run": 35761761009,
+      "authority": "derived_formal_semantics"
+    },
+    "interaction_semantics": {
+      "branch": "metatron-v1-integration",
+      "qualification_run": 35776238725,
+      "bridge": "generatedResidualBasis_closes",
+      "minimality": "minimumGeneratedBasis_minimalSufficient",
+      "authority": "derived_formal_semantics"
+    },
+    "synergy_falsifier": {
+      "branch": "residual-synergy-falsifier-v0",
+      "head": "52b720a3ecaf3b3f88595b402c785fd9c5308e5e",
+      "qualification_run": 35774746265,
+      "theorem": "ordinarySingletonCover_fails",
+      "positive": "jointBasis_sufficient",
+      "authority": "derived_falsification_evidence"
+    }
+  },
+  "external_policies": {
+    "search": {
+      "branch": "separating-hypergraph-blind-v3",
+      "head": "b2dc8d1599add03bf6e6d0a3cd6aa4555257512b",
+      "qualification_run": 35761034357,
+      "verdict": "BLIND_PROSPECTIVE_PASS",
+      "authority": "external_policy"
+    },
+    "lean_kernel_adapter": {
+      "branch": "metatron-lkc-eight-lane-v1",
+      "head": "b2d384087e79719f384852688d730cb0d56a1d7d",
+      "qualification_run": 35708162623,
+      "authority": "external_evidence_policy"
+    }
+  },
+  "blind_control": {
+    "verdict": "BLIND_PROSPECTIVE_PASS",
+    "reveal_artifact_id": 10721627918,
+    "reveal_artifact_digest": "sha256:28426084271e9b763155cc2ec1c64594cba1c5640a6a988978b440216e2a80ef"
+  },
+  "preserved_nonpromotions": {
+    "nebula_ignition_v0": {
+      "branch": "nebula-ignition-v0",
+      "head": "5e9de066eb44b1dafcfba0154c3db18182abdf7a",
+      "run_id": 35659570524,
+      "workflow_conclusion": "failure",
+      "treatment": "Preserved as provenance; no scientific conclusion or runtime authority inferred by consolidation."
+    }
+  }
+}
