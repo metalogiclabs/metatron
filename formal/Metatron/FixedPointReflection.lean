@@ -527,4 +527,67 @@ theorem saturatedProtected_split
         actB evalB protB (liftProtect p) (liftProtected p hp))).1 = p := by
   exact split p hp
 
+
+/-!
+Why exactness matters.
+
+The saturated strict-transport theorem does not extend to arbitrary
+information-gaining refinements by replacing exact evaluation preservation with
+a one-way information order. The following two-point fixture is a counterexample.
+-/
+
+def boolInfoLe (a b : Bool) : Prop :=
+  a = false ∨ b = true
+
+def laxAAct (_ : Unit) (x : Bool) : Bool := x
+
+def laxAEval (q x : Bool) : Bool :=
+  if q then x else false
+
+def laxAProtected (q : Bool) : Prop :=
+  q = false
+
+def laxBAct (_ : Unit) (_ : Unit) : Unit := ()
+
+def laxBEval (_ : Unit) (_ : Unit) : Bool := true
+
+def laxBProtected (_ : Unit) : Prop := True
+
+def laxMapState (_ : Bool) : Unit := ()
+
+def laxPullTest (_ : Unit) : Bool := true
+
+theorem laxRefinement_law :
+    ∀ x q,
+      boolInfoLe (laxAEval (laxPullTest q) x)
+        (laxBEval q (laxMapState x)) := by
+  intro x q
+  exact Or.inr rfl
+
+theorem laxAFutureEq :
+    FutureEq laxAAct laxAEval laxAProtected false true := by
+  intro steps q hq
+  subst q
+  simp [laxAEval]
+
+def laxTargetCompatible :
+    CompatibleTest laxBAct laxBEval laxBProtected :=
+  ⟨(), by
+    intro x y hxy
+    rfl⟩
+
+/--
+Despite the information-refinement law, the pullback of a target-compatible
+test can fail to be compatible with the source continuation-safe quotient.
+-/
+theorem laxRefinement_compatiblePullback_fails :
+    ¬ (∀ x y,
+      FutureEq laxAAct laxAEval laxAProtected x y →
+      laxAEval (laxPullTest laxTargetCompatible.1) x =
+        laxAEval (laxPullTest laxTargetCompatible.1) y) := by
+  intro h
+  have hbad := h false true laxAFutureEq
+  change false = true at hbad
+  cases hbad
+
 end Metatron.FixedPointReflection
