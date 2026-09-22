@@ -18,7 +18,8 @@ lean_lib Metatron where
     `Metatron.PortEventStructure,
     `Metatron.ResidualBasis,
     `Metatron.ResidualSynergy,
-    `Metatron.CausalRepairCover
+    `Metatron.CausalRepairCover,
+    `Metatron.CausalLinearization
   ]
 
 lean_exe metatron_reference where
