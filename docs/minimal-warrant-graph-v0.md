@@ -4,7 +4,7 @@ Metatron's semantic nucleus has two public runtime concepts:
 
 ```text
 Node(kind, payload, premises)
-WarrantGraph.append(node)
+append(Log, Node) -> Log
 ```
 
 Everything else is either a derived view or an external policy.
@@ -32,8 +32,9 @@ nodes are never deleted.
 
 ## One authority, not mirrored stores
 
-The in-memory authority is one immutable tuple, `WarrantGraph._log`.
+The in-memory authority is the immutable `Log = tuple[Node, ...]` itself.
 The persisted authority is canonical JSONL replay of that same log.
+There is no wrapper object with hidden mutable state.
 
 There is no authoritative capability map, certificate map, residual store,
 relation store, revocation set, lineage list, dependency index, frontier, or
@@ -83,8 +84,11 @@ The formal reference uses Lean core only. Mathlib is not required.
 - Python standard library only;
 - at most 120 nonblank, noncomment lines.
 
-The qualified implementation has 114 such lines and is 4,253 bytes. The whole
-runtime package (`__init__.py`, `nucleus.py`, `views.py`) is 5,672 bytes.
+The previously qualified implementation had 114 semantic lines and was 4,253
+bytes. The current branch removes the `WarrantGraph` wrapper as a further
+pure-functional reduction. Its exact source head is not called qualified until
+the dedicated workflow records a fresh successful run in
+`evidence/qualified-runs/minimal-warrant-graph-v0-latest.json`.
 
 ## External systems
 
@@ -116,3 +120,19 @@ artifact metatron-minimal-nucleus-v0
 
 The committed qualification record names that implementation head. A later
 workflow artifact attests the evidence-closure head, avoiding self-reference.
+
+## Nebula certificate boundary
+
+Nebula ignition is not implemented by adding Nebula, Genesis, or Aha classes to
+the nucleus. Those are derived developmental interpretations over warranted
+history.
+
+A sustained ignition claim is accepted only through the external causal
+certificate gate in `scripts/check_nebula_certificate.py`. The certificate must
+bind exact source/run/artifact hashes and establish:
+
+`G1 -> (rho2,K2) -> G2 -> (rho3,K3) -> G3`
+
+with future-withholding, knockout, semantic-sham, restart, and sealed-semantics
+controls. Until such evidence exists, no Nebula claim is promoted into the
+warrant log.

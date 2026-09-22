@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "campaign": "SAIR Lean Kernel Challenge Stage 1",
+  "objective": "lowest valid kernel instruction total on all eight independent leaderboards",
+  "authority_boundary": "This file is external evidence/policy state. The Metatron nucleus remains the append-only warrant graph.",
+  "lanes": {
+    "partition": {
+      "external_champion": {
+        "name": "v13-three-compiled",
+        "external_run_id": 206,
+        "github_run_id": 35672006623,
+        "source_sha256": "bcb6325b9d0ca5c7259b0de76d903ba5cb20e05fdb60938b5201745d00491085",
+        "cohort_id": "sair-playground-grouped-practice-v1-partition-14-22-32",
+        "metric": "perf_instructions",
+        "measurement_contract": "kernel-replay-v2",
+        "protocol": "KTP/3",
+        "case_values": {
+          "P1:0@n=14": 75221175,
+          "P2:0@n=22": 197200815,
+          "P3:0@n=32": 443764613
+        },
+        "external_total_instructions": 716186603,
+        "official": false,
+        "scoreable": false,
+        "verdict": "accepted",
+        "final_conclusion": "passed"
+      },
+      "best_local": {
+        "name": "v13-three-compiled",
+        "repo": "heathsanchez/test",
+        "branch": "lkc-partition-three-compiled-v13",
+        "commit": "ebcc890db3098f1a238c6419fc1ed9eddfcaaf2d",
+        "qualification_run": 35660577434,
+        "source_sha256": "bcb6325b9d0ca5c7259b0de76d903ba5cb20e05fdb60938b5201745d00491085",
+        "universal_proof": true,
+        "canonical_accepted": true,
+        "axioms": [
+          "propext",
+          "Quot.sound"
+        ],
+        "local_proxy_seconds": 0.182697394
+      },
+      "status": "EXTERNAL_PROMOTE_PRACTICE"
+    },
+    "primecount": {
+      "external_champion": {
+        "name": "v3-structural"
+      },
+      "screen_candidate": {
+        "name": "v5-bitset-probe",
+        "branch": "lkc-flash2-primecount-v5-bitset",
+        "commit": "e0b506b2276b181890fb31912b391cb748fb196e",
+        "screen_run": 35423022766,
+        "wall_time_improvement_pct": 11.171794277638526,
+        "universal_proof": false
+      },
+      "status": "SCREEN_WIN_PROOF_REQUIRED"
+    },
+    "mertens": {
+      "champion": {
+        "name": "v6-structural"
+      },
+      "rejected_probe": {
+        "name": "v9-bitset-probe",
+        "branch": "lkc-flash2-mertens-v9-bitset",
+        "commit": "0e90efe068bf3ab54c1c350a03f671b3578551a3",
+        "screen_run": 35423028612,
+        "wall_time_improvement_pct": -23.301916230627384
+      },
+      "status": "REFUTED_RESOURCE"
+    },
+    "fib": {
+      "champion": {
+        "name": "v2-bitwise"
+      },
+      "rejected_probe": {
+        "name": "v4-shift-probe",
+        "branch": "lkc-flash2-fib-v4-shift",
+        "commit": "8f06a3fe81476fb8d2755e290d1deb8b14fb247c",
+        "screen_run": 35422786945,
+        "wall_time_improvement_pct": -1.7309719455808725
+      },
+      "public_packages": {
+        "snapshot_run": 35659790535,
+        "count": 2,
+        "families": [
+          "tiny fast-pair / fast doubling",
+          "large anchor/interpolation construction"
+        ]
+      },
+      "status": "CHAMPION_RETAINED_PUBLIC_FAMILIES_INGESTED"
+    },
+    "polydisc": {
+      "champion": {
+        "name": "v3-frozen"
+      },
+      "probe": {
+        "name": "v4-fixed-shape",
+        "branch": "lkc-flash2-polydisc-v4",
+        "callgrind_run": 35423038757,
+        "callgrind_improvement_pct": 0.01065298045975771,
+        "proof_status": "red"
+      },
+      "status": "FLAT_AND_UNQUALIFIED"
+    },
+    "ca-rule110": {
+      "champion": {
+        "name": "v60-frozen"
+      },
+      "probe": {
+        "name": "v64-generic-step-dispatch",
+        "branch": "lkc-flash2-rule110-v64",
+        "commit": "216c0e5973e8bd6a66c80e5aa86392a8c8e3bdc9",
+        "proof_status": "unqualified",
+        "screen_run": 35672093364,
+        "wall_time_improvement_pct": 1.7039125961111123,
+        "proof_run": 35672522770,
+        "source_sha256": "76432df96c983d05565dc6fb447ff508d571423b52f358299df05347e210c91e",
+        "universal_proof": true,
+        "canonical_accepted": true
+      },
+      "status": "EXTERNAL_PROMOTE_PRACTICE",
+      "external_champion": {
+        "name": "v64-generic-step-dispatch",
+        "external_run_id": 207,
+        "github_run_id": 35672711729,
+        "source_sha256": "76432df96c983d05565dc6fb447ff508d571423b52f358299df05347e210c91e",
+        "cohort_id": "sair-playground-grouped-practice-v1-ca-rule110",
+        "metric": "perf_instructions",
+        "measurement_contract": "kernel-replay-v2",
+        "protocol": "KTP/3",
+        "case_values": {
+          "C1:0": 2691464,
+          "C2:0": 3344389,
+          "C3:0": 4523000
+        },
+        "external_total_instructions": 10558853,
+        "official": false,
+        "scoreable": false,
+        "verdict": "accepted",
+        "final_conclusion": "passed"
+      }
+    },
+    "permanent": {
+      "champion": {
+        "name": "v7-state-counter-exact",
+        "repo": "heathsanchez/test",
+        "branch": "lkc-permanent-v7-exact-proof",
+        "commit": "ade0dea3659acfc7ce798b28d328c0c969618bb1",
+        "qualification_run": 35706258900,
+        "source_sha256": "13a96a0c1da96606a918a14baada1083578e6f1123025dae64448e4cb2130ac4",
+        "universal_proof": true,
+        "canonical_accepted": true,
+        "local_wall_time_improvement_pct": 2.535448847763988
+      },
+      "rejected_probe": {
+        "name": "v6-reverse-row-order",
+        "branch": "lkc-flash2-permanent-v6",
+        "commit": "98dcca608af6bb8dd0ed42391e83453e4776eeb5",
+        "screen_run": 35672099944,
+        "wall_time_improvement_pct": -19.282830821159223
+      },
+      "external_champion": {
+        "name": "v7-state-counter-exact",
+        "external_run_id": 213,
+        "github_run_id": 35707127499,
+        "source_sha256": "13a96a0c1da96606a918a14baada1083578e6f1123025dae64448e4cb2130ac4",
+        "cohort_id": "sair-playground-grouped-practice-v1-permanent",
+        "metric": "perf_instructions",
+        "measurement_contract": "kernel-replay-v2",
+        "protocol": "KTP/3",
+        "case_values": {
+          "R1:0@6x6": 148674912,
+          "R2:0@12x12": 3233722033,
+          "R3:0@16x16": 36781366608
+        },
+        "external_total_instructions": 40163763553,
+        "official": false,
+        "scoreable": false,
+        "verdict": "accepted",
+        "final_conclusion": "passed"
+      },
+      "status": "EXTERNAL_PROMOTE_PRACTICE"
+    },
+    "sha256": {
+      "champion": {
+        "name": "v23-frozen"
+      },
+      "probe": {
+        "name": "v24-deferred-normalization",
+        "branch": "lkc-flash2-sha-v24",
+        "commit": "f55bae277f4d0aa01718140e5b36bdacba06934a",
+        "proof_status": "unqualified",
+        "screen_run": 35672052561,
+        "comparable_wall_time_improvement_pct": 7.439026002209792
+      },
+      "status": "SCREEN_WIN_PROOF_REQUIRED"
+    }
+  },
+  "next_actions": [
+    "Primecount: qualify the odd-only V6 proof-friendly family and compare it against both V3 and the faster unproved V5; pursue a V5 proof only if it remains the resource leader.",
+    "Partition: V13 remains the external practice champion; V14 closed part-size-3 row now requires a universal closed-form bridge before it can be screened.",
+    "SHA256: continue the V24 deferred-normalization proof bridge; the runtime screen remains materially positive and the current residual is proof normalization only.",
+    "Permanent: V7 exact state-counter is now the external practice champion; use its case-level PMU residual before opening the next representation family.",
+    "Mertens: grouped-quotient recurrence is the live new family; compile and screen before proof.",
+    "Fib: retain V2; shift, shared-pair, and Mathlib fastFib families are all resource-refuted.",
+    "Rule110: retain external V64; radius-2 superstep V65 is resource-refuted.",
+    "Polydisc: retain V3; pursue only a qualitatively different modular/resultant representation."
+  ]
+}
