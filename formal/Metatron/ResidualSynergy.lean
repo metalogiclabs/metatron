@@ -29,7 +29,7 @@ def y : State := ⟨true, false, false⟩
 def Allowed (basis steps : List Gen) : Prop :=
   ∀ g, g ∈ steps → g ∈ basis
 
-def BasisEq (basis : List Gen) : Relation State :=
+def BasisEq (basis : List Gen) : Metatron.ResidualBasis.Relation State :=
   fun s t =>
     ∀ steps, Allowed basis steps →
       observe (run act steps s) = observe (run act steps t)
@@ -108,9 +108,9 @@ theorem b_then_a_does_not_separate :
       observe (run act [.b, .a] y) := by
   rfl
 
-def current : Relation State := fun _ _ => True
+def current : Metatron.ResidualBasis.Relation State := fun _ _ => True
 
-def target : Relation State := BasisEq [.a, .b]
+def target : Metatron.ResidualBasis.Relation State := BasisEq [.a, .b]
 
 theorem target_separates_xy :
     ¬ target x y := by
