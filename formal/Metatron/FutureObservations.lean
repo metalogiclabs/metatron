@@ -192,6 +192,63 @@ theorem continuationSafe_eq_gfp
   · intro R hR x y hxy
     exact admissible_le_futureEq act test Protected R hR x y hxy
 
+
+/-- Pointwise inclusion of binary relations. -/
+def RelLe
+    {State : Type u}
+    (R S : Relation State) : Prop :=
+  ∀ x y, R x y → S x y
+
+/--
+Strict refinement in the information order: every newly identified pair was
+already identified before, and at least one old pair is now separated.
+-/
+def StrictRefines
+    {State : Type u}
+    (Rnew Rold : Relation State) : Prop :=
+  RelLe Rnew Rold ∧
+    ∃ x y, Rold x y ∧ ¬ Rnew x y
+
+/-- Enlarging the protected test language can only refine FutureEq. -/
+theorem futureEq_antitone_protected
+    {State : Type u} {Step : Type v} {Test : Type w} {Val : Type z}
+    (act : Step → State → State)
+    (test : Test → State → Val)
+    (Pold Pnew : Test → Prop)
+    (hprotect : ∀ q, Pold q → Pnew q) :
+    RelLe (FutureEq act test Pnew) (FutureEq act test Pold) := by
+  intro x y hnew steps q hq
+  exact hnew steps q (hprotect q hq)
+
+/--
+Residual-driven strict descent, with the Lyapunov value taken in the poset of
+continuation-safe relations ordered by reverse information.
+
+If the new protected language extends the old one and contains a test that
+separates a pair previously continuation-safe equivalent, then the new
+behavioral relation is a strict refinement of the old relation.
+-/
+theorem residualAdjoin_strictLyapunov
+    {State : Type u} {Step : Type v} {Test : Type w} {Val : Type z}
+    (act : Step → State → State)
+    (test : Test → State → Val)
+    (Pold Pnew : Test → Prop)
+    (hprotect : ∀ q, Pold q → Pnew q)
+    (qFresh : Test)
+    (x y : State)
+    (hOld : FutureEq act test Pold x y)
+    (hFreshProtected : Pnew qFresh)
+    (hSeparates : test qFresh x ≠ test qFresh y) :
+    StrictRefines
+      (FutureEq act test Pnew)
+      (FutureEq act test Pold) := by
+  constructor
+  · exact futureEq_antitone_protected act test Pold Pnew hprotect
+  · refine ⟨x, y, hOld, ?_⟩
+    intro hNew
+    apply hSeparates
+    simpa [run] using hNew [] qFresh hFreshProtected
+
 def futureSetoid
     {State : Type u} {Step : Type v} {Test : Type w} {Val : Type z}
     (act : Step → State → State)
