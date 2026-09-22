@@ -60,16 +60,7 @@ theorem independent2RL_certified
   · simp [independent2RL]
   constructor
   · intro e
-    simp only [independent2RL, independent2PES, List.mem_cons, List.mem_singleton]
-    constructor
-    · intro h
-      cases h with
-      | inl h0 => exact Or.inr h0
-      | inr h1 => exact Or.inl h1
-    · intro h
-      cases h with
-      | inl h1 => exact Or.inr h1
-      | inr h0 => exact Or.inl h0
+    simpa [independent2RL, independent2PES, or_comm]
   · intro a b ha hb hbefore
     simp [independent2RL, independent2PES] at hbefore
 
