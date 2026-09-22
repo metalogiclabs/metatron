@@ -124,12 +124,14 @@ def singletonSeparates (g : Gen) (s t : State) : Prop :=
   ¬ BasisEq [g] s t
 
 theorem singletonA_has_no_xy_edge :
-    ¬ singletonSeparates .a x y :=
-  singletonA_indistinguishable
+    ¬ singletonSeparates .a x y := by
+  intro h
+  exact h singletonA_indistinguishable
 
 theorem singletonB_has_no_xy_edge :
-    ¬ singletonSeparates .b x y :=
-  singletonB_indistinguishable
+    ¬ singletonSeparates .b x y := by
+  intro h
+  exact h singletonB_indistinguishable
 
 theorem ordinarySingletonCover_fails :
     ¬ CoversResidual current target singletonSeparates [.a, .b] := by
