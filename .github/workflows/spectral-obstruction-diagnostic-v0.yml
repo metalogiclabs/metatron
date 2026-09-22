@@ -21,7 +21,7 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_spectral_obstruction_diagnostic.py' -v
       - name: Emit diagnostic report
         run: |
-          python scripts/spectral_obstruction_diagnostic.py > spectral-obstruction-v0.json
+          python -m scripts.spectral_obstruction_diagnostic > spectral-obstruction-v0.json
           cat spectral-obstruction-v0.json
       - name: Upload report
         uses: actions/upload-artifact@v4
