@@ -285,12 +285,9 @@ theorem synergy_pair_is_minimum_generated_basis :
             | right =>
                 simpa using hl
         | cons b rest =>
-            have hge : 2 ≤ ([a, b] ++ rest).length := by
+            have hge : 2 ≤ (a :: b :: rest).length := by
               simp
-            have hlen :
-                (a :: b :: rest).length = ([a, b] ++ rest).length := by
-              rfl
-            exact (Nat.not_lt_of_ge (by simpa [hlen] using hge)) hlt
+            exact (Nat.not_lt_of_ge hge) hlt
 
 theorem synergy_minimum_target_sufficient :
     GeneratedTargetSufficient
