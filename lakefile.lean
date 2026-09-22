@@ -11,7 +11,8 @@ lean_lib Metatron where
     `Metatron.WarrantGraph,
     `Metatron.FutureObservations,
     `Metatron.FixedPointReflection,
-    `Metatron.DevelopmentalRelation
+    `Metatron.DevelopmentalRelation,
+    `Metatron.ProofRelevantOplax
   ]
 
 lean_exe metatron_reference where
