@@ -1,0 +1,66 @@
+name: Finite Poset Toposort Connectivity V0
+
+on:
+  push:
+    branches: [finite-poset-toposort-connectivity-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  theorem-gate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify trusted Nucleus unchanged
+        run: |
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)'             formal/Metatron/FinitePosetConnectivity.lean
+
+      - name: Build theorem stack
+        run: lake build Metatron
+
+      - name: Run retained Python suite
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Check theorem package
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lean=Path("formal/Metatron/FinitePosetConnectivity.lean").read_text()
+          spec=Path("spec/FINITE_POSET_TOPOSORT_CONNECTIVITY_V0.md").read_text()
+          for name in (
+              "posetTrace_cons",
+              "topo_remove_middle",
+              "topo_prefix_not_reverse",
+              "bubble_left_by_incomparables",
+              "all_topological_sorts_traceConnected",
+              "posetTrace_to_semanticTrace",
+              "all_topological_sorts_semantically_invariant",
+              "pes_topological_sorts_traceConnected",
+              "pes_all_topological_sorts_semantically_invariant",
+              "forkA_topological",
+              "forkB_topological",
+              "fork_topological_sorts_connected",
+              "chain_not_incomparable",
+          ):
+              assert f"theorem {name}" in lean, name
+          assert "constructive" in spec
+          assert "one semantic trace class" in spec
+          print("FINITE_POSET_TOPOSORT_CONNECTIVITY_V0_OK")
+          PY
