@@ -22,6 +22,7 @@ ALLOWED_PERF = {
     "DIAGNOSTIC_ONLY",
     "UNKNOWN_NO_SAME_COHORT_HARDWARE_COUNTERS",
 }
+GIT_SHA = re.compile(r"^[0-9a-f]{40}$")
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 DIGEST = re.compile(r"^sha256:[0-9a-f]{64}$")
 
@@ -46,8 +47,7 @@ def validate(record):
     pred = _need(record, "predecessor", errors, "record") or {}
     if pred.get("g13_head") != EXPECTED_G13_HEAD:
         errors.append("predecessor.g13_head: does not bind sealed G13")
-    seal = pred.get("external_seal")
-    if seal != EXPECTED_G13_SEAL:
+    if pred.get("external_seal") != EXPECTED_G13_SEAL:
         errors.append("predecessor.external_seal: does not match sealed G13 evidence")
 
     residual = _need(record, "residual", errors, "record") or {}
@@ -65,10 +65,8 @@ def validate(record):
 
     result = _need(record, "result", errors, "record") or {}
     head = result.get("g14_head")
-    if not isinstance(head, str) or not HEX64.fullmatch(head):
-        errors.append("result.g14_head: expected exact 40/64? commit SHA as 40 lowercase hex")
-    elif len(head) != 40:
-        errors.append("result.g14_head: expected full 40-character git SHA")
+    if not isinstance(head, str) or not GIT_SHA.fullmatch(head):
+        errors.append("result.g14_head: expected full 40-character lowercase git SHA")
     if result.get("exact_pprod") != "ACCEPT":
         errors.append("result.exact_pprod: must be ACCEPT")
     if result.get("malformed_recognized") != "REJECT":
@@ -93,7 +91,9 @@ def validate(record):
     else:
         expected = {"identical": 40, "earned_delta": 1, "mismatches": 0}
         if diff != expected:
-            errors.append("result.differential: expected 40 identical + 1 earned delta + 0 mismatches")
+            errors.append(
+                "result.differential: expected 40 identical + 1 earned delta + 0 mismatches"
+            )
 
     formal = _need(record, "formal", errors, "record") or {}
     if formal.get("semantic_warrant") is not True:
