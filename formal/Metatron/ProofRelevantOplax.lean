@@ -441,6 +441,68 @@ theorem closure_least
   | comp p q ihp ihq =>
       exact htrans ihp ihq
 
+/-!
+The re-entry witness can itself be consumed as a proof-lifted closure path.
+This is the explicit bridge from quotient-level causal re-entry to Flash-style
+reclosure.
+-/
+
+def reentryFEvidence :
+    QEvidence
+      tinyAct tinyEval allTinyProtected
+      tinyAct tinyEval tinyProtected
+      reentryF qAFalse qBFalse :=
+  {
+    repr := false
+    source_eq := rfl
+    target_eq := rfl
+    trace := [101]
+    trace_eq := rfl
+  }
+
+def reentryGEvidence :
+    QEvidence
+      tinyAct tinyEval tinyProtected
+      tinyAct tinyEval allTinyProtected
+      reentryG qBFalse qCTrue :=
+  {
+    repr := true
+    source_eq := (Quotient.sound tinyFutureEq).symm
+    target_eq := rfl
+    trace := [202]
+    trace_eq := rfl
+  }
+
+inductive ReentryNode
+  | source | middle | target
+
+inductive ReentryEdge : ReentryNode → ReentryNode → Type
+  | first : QEvidence
+      tinyAct tinyEval allTinyProtected
+      tinyAct tinyEval tinyProtected
+      reentryF qAFalse qBFalse →
+      ReentryEdge .source .middle
+  | second : QEvidence
+      tinyAct tinyEval tinyProtected
+      tinyAct tinyEval allTinyProtected
+      reentryG qBFalse qCTrue →
+      ReentryEdge .middle .target
+
+def reentryEdgeCert :
+    ∀ {a b}, ReentryEdge a b → Nat
+  | _, _, ReentryEdge.first _ => 101
+  | _, _, ReentryEdge.second _ => 202
+
+def reentryFlashPath :
+    ProofClosure ReentryEdge .source .target :=
+  ProofClosure.comp
+    (ProofClosure.edge (ReentryEdge.first reentryFEvidence))
+    (ProofClosure.edge (ReentryEdge.second reentryGEvidence))
+
+theorem flash_reclosure_carries_reentry :
+    closureTrace reentryEdgeCert reentryFlashPath = [101, 202] := by
+  rfl
+
 inductive FlashNode
   | a | b | c
   deriving DecidableEq
