@@ -11,8 +11,8 @@ open Metatron.FutureObservations
 universe u v
 
 def OccursBefore (schedule : List Nat) (a b : Nat) : Prop :=
-  ∃ prefix middle suffix,
-    schedule = prefix ++ a :: middle ++ b :: suffix
+  ∃ pre mid post,
+    schedule = pre ++ a :: mid ++ b :: post
 
 structure CausalRepair (Gen : Type u) where
   pes : PES Nat
