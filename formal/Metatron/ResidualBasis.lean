@@ -59,13 +59,15 @@ theorem certifiedResidualBasis_closes
   classical
   constructor
   · intro hcover x y hrefined
-    by_contra htarget
+    apply Classical.byContradiction
+    intro htarget
     have hres : ResidualPair current target x y :=
       ⟨hrefined.1, htarget⟩
     rcases hcover x y hres with ⟨g, hg, hsep⟩
     exact (hrefined.2 g hg) hsep
   · intro hsufficient x y hres
-    by_contra hnone
+    apply Classical.byContradiction
+    intro hnone
     have hall : ∀ g, g ∈ basis → ¬ separates g x y := by
       intro g hg hsep
       apply hnone
