@@ -198,11 +198,11 @@ def futureSetoid
     (test : Test → State → Val)
     (Protected : Test → Prop) : Setoid State where
   r := FutureEq act test Protected
-  iseqv := ⟨
-    futureEq_refl act test Protected,
-    fun _ _ h => futureEq_symm act test Protected h,
-    fun _ _ _ hxy hyz => futureEq_trans act test Protected hxy hyz
-  ⟩
+  iseqv := {
+    refl := futureEq_refl act test Protected
+    symm := futureEq_symm act test Protected
+    trans := futureEq_trans act test Protected
+  }
 
 abbrev BehavioralQuotient
     {State : Type u} {Step : Type v} {Test : Type w} {Val : Type z}
@@ -247,14 +247,16 @@ theorem behavioralQuotient_reflection
     (Protected : Test → Prop)
     (f : State → Y)
     (hf : ∀ x y, FutureEq act test Protected x y → f x = f y) :
-    ∃! g : BehavioralQuotient act test Protected → Y,
-      ∀ x, g (quotientMap act test Protected x) = f x := by
+    ∃ g : BehavioralQuotient act test Protected → Y,
+      (∀ x, g (quotientMap act test Protected x) = f x) ∧
+      ∀ h : BehavioralQuotient act test Protected → Y,
+        (∀ x, h (quotientMap act test Protected x) = f x) → h = g := by
   refine ⟨factor act test Protected f hf, ?_, ?_⟩
   · intro x
     rfl
-  · intro g hg
+  · intro h hh
     funext qx
     exact Quotient.inductionOn qx (fun x => by
-      simpa [factor, quotientMap] using hg x)
+      simpa [factor, quotientMap] using hh x)
 
 end Metatron.FutureObservations
