@@ -13,7 +13,8 @@ lean_lib Metatron where
     `Metatron.FixedPointReflection,
     `Metatron.DevelopmentalRelation,
     `Metatron.ProofRelevantOplax,
-    `Metatron.MonoidalDeepPresent
+    `Metatron.MonoidalDeepPresent,
+    `Metatron.WiredPomset
   ]
 
 lean_exe metatron_reference where
