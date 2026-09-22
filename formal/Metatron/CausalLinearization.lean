@@ -60,7 +60,16 @@ theorem independent2RL_certified
   · simp [independent2RL]
   constructor
   · intro e
-    simp [independent2RL, independent2PES]
+    change (e = 0 ∨ e = 1) ↔ (e = 1 ∨ e = 0)
+    constructor
+    · intro h
+      cases h with
+      | inl h0 => exact Or.inr h0
+      | inr h1 => exact Or.inl h1
+    · intro h
+      cases h with
+      | inl h1 => exact Or.inr h1
+      | inr h0 => exact Or.inl h0
   · intro a b ha hb hbefore
     simp [independent2RL, independent2PES] at hbefore
 
@@ -173,10 +182,10 @@ theorem ab_independent_rl_does_not_separate :
 theorem ab_actions_do_not_commute :
     ¬ Commute act Gen.a Gen.b := by
   intro hcomm
-  have h := hcomm y
-  have hob :=
-    congrArg State.observed h
-  decide at hob
+  have hob : true = false := by
+    simpa [act, y] using
+      congrArg State.observed (hcomm y)
+  cases hob
 
 theorem causalStructureAlone_not_enough :
     (causalSignature abIndependentLR.pes [301, 302] =
@@ -214,8 +223,10 @@ theorem independent_swapSafe_of_commute
 theorem ab_not_swapSafe :
     ¬ SwapSafe act abIndependentLR abIndependentRL := by
   intro hsafe
-  have h := hsafe y
-  have hob := congrArg State.observed h
-  decide at hob
+  have hob : true = false := by
+    simpa [abIndependentLR, abIndependentRL, independent2LR, independent2RL,
+      execute, CausalRepair.support, act, y] using
+      congrArg State.observed (hsafe y)
+  cases hob
 
 end Metatron.CausalLinearization
