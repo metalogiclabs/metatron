@@ -1,0 +1,54 @@
+name: CLC Port Event Structure V0
+
+on:
+  push:
+    branches: [clc-port-event-structure-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clc-port-event-structure-v0-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  theorem-gate:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' \
+            formal/Metatron/PortEventStructure.lean
+
+      - name: Build theorem package
+        run: lake build Metatron
+
+      - name: Check theorem names and claim boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lean = Path("formal/Metatron/PortEventStructure.lean").read_text()
+          spec = Path("spec/CLC_PORT_EVENT_STRUCTURE_V0.md").read_text()
+          for name in [
+              "serial_assoc_explicit_iso",
+              "serial_parallel_interchange_explicit_iso",
+              "interchange_no_false_cross_dependency",
+              "revocation_selective",
+              "alternative_support_causal_shape",
+          ]:
+              assert f"theorem {name}" in lean, name
+          assert "diamond DAG" in spec
+          assert "up to explicit causal-structure isomorphism" in spec
+          assert "generic preservation of acyclicity/transitivity" in spec
+          print("PORT_EVENT_STRUCTURE_CLAIM_BOUNDARY_OK")
+          PY
