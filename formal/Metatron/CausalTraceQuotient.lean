@@ -171,13 +171,13 @@ def t2 : List TGen :=
 theorem t0_trace_t1 :
     TraceEq tAct t0 t1 := by
   simpa [t0, t1] using
-    TraceEq.swap tAct [] [TGen.observedFlip]
+    TraceEq.swap (act := tAct) [] [TGen.observedFlip]
       TGen.sourceFlip TGen.noiseFlip source_noise_commute
 
 theorem t1_trace_t2 :
     TraceEq tAct t1 t2 := by
   simpa [t1, t2] using
-    TraceEq.swap tAct [TGen.noiseFlip] []
+    TraceEq.swap (act := tAct) [TGen.noiseFlip] []
       TGen.sourceFlip TGen.observedFlip source_observed_commute
 
 theorem t0_trace_t2 :
