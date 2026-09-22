@@ -46,9 +46,14 @@ jobs:
               "alpha_mu_eq_nu_b",
               "fullEvaluatorDescent_impossible",
               "compatibleQuotientEval_mk",
+              "behavioralQuotientMap_mk",
+              "strictTransport_saturatedQuotient_naturality",
+              "saturatedProtected_split",
           ]:
               assert f"theorem {name}" in lean, name
           assert "full original state-test form does not reflect" in spec
           assert "Galois-closed interface" in spec
+          assert "exact strict transports through the saturated quotient" in spec
+          assert "information-gaining developmental refinements" in spec
           print("FIXEDPOINT_REFLECTION_CLAIM_BOUNDARY_OK")
           PY
