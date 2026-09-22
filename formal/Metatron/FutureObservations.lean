@@ -257,6 +257,6 @@ theorem behavioralQuotient_reflection
   · intro h hh
     funext qx
     exact Quotient.inductionOn qx (fun x => by
-      simpa [factor, quotientMap] using hh x)
+      exact (hh x).trans (by rfl))
 
 end Metatron.FutureObservations
