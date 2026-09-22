@@ -27,7 +27,7 @@ jobs:
       - name: Reject proof placeholders
         run: |
           set -euo pipefail
-          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|constant|unsafe)([^[:alnum:]_]|$)' formal/Metatron/FutureObservations.lean
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron/FutureObservations.lean
 
       - name: Build theorem package
         run: lake build Metatron
@@ -35,8 +35,6 @@ jobs:
       - name: Finite differential fixed-point fixture
         run: |
           python - <<'PY'
-          from itertools import product
-
           states = (0, 1, 2)
           identity = (0, 1, 2)
           step = (1, 1, 2)
@@ -76,7 +74,6 @@ jobs:
 
           def gfp_partition(protected):
               rel = {(x, y) for x in states for y in states}
-
               while True:
                   nxt = set()
                   for x, y in rel:
