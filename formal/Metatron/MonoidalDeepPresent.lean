@@ -108,6 +108,37 @@ theorem serialParallel_interchange
       (lcomp (latom f₂ b) (latom g₂ d)) := by
   rfl
 
+def asyncF₁ : LayeredMap Bool Bool :=
+  ⟨fun x => x, [[1], [2]]⟩
+
+def asyncF₂ : LayeredMap Bool Bool :=
+  ⟨fun x => x, [[3]]⟩
+
+def asyncG₁ : LayeredMap Bool Bool :=
+  ⟨fun x => x, [[4]]⟩
+
+def asyncG₂ : LayeredMap Bool Bool :=
+  ⟨fun x => x, [[5], [6]]⟩
+
+/--
+Layered traces repair synchronized interchange, but not arbitrary asynchronous
+composition. A total ordering into global stages is still too rigid when the
+two sides have different causal depths.
+-/
+theorem layered_async_interchange_fails :
+    lcomp
+      (ltensor asyncF₁ asyncF₂)
+      (ltensor asyncG₁ asyncG₂) ≠
+    ltensor
+      (lcomp asyncF₁ asyncG₁)
+      (lcomp asyncF₂ asyncG₂) := by
+  intro h
+  have ht := congrArg LayeredMap.stages h
+  change
+    [[1, 3], [2], [4, 5], [6]] =
+    [[1, 3], [2, 5], [4, 6]] at ht
+  simp at ht
+
 /-!
 2. Feedback / causal re-entry.
 
