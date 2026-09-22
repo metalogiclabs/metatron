@@ -1,0 +1,60 @@
+name: CLC Wired Pomset V0
+
+on:
+  push:
+    branches: [clc-wired-pomset-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clc-wired-pomset-v0-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  theorem-gate:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' \
+            formal/Metatron/WiredPomset.lean
+
+      - name: Build theorem package
+        run: lake build Metatron
+
+      - name: Check theorem names and claim boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lean = Path("formal/Metatron/WiredPomset.lean").read_text()
+          spec = Path("spec/CLC_WIRED_POMSET_V0.md").read_text()
+          for name in [
+              "before_irrefl",
+              "before_trans",
+              "parallel_atoms_independent",
+              "serial_atoms_ordered",
+              "wired_interchange_sync",
+              "wired_interchange_async",
+              "async_expected_order",
+              "storage_order_irrelevant",
+              "revocation_removes_first_support",
+              "alternative_support_survives",
+              "causal_not_serialization_is_canonical",
+          ]:
+              assert f"theorem {name}" in lean, name
+          assert "port-aware" in spec
+          assert "storage order does not affect" in spec
+          assert "arbitrary finite posets" in spec
+          print("WIRED_POMSET_CLAIM_BOUNDARY_OK")
+          PY
