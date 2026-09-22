@@ -10,7 +10,8 @@ lean_lib Metatron where
   roots := #[
     `Metatron.WarrantGraph,
     `Metatron.FutureObservations,
-    `Metatron.FixedPointReflection
+    `Metatron.FixedPointReflection,
+    `Metatron.DevelopmentalRelation
   ]
 
 lean_exe metatron_reference where
