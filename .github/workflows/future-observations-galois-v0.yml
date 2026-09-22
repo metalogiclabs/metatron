@@ -117,6 +117,7 @@ jobs:
           text = Path("spec/FUTURE_OBSERVATIONS_GALOIS_V0.md").read_text()
           assert "state-map universal property only" in text
           assert "full heterogeneous CLC adjunction" in text
-          assert "residualAdjoin_strictLyapunov" in text
+          assert "general scalar natural-number Lyapunov theorem" in text
+          assert "residual-driven refinement in the relation order" in text
           print("CLAIM_BOUNDARY_OK")
           PY
