@@ -422,6 +422,28 @@ def behavioralQuotientMap
       intro x y hxy
       exact Quotient.sound (mapFuture x y hxy))
 
+theorem behavioralQuotientMap_mk
+    {AState : Type u} {BState : Type v}
+    {AStep : Type w} {BStep : Type z}
+    {ATest : Type} {BTest : Type} {Val : Type}
+    (actA : AStep → AState → AState)
+    (evalA : ATest → AState → Val)
+    (protA : ATest → Prop)
+    (actB : BStep → BState → BState)
+    (evalB : BTest → BState → Val)
+    (protB : BTest → Prop)
+    (mapState : AState → BState)
+    (mapFuture :
+      ∀ x y,
+        FutureEq actA evalA protA x y →
+        FutureEq actB evalB protB (mapState x) (mapState y))
+    (x : AState) :
+    behavioralQuotientMap
+      actA evalA protA actB evalB protB mapState mapFuture
+      (quotientMap actA evalA protA x) =
+    quotientMap actB evalB protB (mapState x) := by
+  rfl
+
 /--
 Exact strict transports satisfy the quotient state/test commuting law after
 saturating the test language to compatible observations.
@@ -455,12 +477,9 @@ theorem strictTransport_saturatedQuotient_naturality
         mapState pullTest mapFuture exactEval q) := by
   refine Quotient.inductionOn qx ?_
   intro x
-  simpa [
-    behavioralQuotientMap,
-    compatibleQuotientEval,
-    pullCompatibleTest,
-    quotientMap
-  ] using (exactEval x q.1).symm
+  rw [behavioralQuotientMap_mk]
+  rw [compatibleQuotientEval_mk, compatibleQuotientEval_mk]
+  exact (exactEval x q.1).symm
 
 /--
 A protected lift with the CLC split law remains a split after embedding protected
