@@ -1,124 +1,80 @@
 # Metatron V1 Integration
 
-**Status:** integration candidate / theorem line  
-**Branch:** `metatron-v1-integration`
+**Status:** integrated theorem line
 
-This branch joins the strongest qualified lines without enlarging the trusted
-Nucleus.
+Metatron V1 keeps one trusted thin waist and layers all richer mathematics outside it.
 
-## Pinned source lines
+## Trusted authority
 
-Exact heads and qualification runs are recorded in
-`evidence/integration/metatron-v1-sources.json`.
+Only the pure append-only warrant log is runtime authority:
 
-The four roles are:
+Node(kind, payload, premises)
+Log = tuple[Node, ...]
+append(Log, Node) -> Log
 
-1. **Minimal Warrant Log** — sole trusted runtime authority.
-2. **CLC Port Event semantics** — future-safe identity and proof-relevant causal history.
-3. **Blind-qualified separating hypergraph** — external repair/search policy.
-4. **Lean Kernel eight-lane adapter** — external proof/measurement/promotion boundary.
+The current pure-log implementation remains byte-identical to the qualified Nucleus.
 
-Only (1) is runtime authority.
+## Derived semantic stack
 
-## Thin waist
+CLC supplies lawful future observations, continuation-safe behavioral identity, quotient refinement, proof-relevant developmental relations, causal re-entry, and port-aware finite causal event structures.
 
-The integration preserves byte-identical trusted semantics:
+For pure same-carrier refinement the canonical map remains Q_new ->> Q_old. General developmental change is relational/oplax rather than necessarily functional.
 
-```text
-runtime/metatron/nucleus.py
-  git blob d9d4293e54471714bf098593bf4018c3f6403273
+## Discovery and repair
 
-formal/Metatron/WarrantGraph.lean
-  git blob d2affc0a57a1815f303f6f1859941465c69e7d32
-```
+The blind separating-hypergraph line established a useful arity-one search law: for separable candidate generators, exact minimum residual cover identifies a minimum sufficient behavioral basis.
 
-The current pure-log qualification is pinned to implementation
-`13b1f6b52ee4724e33a6063c18c4a105f20bb0bc`, run `35764668476`,
-with 119 semantic lines under the 120-line budget.
+Residual Synergy V0 then proved the limitation: two generators may be individually inert yet jointly sufficient because causal composition creates a new observation. A->B can separate while B->A does not.
 
-No residual store, hypergraph, port-event graph, benchmark frontier, search
-controller, capability map, or external measurement state becomes authoritative
-runtime state.
+The general repair object is therefore a certified causal repair carrying:
 
-## Integrated developmental picture
+- a finite port-aware causal event structure;
+- an executable schedule;
+- generator labels;
+- certification that the schedule covers the event carrier exactly and respects every causal edge.
 
-For append-only history (L_t),
+Ordinary generators embed as one-event causal repairs. Thus ordinary tau is preserved as the arity-one/separable special case.
 
-[
-Gamma_t=operatorname{Live}(L_t).
-]
+## General bridge theorem
 
-Derived CLC semantics determines lawful future observations and
-continuation-safe equivalence
+formal/Metatron/CausalRepairCover.lean proves causalRepairCover_iff_targetSufficient:
 
-[
-R_t=alpha(mumathcal L_t)=
-umathcal B_t,
-qquad
-Q_t=X_t/R_t.
-]
+> A family of certified causal repairs covers every future-demanded residual pair iff the relation refined by those repairs is sufficient for the frozen target relation.
 
-Given a frozen target future relation (T), the consequential residual is the
-set of pairs still identified by the current view but separated by (T).
+It also proves minimumCausalRepair_minimalSufficient, transferring exact minimum repair count to minimum target sufficiency.
 
-A candidate generator induces a hyperedge over the residual. Search policy may
-retain multiple exact minimum bases; it does not privilege a syntactic realizer
-unless later warranted evidence distinguishes them.
+The qualified A->B / B->A fixture proves causal structure is semantically relevant: the same reusable generators can differ solely by causal order, with only A->B closing the target residual.
 
-Independent verification is still required before installation. Installation
-appends warrant lineage and triggers derived reclosure. Under pure refinement,
-the new quotient canonically forgets to the old view:
+## Integrated architecture
 
-[
-Q_{t+1}	woheadrightarrow Q_t.
-]
+warrant log
+  -> lawful future semantics
+  -> behavioral quotient
+  -> future-demanded consequential residual
+  -> minimum certified causal repair frontier
+  -> independent verification
+  -> warranted promotion
+  -> global reclosure
 
-## Integration bridge theorem
+Search may preserve multiple minimum causal repairs when consequence does not distinguish them. Cost, admissibility, external measurement, or later protected futures may refine that frontier.
 
-`formal/Metatron/ResidualBasis.lean` now proves
+## External engineering wedge
 
-[
-oxed{	exttt{certifiedResidualBasis_closes}}
-]
-
-stating:
-
-> A declared candidate basis covers every future-demanded residual pair iff the
-> relation refined by that basis is sufficient for the frozen target relation.
-
-It also proves
-
-[
-oxed{	exttt{minimumResidualBasis_minimalSufficient}}
-]
-
-so exact minimum residual cover transfers directly to minimum target
-sufficiency by basis length.
-
-A positive Boolean fixture and an empty-basis negative fixture are included.
-
-This is the mathematical bridge between CLC's semantics of identity and the
-blind-qualified (	au) search policy.
+The Lean Kernel eight-lane controller remains external proof/measurement/promotion policy. It does not become trusted semantics.
 
 ## Representation discipline
 
 The integration preserves distinct roles:
 
-- warrant DAG — why a result is authorized;
-- behavioral quotient — what may currently be identified;
-- separating hypergraph — what future-demanded distinction is missing;
-- port event structure — how warranted histories compose;
-- benchmark frontier — what external candidate should be tested.
+- warrant DAG: why a result is authorized;
+- behavioral quotient: what may currently be identified;
+- singleton hypergraph: arity-one residual search;
+- certified causal repair: compositional repair semantics;
+- port event structure: causal/wiring structure of developmental history;
+- benchmark frontier: external engineering policy.
 
 No generic property of raw storage-graph geometry is promoted to semantics.
 
 ## Claim boundary
 
-V1 integration does not claim:
-
-- unrestricted generator invention outside a declared candidate language;
-- universal minimum repair for arbitrary infinite systems;
-- generic category laws for all finite port-event structures;
-- automatic promotion of benchmark candidates;
-- a larger trusted runtime;
-- empirical or ontological universality.
+V1 does not claim unrestricted event-structure invention, tractable minimum repair search in arbitrary large languages, a complete multidimensional cost theory, generic equivalence under all linearizations of arbitrary partial orders, or any enlargement of Nucleus authority.
