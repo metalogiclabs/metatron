@@ -1,6 +1,6 @@
 # Metatron V1 Integration
 
-**Status:** integrated theorem + blind causal discovery + finite trace quotient
+**Status:** integrated theorem + blind causal discovery + finite causal quotient
 
 Metatron V1 keeps one trusted thin waist and layers all richer mathematics outside it.
 
@@ -40,62 +40,54 @@ The qualified A->B / B->A theorem fixture proves causal structure is semanticall
 
 Blind Causal Repair V1 tested discovery rather than explanation.
 
-On a fresh hidden 16-state world with six anonymous reusable actions, the public-only predictor searched all 6 one-event repairs and all 36 ordered two-event chains.
+On a fresh hidden finite world, the public-only predictor recovered the exact minimum ordered two-event repair before reveal, while all singleton repairs and the reverse order were insufficient.
 
-It committed before reveal to the unique minimum ordered repair with event count 2, and reveal confirmed the exact planted direction while the reverse order was insufficient.
+The run sealed BLIND_CAUSAL_REPAIR_PASS.
 
-The run sealed BLIND_CAUSAL_REPAIR_PASS with all C1-C9 gates true.
+## Certified trace semantics
 
-## Two-event linearization boundary
+Causal Linearization Invariance V0 proves the primitive rule:
 
-Causal Linearization Invariance V0 established the primitive swap law.
+- incomparable events may swap only when their actions semantically commute;
+- the same PES with noncommuting A/B actions remains order-sensitive.
 
-For two events with no causal edge, if their actions commute pointwise, Lean proves:
+Causal Trace Quotient V0 lifts that to any explicit finite chain of certified adjacent commuting swaps. Execution and observation are invariant across the full trace relation.
 
-- independentSwap_invariant_of_commute;
-- independentObservation_invariant_of_commute;
-- independent_swapSafe_of_commute.
+## Finite topological-sort connectivity
 
-But the same-PES A/B falsifier proves:
-
-- causalStructureAlone_not_enough;
-- ab_actions_do_not_commute;
-- ab_not_swapSafe.
-
-Thus raw partial-order isomorphism is insufficient. Every erased serialization distinction must be warranted by semantic commutation evidence.
-
-## Finite causal trace quotient
-
-Causal Trace Quotient V0 lifts the primitive swap law to arbitrary finite schedules.
-
-It defines TraceEq as the reflexive/symmetric/transitive closure of adjacent swaps
-
-pre ++ g :: h :: post
-<-> 
-pre ++ h :: g :: post
-
-where each swap carries a Commute certificate.
+Finite Poset Topological-Sort Connectivity V0 closes the remaining combinatorial gap.
 
 Lean proves:
 
-- adjacent_commuting_swap_preserves_run;
-- traceEq_preserves_run;
-- traceEq_preserves_observation;
-- repair_traceEq_swapSafe;
-- topological_linearizations_equivalent_if_traceConnected;
-- topological_observations_equivalent_if_traceConnected.
+[
+oxed{	exttt{all_topological_sorts_traceConnected}}
+]
 
-A three-event fixture proves invariance through multiple certified swaps, while ab_same_pes_not_trace_quotiented retains the noncommuting negative case.
+Any two duplicate-free topological schedules that are permutations of the same finite event set are connected by adjacent swaps of incomparable events.
 
-The canonical repair representation is therefore:
+The proof is constructive: align the schedules from left to right, bubble the required head event left across only incomparable events, cancel the common head, and recurse.
 
-certified causal presentation
+It then composes with the semantic trace theorem:
+
+[
+oxed{	exttt{all_topological_sorts_semantically_invariant}}
+]
+
+If every incomparable pair carries a Commute certificate, every topological schedule of that finite causal presentation has identical execution semantics.
+
+For PES presentations Lean also proves:
+
+- pes_topological_sorts_traceConnected;
+- pes_all_topological_sorts_semantically_invariant.
+
+So the finite canonical repair object is now:
+
+certified finite causal presentation
 /
-finite certified commuting trace equivalence.
+all legal topological schedules,
+provided every incomparable pair is semantically certified to commute.
 
-This is the general finite semantic quotient for any pair of certified schedules connected by a warranted commuting trace.
-
-The remaining combinatorial boundary is separate: V1 does not yet prove that every pair of topological sorts of every finite poset is connected by adjacent swaps of incomparable events, nor that such incomparable events automatically commute semantically.
+Equivalently, the whole topological-sort space collapses to one semantic trace class exactly under the warranted independence condition.
 
 ## Integrated architecture
 
@@ -104,7 +96,7 @@ warrant log
   -> behavioral quotient
   -> future-demanded consequential residual
   -> minimum certified causal repair frontier
-  -> finite certified commuting trace quotient
+  -> finite causal quotient over all swap-safe topological schedules
   -> independent verification
   -> warranted promotion
   -> global reclosure
@@ -124,11 +116,12 @@ The integration preserves distinct roles:
 - singleton hypergraph: arity-one residual search;
 - certified causal repair: compositional repair semantics;
 - port event structure: causal/wiring structure of developmental history;
-- trace certificate: which finite serializations may be identified;
+- commutation certificate: which incomparable events may swap;
+- finite-poset theorem: connectivity of all legal topological schedules;
 - benchmark frontier: external engineering policy.
 
 No generic property of raw storage-graph geometry is promoted to semantics.
 
 ## Claim boundary
 
-V1 does not claim unrestricted event-structure invention, tractable minimum repair search in arbitrary large languages, a complete multidimensional cost theory, automatic topological-sort connectivity for arbitrary finite posets, automatic semantic commutation of incomparable events, confluence, conflict semantics, feedback, or any enlargement of Nucleus authority.
+V1 does not claim unrestricted event-structure invention, tractable minimum repair search in arbitrary large languages, automatic discovery of commutation certificates, confluence under conflict/synchronization/feedback, or any enlargement of Nucleus authority.
