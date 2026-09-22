@@ -1,15 +1,20 @@
 {
-  "schema": "metatron.v1.integration.sources.v0",
+  "schema": "metatron.v1.integration.sources.v1",
   "branch": "metatron-v1-integration",
   "trusted_core": {
     "source_branch": "metatron-minimal-warrant-graph-v0",
-    "source_head": "d48d84ad02477bc3bc7793d0e4fffca305aeb503",
+    "source_branch_head": "c14b74929e64f6c819d320698079147356480b16",
+    "qualified_implementation_sha": "13b1f6b52ee4724e33a6063c18c4a105f20bb0bc",
+    "qualification_run": 35764668476,
     "runtime_nucleus_blob": "d9d4293e54471714bf098593bf4018c3f6403273",
-    "formal_warrant_graph_blob": "d2affc0a57a1815f303f6f1859941465c69e7d32"
+    "formal_warrant_graph_blob": "d2affc0a57a1815f303f6f1859941465c69e7d32",
+    "authority": "trusted_runtime"
   },
   "semantics": {
     "source_branch": "clc-port-event-structure-v0",
-    "source_head": "20844ab1c68b8c4f9d6528a191eb136c0bdce791"
+    "source_head": "20844ab1c68b8c4f9d6528a191eb136c0bdce791",
+    "qualification_run": 35761761009,
+    "authority": "derived_formal_semantics"
   },
   "search_policy": {
     "source_branch": "separating-hypergraph-blind-v3",
@@ -21,7 +26,13 @@
   "external_adapter": {
     "source_branch": "metatron-lkc-eight-lane-v1",
     "source_head": "b2d384087e79719f384852688d730cb0d56a1d7d",
+    "qualification_run": 35708162623,
     "authority": "external_evidence_policy"
+  },
+  "integration_theorem": {
+    "file": "formal/Metatron/ResidualBasis.lean",
+    "bridge": "certifiedResidualBasis_closes",
+    "minimality": "minimumResidualBasis_minimalSufficient"
   },
   "integration_rule": "No source component other than the immutable warrant log becomes trusted runtime authority."
 }
