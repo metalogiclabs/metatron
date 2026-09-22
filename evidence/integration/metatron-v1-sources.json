@@ -30,9 +30,19 @@
     "authority": "external_evidence_policy"
   },
   "integration_theorem": {
-    "file": "formal/Metatron/ResidualBasis.lean",
-    "bridge": "certifiedResidualBasis_closes",
-    "minimality": "minimumResidualBasis_minimalSufficient"
+    "additive_bridge": "certifiedResidualBasis_closes",
+    "additive_minimality": "minimumResidualBasis_minimalSufficient",
+    "general_causal_bridge": "causalRepairCover_iff_targetSufficient",
+    "general_causal_minimality": "minimumCausalRepair_minimalSufficient"
   },
-  "integration_rule": "No source component other than the immutable warrant log becomes trusted runtime authority."
+  "integration_rule": "No source component other than the immutable warrant log becomes trusted runtime authority.",
+  "causal_repair": {
+    "source_branch": "causal-repair-cover-v0",
+    "source_head": "31dfdef5f733455037df200256c3b487c6a38aae",
+    "qualification_run": 35776123412,
+    "theorem": "causalRepairCover_iff_targetSufficient",
+    "minimum_theorem": "minimumCausalRepair_minimalSufficient",
+    "singleton_special_case": "singleton_support_is_arity_one",
+    "authority": "external_policy_semantics"
+  }
 }
