@@ -25,9 +25,10 @@
   },
   "external_adapter": {
     "source_branch": "metatron-lkc-eight-lane-v1",
-    "source_head": "b2d384087e79719f384852688d730cb0d56a1d7d",
-    "qualification_run": 35708162623,
-    "authority": "external_evidence_policy"
+    "source_head": "a26e9f0c69541ce51120de3d9291d447be64fade",
+    "qualification_run": 35790627308,
+    "authority": "external_evidence_policy",
+    "note": "Includes externally promoted practice champions through SHA V25 interaction."
   },
   "integration_theorem": {
     "additive_file": "formal/Metatron/ResidualBasis.lean",
