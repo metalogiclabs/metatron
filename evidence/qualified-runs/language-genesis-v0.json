@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "experiment": "language-genesis-v0",
+  "implementation_head": "84ae6c549c6943e8cf2cabfb49f6686074b4812e",
+  "qualification_run": 35797853442,
+  "qualification_job": 106981193116,
+  "verdict": "PASS_RESIDUAL_DRIVEN_LANGUAGE_GENESIS",
+  "trusted_core": {
+    "runtime_nucleus_blob": "d9d4293e54471714bf098593bf4018c3f6403273",
+    "formal_warrant_graph_blob": "d2affc0a57a1815f303f6f1859941465c69e7d32"
+  },
+  "result": {
+    "state_count": 16,
+    "schema_family": "coordinate_transposition",
+    "schema_instance_count": 6,
+    "generation_count": 3,
+    "residual_trace": [56, 24, 8, 0],
+    "selected_semantic_swaps": [[0,1],[0,2],[0,3]],
+    "current_language_max_gain_before_each_genesis": [0,0,0],
+    "selector_parameters": ["residual","installed","schemas","dim"],
+    "selector_has_target_argument": false,
+    "restart_pass": true,
+    "semantic_sham_pass": true,
+    "g1_knockout_restores_seed": true,
+    "schema_name_invariant": true
+  },
+  "claim_boundary": "Finite declared meta-language of coordinate-transposition schemas; residual-driven schema instantiation is demonstrated, not unrestricted invention of the meta-language itself."
+}
