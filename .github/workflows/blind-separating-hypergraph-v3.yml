@@ -1,0 +1,114 @@
+name: Blind Separating Hypergraph V3
+
+on:
+  push:
+    branches:
+      - separating-hypergraph-blind-v3
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generate-seal:
+    runs-on: ubuntu-latest
+    outputs:
+      public_commitment: ${{ steps.seal.outputs.hidden_sha256 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Generate brand-new hidden challenge and seal
+        id: seal
+        run: |
+          mkdir -p out/public out/hidden
+          python -m scripts.blind_hypergraph_v3_generate \
+            --public out/public/public.json \
+            --hidden out/hidden/hidden.json \
+            | tee out/seal-summary.json
+          HIDDEN_SHA=$(python - <<'PY'
+          import json
+          print(json.load(open("out/public/public.json"))["hidden_sha256"])
+          PY
+          )
+          echo "hidden_sha256=$HIDDEN_SHA" >> "$GITHUB_OUTPUT"
+      - name: Upload public challenge only
+        uses: actions/upload-artifact@v4
+        with:
+          name: blind-v3-public
+          path: out/public/public.json
+      - name: Upload sealed hidden challenge
+        uses: actions/upload-artifact@v4
+        with:
+          name: blind-v3-hidden
+          path: out/hidden/hidden.json
+
+  predict:
+    needs: generate-seal
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Download public challenge only
+        uses: actions/download-artifact@v4
+        with:
+          name: blind-v3-public
+          path: in/public
+      - name: Assert hidden artifact is absent
+        run: |
+          test ! -e in/hidden
+          test ! -e in/hidden.json
+      - name: Commit public-only prediction
+        run: |
+          mkdir -p out/prediction
+          python -m scripts.blind_hypergraph_v3_predict \
+            --public in/public/public.json \
+            --prediction out/prediction/prediction.json \
+            | tee out/prediction-summary.json
+      - name: Upload committed prediction
+        uses: actions/upload-artifact@v4
+        with:
+          name: blind-v3-prediction
+          path: out/prediction/prediction.json
+
+  reveal:
+    needs:
+      - generate-seal
+      - predict
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Download public challenge
+        uses: actions/download-artifact@v4
+        with:
+          name: blind-v3-public
+          path: in/public
+      - name: Download sealed hidden challenge
+        uses: actions/download-artifact@v4
+        with:
+          name: blind-v3-hidden
+          path: in/hidden
+      - name: Download committed prediction
+        uses: actions/download-artifact@v4
+        with:
+          name: blind-v3-prediction
+          path: in/prediction
+      - name: Reveal and verify
+        run: |
+          mkdir -p out/reveal
+          python -m scripts.blind_hypergraph_v3_reveal \
+            --public in/public/public.json \
+            --hidden in/hidden/hidden.json \
+            --prediction in/prediction/prediction.json \
+            --report out/reveal/reveal.json
+      - name: Upload reveal report
+        uses: actions/upload-artifact@v4
+        with:
+          name: blind-v3-reveal
+          path: out/reveal/reveal.json
