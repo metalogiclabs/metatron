@@ -493,4 +493,39 @@ theorem quotientRelation_comp_eq_of_preserves
       actA evalA protA actB evalB protB
       actC evalC protC f g hg qa qc
 
+
+/-!
+Repeated same-carrier refinement forms an inverse system of quotient views.
+-/
+
+theorem forgetRefinement_id
+    {State : Type u} {Step : Type v} {Test : Type w} {Val : Type z}
+    (act : Step → State → State)
+    (eval : Test → State → Val)
+    (P : Test → Prop)
+    (hprotect : ∀ q, P q → P q) :
+    forgetRefinement act eval P P hprotect =
+      (fun q => q) := by
+  funext q
+  refine Quotient.inductionOn q ?_
+  intro x
+  rfl
+
+theorem forgetRefinement_comp
+    {State : Type u} {Step : Type v} {Test : Type w} {Val : Type z}
+    (act : Step → State → State)
+    (eval : Test → State → Val)
+    (P0 P1 P2 : Test → Prop)
+    (h01 : ∀ q, P0 q → P1 q)
+    (h12 : ∀ q, P1 q → P2 q)
+    (h02 : ∀ q, P0 q → P2 q) :
+    forgetRefinement act eval P0 P2 h02 =
+      fun q2 =>
+        forgetRefinement act eval P0 P1 h01
+          (forgetRefinement act eval P1 P2 h12 q2) := by
+  funext q2
+  refine Quotient.inductionOn q2 ?_
+  intro x
+  rfl
+
 end Metatron.DevelopmentalRelation
