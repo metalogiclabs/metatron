@@ -142,5 +142,24 @@
     "objectivity_theorem": "absolute_dynamics_relational_identity",
     "refinement_theorem": "observer_state_strictly_refines_identity",
     "authority": "derived_formal_semantics"
+  },
+  "novel_capability_genesis": {
+    "source_branch": "novel-capability-genesis-v0",
+    "source_head": "53d2517c27ab6d249202b8a0245e2d0dfea4140e",
+    "preregistration_commit": "484b14d0c9cfcc0440c4808acfe0951427005112",
+    "qualification_run": 35819719752,
+    "verdict": "BLIND_NOVEL_CAPABILITY_PASS",
+    "current_block_sizes": [
+      4,
+      4
+    ],
+    "residual_pair_count": 8,
+    "novel_candidate_count": 3,
+    "minimum_acquisition_size": 2,
+    "exact_minimum_basis_count": 2,
+    "refinement_theorem": "interfaceExtension_refines",
+    "strictness_theorem": "extension_with_new_distinction_is_strict",
+    "novelty_theorem": "strict_extension_requires_novel_interface_witness",
+    "authority": "derived_formal_semantics_and_external_policy_evidence"
   }
 }
