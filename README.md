@@ -14,7 +14,7 @@ Everything richer is derived semantics or external policy.
 
 warrant log
   -> lawful future observations
-  -> continuation-safe behavioral quotient
+  -> compute continuation-safe behavioral quotient
   -> future-demanded residual
   -> minimum certified causal repair frontier
   -> earn safe swaps modulo FutureEq
@@ -30,6 +30,8 @@ Behavioral Commutation V0 now goes further: raw states need not commute. If two 
 
 In the blind quotient-relative test, 4 raw-state commuting pairs expanded to 5 behaviorally commuting pairs; the extra pair changed internal state but no lawful future observation could expose the difference. The 24 schedules collapsed into exactly two behavioral trace classes of size 12, matching independently computed behavioral semantics.
 
+Blind Future Quotient V0 now removes the supplied quotient too: from anonymous transitions plus protected test outcomes alone, Metatron recovered the exact greatest continuation-safe finite partition, exhaustively verified maximal admissibility, and then recovered the same strict behavioral-commutation gain.
+
 The Lean Kernel controller remains an external engineering wedge; none of this enlarges Nucleus authority.
 
 See:
@@ -37,6 +39,7 @@ See:
 - spec/METATRON_V1_INTEGRATION.md
 - spec/BEHAVIORAL_COMMUTATION_V0.md
 - spec/BLIND_BEHAVIORAL_COMMUTATION_V1_PREREG.md
+- spec/BLIND_FUTURE_QUOTIENT_V0_PREREG.md
 - spec/EARNED_COMMUTATION_BASIS_V0.md
 - spec/FINITE_POSET_TOPOSORT_CONNECTIVITY_V0.md
 - spec/CAUSAL_TRACE_QUOTIENT_V0.md
