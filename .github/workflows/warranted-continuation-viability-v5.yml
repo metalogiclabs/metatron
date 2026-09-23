@@ -1,0 +1,121 @@
+name: Warranted Continuation Viability V5
+
+on:
+  push:
+    branches:
+      - warranted-continuation-viability-v5
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify V4 lineage and trusted thin waist
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 911e37b4de153fae7f41dee10d246ae1617e2ea1 HEAD
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "V4_LINEAGE_AND_THIN_WAIST_OK"
+
+      - name: Run repair-cover cut census
+        run: |
+          python scripts/warranted_continuation_viability_v5.py | tee /tmp/wcv-v5.txt
+          grep -F "WARRANTED_CONTINUATION_VIABILITY_V5=PASS" /tmp/wcv-v5.txt
+          grep -F "minimum_cut_size=2" /tmp/wcv-v5.txt
+          grep -F "warrant_live_after_cut_13=(0, 2)" /tmp/wcv-v5.txt
+          grep -F "failure0_covered_after_cut_13=True" /tmp/wcv-v5.txt
+          grep -F "failure1_covered_after_cut_13=False" /tmp/wcv-v5.txt
+          grep -F "complete_cover_after_cut_13=False" /tmp/wcv-v5.txt
+
+      - name: Verify claim boundary text
+        run: |
+          set -euo pipefail
+          grep -F "Generic cut/cover theorem" spec/WARRANTED_CONTINUATION_VIABILITY_V5.md
+          grep -F "minimum cut size is 2 in this exact fixture" spec/WARRANTED_CONTINUATION_VIABILITY_V5.md
+          grep -F "does not replace it" spec/WARRANTED_CONTINUATION_VIABILITY_V5.md
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+
+      - name: Build integrated formal stack
+        run: lake build Metatron
+
+      - name: Verify theorem surface
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = Path("formal/Metatron/WarrantedContinuationViabilityV5.lean").read_text()
+          for name in (
+              "complete_cover_implies_postfixed",
+              "postfixed_implies_complete_cover",
+              "complete_cover_iff_postfixed",
+              "cut_breaks_viability_iff",
+              "fixture_complete_cover",
+              "every_singleton_cut_preserves_cover",
+              "three_pair_cuts_break_cover",
+              "conjunctive_path_is_not_singleton_equivalent",
+              "coverage_base_live",
+              "coverage_cut13_live",
+              "cut13_preserves_failure0_but_breaks_failure1",
+              "warrant_cut_breaks_complete_cover",
+              "repair_cover_cut_characterization_fixture",
+          ):
+              assert f"theorem {name}" in src, name
+          print("WCV_V5_THEOREM_SURFACE_OK")
+          PY
+
+      - name: Emit qualification attestation
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          result = {
+              "schema_version": 1,
+              "status": "QUALIFIED_WARRANTED_CONTINUATION_VIABILITY_V5",
+              "head_sha": os.environ["GITHUB_SHA"],
+              "workflow_run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "parent_v4_sha": "911e37b4de153fae7f41dee10d246ae1617e2ea1",
+              "parent_v4_run": 35927220742,
+              "generic_cover_theorem": "complete_cover_iff_postfixed",
+              "generic_cut_theorem": "cut_breaks_viability_iff",
+              "fixture_capabilities": [0,1,2,3],
+              "fixture_failures": [0,1],
+              "minimal_cuts": [[0,1],[1,3],[2,3]],
+              "minimum_cut_size": 2,
+              "warrant_cut_13_live": [0,2],
+              "failure0_still_covered": True,
+              "failure1_uncovered": True,
+              "trusted_runtime_changed": False,
+              "warrant_graph_changed": False,
+              "boundary": "finite live repair hypergraph cover/cut semantics plus exact WarrantGraph cut fixture",
+          }
+          Path("/tmp/warranted-continuation-viability-v5.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: warranted-continuation-viability-v5
+          path: |
+            /tmp/warranted-continuation-viability-v5.json
+            /tmp/wcv-v5.txt
