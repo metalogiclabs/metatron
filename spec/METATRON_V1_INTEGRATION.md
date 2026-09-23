@@ -1,6 +1,6 @@
 # Metatron V1 Integration
 
-**Status:** integrated theorem + blind causal discovery + earned commutation
+**Status:** integrated theorem + blind causal discovery + earned behavioral commutation
 
 Metatron V1 keeps one trusted thin waist and layers all richer mathematics outside it.
 
@@ -24,56 +24,61 @@ For pure same-carrier refinement the canonical map remains Q_new ->> Q_old. Gene
 
 Blind V3 established the arity-one minimum-basis law for separable candidate generators.
 
-Residual Synergy V0 proved that composition can create distinctions absent from every singleton generator.
+Residual Synergy V0 proved composition can create distinctions absent from every singleton generator.
 
 Certified Causal Repair V0 replaced isolated generators with port-aware ordered repair structures, and Blind Causal Repair V1 prospectively recovered the exact hidden ordered repair from anonymous consequences alone.
 
 ## Finite causal quotient
 
-Causal Linearization Invariance V0 proved the primitive swap rule: incomparable events may exchange order only when semantic commutation warrants the swap.
+Causal Linearization Invariance V0 established the primitive exact-state swap law.
 
-Causal Trace Quotient V0 lifted that rule to arbitrary finite chains of certified swaps.
+Causal Trace Quotient V0 lifted it to finite chains.
 
-Finite Poset Topological-Sort Connectivity V0 then proved constructively that any two duplicate-free topological schedules of the same finite event set are connected by adjacent swaps of incomparable events.
+Finite Poset Topological-Sort Connectivity V0 proved all legal finite topological schedules are connected by adjacent swaps of incomparable events.
 
-Hence if every incomparable pair is certified to commute, all legal topological schedules have identical semantics.
+Earned Commutation Basis V0 then made exact commutation itself earned from transition consequences rather than assumed.
 
-## Earned commutation
+## Behavioral commutation
 
-Earned Commutation Basis V0 removes the last assumption that pair certificates are supplied externally.
+Behavioral Commutation V0 weakens exact raw-state commutation to the constitutionally relevant law.
 
-For events a,b, an EarnedPair requires both:
+For a continuation-safe relation R, define two actions to commute modulo R when
 
-1. causal incomparability;
-2. exact semantic commutation of the labeled actions.
+[
+R(h(g(s)),g(h(s)))
+]
+
+for every state s.
+
+If R is step-closed, the swap remains R-equivalent after any lawful continuation.
 
 Lean proves:
 
-- earnedTrace_to_posetTrace;
-- earnedTrace_to_semanticTrace;
-- earnedTrace_preserves_run;
-- sameEarnedComponent_semantically_equal;
-- all_incomparables_earned_traceConnected;
-- all_topological_sorts_equal_if_all_incomparables_earned.
+- behavioral_adjacent_swap_preserves;
+- behavioralTrace_preserves;
+- futureBehavioralTrace_preserves;
+- futureBehavioralTrace_preserves_protected_observation.
 
-The blind earned-commutation challenge then exposed only anonymous finite transition tables. Before reveal, the predictor recovered:
+The strict-gain fixture proves a hidden-state setter and toggle fail exact state commutation while commuting modulo FutureEq. A protected-observation setter/toggle remains unsafe.
 
-- exactly 3 warranted commuting action pairs;
+Blind Behavioral Commutation V1 then tested this prospectively on anonymous transitions plus a public continuation-safe behavioral quotient.
+
+Before reveal, Metatron recovered:
+
+- 4 exact commuting pairs;
+- 5 behaviorally commuting pairs;
+- exactly 1 strict quotient-only gain pair;
 - 24 legal schedules;
-- exactly 8 safe-trace connected components;
-- exactly 8 execution-semantic classes with identical size profile;
-- a minimum pair-certificate basis of size 3;
-- irredundancy of all three basis certificates.
+- 2 safe-trace components of size 12;
+- exactly 2 independent behavioral execution classes of size 12;
+- a minimum behavioral certificate basis of size 5;
+- irredundancy of all five certificates.
 
-The hidden semantic mapping confirmed the pair relation exactly and every rejected pair had an explicit counterexample state.
+All B1-B10 reveal gates passed:
 
-Verdict:
+BLIND_BEHAVIORAL_COMMUTATION_PASS
 
-BLIND_EARNED_COMMUTATION_PASS
-
-with all E1-E9 gates true.
-
-So commutation is now a derived, falsifiable capability rather than constitutional input.
+Thus exact state equality is no longer the canonical independence criterion. Metatron may erase an implementation-order distinction whenever the full lawful future quotient cannot expose it.
 
 ## Integrated architecture
 
@@ -82,34 +87,21 @@ warrant log
   -> behavioral quotient
   -> future-demanded consequential residual
   -> minimum certified causal repair frontier
-  -> earn exact safe-swap relation from execution consequences
-  -> minimum warranted commutation basis
-  -> semantic trace components / causal quotient
+  -> earn safe swaps modulo FutureEq
+  -> minimum warranted behavioral commutation basis
+  -> behavioral trace components / causal quotient
   -> independent verification
   -> warranted promotion
   -> global reclosure
 
-If every incomparable pair is earned, the whole topological-sort space collapses to one semantic trace class. If not, the safe-swap graph splits it into the maximum currently warranted semantic components.
+The governing rule is now explicit:
+
+> Never preserve an ordering distinction that no lawful future can expose.
 
 ## External engineering wedge
 
 The Lean Kernel eight-lane controller remains external proof/measurement/promotion policy. It does not become trusted semantics.
 
-## Representation discipline
-
-The integration preserves distinct roles:
-
-- warrant DAG: why a result is authorized;
-- behavioral quotient: what may currently be identified;
-- singleton hypergraph: arity-one residual search;
-- certified causal repair: compositional repair semantics;
-- port event structure: causal/wiring structure;
-- earned commutation relation: which incomparable pairs may lawfully swap;
-- trace components: which legal schedules are currently identified;
-- benchmark frontier: external engineering policy.
-
-No generic property of raw storage-graph geometry is promoted to semantics.
-
 ## Claim boundary
 
-V1 now supports exact finite pairwise commutation discovery from declared transition semantics. It does not yet establish higher-order independence that exists without pairwise commutation, observational-only commutation modulo FutureEq, symbolic proof synthesis of commutation on infinite carriers, conflict/synchronization/feedback semantics, or tractable search over arbitrary large action languages. Nucleus authority remains unchanged.
+V1 now supports exact finite quotient-relative commutation discovery for a declared continuation-safe quotient. It does not yet discover the behavioral quotient itself from scratch, establish higher-order independence beyond pairwise swaps, synthesize symbolic commutation proofs on infinite carriers, or solve conflict/synchronization/feedback semantics. Nucleus authority remains unchanged.
