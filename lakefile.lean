@@ -21,7 +21,8 @@ lean_lib Metatron where
     `Metatron.CausalRepairCover,
     `Metatron.CausalLinearization,
     `Metatron.CausalTraceQuotient,
-    `Metatron.FinitePosetConnectivity
+    `Metatron.FinitePosetConnectivity,
+    `Metatron.EarnedCommutation
   ]
 
 lean_exe metatron_reference where
