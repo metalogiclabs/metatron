@@ -1,0 +1,122 @@
+name: Warranted Continuation Viability V2
+
+on:
+  push:
+    branches:
+      - warranted-continuation-viability-v2
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify V1 lineage and trusted thin waist
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor bf71eafec63511a47a351cc2c95b8b239b37e6d5 HEAD
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "V1_LINEAGE_AND_THIN_WAIST_OK"
+
+      - name: Run capability-loss viability census
+        run: |
+          python scripts/warranted_continuation_viability_v2.py | tee /tmp/wcv-v2.txt
+          grep -F "WARRANTED_CONTINUATION_VIABILITY_V2=PASS" /tmp/wcv-v2.txt
+          grep -F "support_only_kernel=('adaptive',)" /tmp/wcv-v2.txt
+          grep -F "support_only_round_sizes=(4, 1, 1)" /tmp/wcv-v2.txt
+          grep -F "capability_loss_kernel=()" /tmp/wcv-v2.txt
+          grep -F "capability_loss_round_sizes=(4, 2, 1, 0, 0)" /tmp/wcv-v2.txt
+          grep -F "primary_repaired_live=(2, 3, 4, 6, 7)" /tmp/wcv-v2.txt
+          grep -F "repair_capability_revoked_live=(2, 3)" /tmp/wcv-v2.txt
+          grep -F "repair_attempt_after_capability_loss_live=(2, 3)" /tmp/wcv-v2.txt
+
+      - name: Verify claim boundary text
+        run: |
+          set -euo pipefail
+          grep -F "greatest post-fixed viability kernel is empty" spec/WARRANTED_CONTINUATION_VIABILITY_V2.md
+          grep -F "authority explicitly depends on the live repair" spec/WARRANTED_CONTINUATION_VIABILITY_V2.md
+          grep -F "meta-repair" spec/WARRANTED_CONTINUATION_VIABILITY_V2.md
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+
+      - name: Build integrated formal stack
+        run: lake build Metatron
+
+      - name: Verify theorem surface
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = Path("formal/Metatron/WarrantedContinuationViabilityV2.lean").read_text()
+          for name in (
+              "support_kernel_postfixed",
+              "support_kernel_greatest",
+              "capability_loss_no_postfixed_state",
+              "capability_loss_empty_kernel_postfixed",
+              "capability_loss_empty_kernel_greatest",
+              "admitting_capability_loss_collapses_kernel",
+              "capability_base_live",
+              "primary_repair_is_capability_backed",
+              "capability_revocation_cuts_repair_cone",
+              "capability_revocation_preserves_history",
+              "no_repair_after_capability_loss",
+              "concrete_capability_separator",
+          ):
+              assert f"theorem {name}" in src, name
+          print("WCV_V2_THEOREM_SURFACE_OK")
+          PY
+
+      - name: Emit qualification attestation
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          result = {
+              "schema_version": 1,
+              "status": "QUALIFIED_WARRANTED_CONTINUATION_VIABILITY_V2",
+              "head_sha": os.environ["GITHUB_SHA"],
+              "workflow_run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "parent_v1_sha": "bf71eafec63511a47a351cc2c95b8b239b37e6d5",
+              "parent_v1_run": 35923675108,
+              "support_only_kernel": ["adaptive"],
+              "support_only_round_sizes": [4, 1, 1],
+              "capability_loss_kernel": [],
+              "capability_loss_round_sizes": [4, 2, 1, 0, 0],
+              "base_live": [0, 1, 2, 3, 4],
+              "primary_repaired_live": [2, 3, 4, 6, 7],
+              "repair_capability_revoked_live": [2, 3],
+              "repair_attempt_after_capability_loss_live": [2, 3],
+              "capability_dependency_warranted": True,
+              "trusted_runtime_changed": False,
+              "warrant_graph_changed": False,
+              "boundary": "finite capability-loss kernel plus exact WarrantGraph dependency/revocation fixture",
+          }
+          Path("/tmp/warranted-continuation-viability-v2.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: warranted-continuation-viability-v2
+          path: |
+            /tmp/warranted-continuation-viability-v2.json
+            /tmp/wcv-v2.txt
