@@ -40,7 +40,7 @@ jobs:
       - name: Verify claim boundary text
         run: |
           set -euo pipefail
-          grep -F "strict serial tower is sufficient" spec/WARRANTED_CONTINUATION_VIABILITY_V4.md
+          grep -F "strict serial tower is then attacked" spec/WARRANTED_CONTINUATION_VIABILITY_V4.md
           grep -F "repair dependency/coverage graph" spec/WARRANTED_CONTINUATION_VIABILITY_V4.md
           grep -F "strict serial depth is sufficient" spec/WARRANTED_CONTINUATION_VIABILITY_V4.md
 
