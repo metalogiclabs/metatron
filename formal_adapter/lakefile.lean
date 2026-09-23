@@ -19,5 +19,7 @@ lean_lib CLCMetatronAdapter where
     `CLCMetatronAdapter.Adapter,
     `CLCMetatronAdapter.Regression,
     `CLCMetatronAdapter.VerifiedTransportSupport,
-    `CLCMetatronAdapter.VerifiedTransportSupportTest
+    `CLCMetatronAdapter.VerifiedTransportSupportTest,
+    `CLCMetatronAdapter.LiveWarrantCertificate,
+    `CLCMetatronAdapter.LiveWarrantCertificateTest
   ]
