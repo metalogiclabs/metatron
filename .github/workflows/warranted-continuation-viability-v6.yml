@@ -1,0 +1,123 @@
+name: Warranted Continuation Viability V6
+
+on:
+  push:
+    branches:
+      - warranted-continuation-viability-v6
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify V5 lineage and trusted thin waist
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 86ae67a0ffda901e78b4bd1f3050ba473129cb50 HEAD
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "V5_LINEAGE_AND_THIN_WAIST_OK"
+
+      - name: Run live-causal cover and contention census
+        run: |
+          python scripts/warranted_continuation_viability_v6.py | tee /tmp/wcv-v6.txt
+          grep -F "WARRANTED_CONTINUATION_VIABILITY_V6=PASS" /tmp/wcv-v6.txt
+          grep -F "oracle_cut_live=(1,)" /tmp/wcv-v6.txt
+          grep -F "authority_only_cover_after_cut=True" /tmp/wcv-v6.txt
+          grep -F "causal_cover_after_cut=False" /tmp/wcv-v6.txt
+          grep -F "repeated_static_complete=True" /tmp/wcv-v6.txt
+          grep -F "failure0_individually_repairable=True" /tmp/wcv-v6.txt
+          grep -F "failure1_individually_repairable=True" /tmp/wcv-v6.txt
+          grep -F "sequence_01_viable=False" /tmp/wcv-v6.txt
+          grep -F "sequence_10_viable=False" /tmp/wcv-v6.txt
+
+      - name: Verify claim boundary text
+        run: |
+          set -euo pipefail
+          grep -F "authority alone is insufficient" spec/WARRANTED_CONTINUATION_VIABILITY_V6.md
+          grep -F "static per-failure live-authorized causal cover is not sufficient" spec/WARRANTED_CONTINUATION_VIABILITY_V6.md
+          grep -F "stateful repair transition system" spec/WARRANTED_CONTINUATION_VIABILITY_V6.md
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+
+      - name: Build integrated formal stack
+        run: lake build Metatron
+
+      - name: Verify theorem surface
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = Path("formal/Metatron/WarrantedContinuationViabilityV6.lean").read_text()
+          for name in (
+              "complete_live_causal_cover_implies_postfixed",
+              "postfixed_implies_complete_live_causal_cover",
+              "complete_live_causal_cover_iff_postfixed",
+              "oracle_route0_matches_actual_causal_repair",
+              "oracle_route1_rejected_by_actual_causal_repair",
+              "oracle_base_complete_live_causal_cover",
+              "oracle_authority_cut_live",
+              "authority_alone_is_not_causal_cover",
+              "repeated_route_uses_actual_certified_causal_repair",
+              "repeated_static_complete_cover",
+              "each_failure_individually_repairable",
+              "shared_resource_breaks_sequence_01",
+              "shared_resource_breaks_sequence_10",
+              "static_live_causal_cover_not_sequentially_sufficient",
+          ):
+              assert f"theorem {name}" in src, name
+          print("WCV_V6_THEOREM_SURFACE_OK")
+          PY
+
+      - name: Emit qualification attestation
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          result = {
+              "schema_version": 1,
+              "status": "QUALIFIED_WARRANTED_CONTINUATION_VIABILITY_V6",
+              "head_sha": os.environ["GITHUB_SHA"],
+              "workflow_run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "parent_v5_sha": "86ae67a0ffda901e78b4bd1f3050ba473129cb50",
+              "parent_v5_run": 35928378587,
+              "generic_static_theorem": "complete_live_causal_cover_iff_postfixed",
+              "authority_only_cover_after_cut": True,
+              "live_causal_cover_after_cut": False,
+              "static_complete_before_contention": True,
+              "each_failure_individually_repairable": True,
+              "sequence_01_viable": False,
+              "sequence_10_viable": False,
+              "trusted_runtime_changed": False,
+              "warrant_graph_changed": False,
+              "boundary": "finite live-authority plus causal-validity static cover and exact one-shot contention counterexample",
+          }
+          Path("/tmp/warranted-continuation-viability-v6.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: warranted-continuation-viability-v6
+          path: |
+            /tmp/warranted-continuation-viability-v6.json
+            /tmp/wcv-v6.txt
