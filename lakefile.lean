@@ -29,7 +29,8 @@ lean_lib Metatron where
     `Metatron.ResidualGeneratedCapability,
     `Metatron.WarrantedContinuationViability,
     `Metatron.WarrantedContinuationViabilityV1,
-    `Metatron.WarrantedContinuationViabilityV2
+    `Metatron.WarrantedContinuationViabilityV2,
+    `Metatron.WarrantedContinuationViabilityV3
   ]
 
 lean_exe metatron_reference where
