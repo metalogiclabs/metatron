@@ -1,0 +1,104 @@
+name: Temporal Concentration V0
+
+on:
+  push:
+    branches:
+      - temporal-concentration-v0
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify trusted thin waist unchanged
+        run: |
+          set -euo pipefail
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "TRUSTED_THIN_WAIST_IDENTICAL"
+
+      - name: Run finite temporal concentration census
+        run: |
+          python scripts/temporal_concentration_v0.py | tee /tmp/temporal-concentration.txt
+          grep -F "TEMPORAL_CONCENTRATION_V0=PASS" /tmp/temporal-concentration.txt
+          grep -F "image_sizes=(4, 3, 2)" /tmp/temporal-concentration.txt
+          grep -F "kernel_sizes=(4, 6, 8)" /tmp/temporal-concentration.txt
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+
+      - name: Build integrated formal stack
+        run: lake build Metatron
+
+      - name: Verify theorem and claim boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = Path("formal/Metatron/TemporalConcentration.lean").read_text()
+          spec = Path("spec/TEMPORAL_CONCENTRATION_V0.md").read_text()
+          for name in (
+              "kernel_postcompose_mono",
+              "strict_witness_adds_identification",
+              "first_gate_strictly_concentrates",
+              "second_gate_strictly_concentrates",
+              "first_merge_survives_second_gate",
+              "second_gate_adds_new_merge",
+              "no_reseparation_after_merge",
+          ):
+              assert f"theorem {name}" in src, name
+          for phrase in (
+              "It is not a theorem about consciousness",
+              "This does not establish:",
+              "requires an explicit metric or event-rate assumption",
+          ):
+              assert phrase in spec, phrase
+          print("TEMPORAL_CONCENTRATION_BOUNDARY_OK")
+          PY
+
+      - name: Emit qualification attestation
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          result = {
+              "schema_version": 1,
+              "status": "QUALIFIED_TEMPORAL_CONCENTRATION_V0",
+              "head_sha": os.environ["GITHUB_SHA"],
+              "workflow_run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "base_sha": "b9d1b5cc10477188be6e55617699be60e70f6dad",
+              "finite_departure_count": 4,
+              "image_sizes": [4, 3, 2],
+              "kernel_pair_counts": [4, 6, 8],
+              "generic_theorem": "kernel_postcompose_mono",
+              "strict_witness_theorem": "strict_witness_adds_identification",
+              "trusted_runtime_changed": False,
+              "warrant_graph_changed": False,
+              "boundary": "deterministic postcomposition plus declared four-departure/two-gate fixture",
+          }
+          Path("/tmp/temporal-concentration-v0.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: temporal-concentration-v0
+          path: |
+            /tmp/temporal-concentration-v0.json
+            /tmp/temporal-concentration.txt
