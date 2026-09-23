@@ -64,7 +64,9 @@ theorem descending_boundary_cascade_fails :
   | zero =>
       rfl
   | succ n ih =>
-      simp [cascade, runTower, towerStep, ih]
+      change runTower (n + 2) ((n + 1) :: cascade (n + 1)) = none
+      rw [runTower, outer_failure_removes_one_layer]
+      exact ih
 
 def lowerAdmitted (depth : Nat) : List Nat :=
   List.range (depth - 1)
