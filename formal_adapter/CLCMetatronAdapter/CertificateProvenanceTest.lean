@@ -25,6 +25,7 @@ theorem unit_certificate_provenance_not_unique :
   have hc := congrFun h ()
   have hv := congrArg
     (fun c : LiveWarrantCertificate Metatron.warrantBaseline => c.1) hc
+  change (0 : Nat) = 3 at hv
   omega
 
 theorem unit_certificate_identity_does_not_determine_warrant :
