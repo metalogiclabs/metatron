@@ -43,6 +43,15 @@ def CompleteLiveCausalCover
     (admitted : List Nat) : Prop :=
   completeLiveCausalCoverB live routes validB admitted = true
 
+instance completeLiveCausalCoverDecidable
+    (live : List Nat)
+    (routes : List CausalRoute)
+    (validB : Nat → Nat → Bool)
+    (admitted : List Nat) :
+    Decidable (CompleteLiveCausalCover live routes validB admitted) := by
+  unfold CompleteLiveCausalCover
+  infer_instance
+
 def staticCausalStep
     (routes : List CausalRoute)
     (validB : Nat → Nat → Bool)
