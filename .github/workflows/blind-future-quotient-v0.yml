@@ -2,7 +2,9 @@ name: Blind Future Quotient V0
 
 on:
   push:
-    branches: [blind-future-quotient-v0]
+    branches:
+      - blind-future-quotient-v0
+      - main
   workflow_dispatch:
 
 permissions:
