@@ -99,6 +99,25 @@ def HasNovelAccess
   (∃ o s, newI.accessible o s ∧ ¬ oldI.accessible o s) ∨
   (∃ o t, newI.available o t ∧ ¬ oldI.available o t)
 
+theorem lawfulPath_of_accessible_iff
+    {World : Type u} {Observer : Type v} {Step : Type w}
+    {Test : Type z} {Val : Type q}
+    (d : AbsoluteDynamics World Observer Step)
+    (oldI newI : ObserverInterface World Observer Step Test Val)
+    (hiff : ∀ o s, newI.accessible o s ↔ oldI.accessible o s) :
+    ∀ o steps,
+      LawfulPath (modelWith d newI) o steps →
+        LawfulPath (modelWith d oldI) o steps := by
+  intro o steps
+  induction steps generalizing o with
+  | nil =>
+      intro h
+      trivial
+  | cons s ss ih =>
+      intro h
+      exact ⟨(hiff o s).1 h.1,
+        ih (d.observerAct s o) h.2⟩
+
 theorem strict_extension_requires_novel_interface_witness
     {World : Type u} {Observer : Type v} {Step : Type w}
     {Test : Type z} {Val : Type q}
@@ -115,17 +134,17 @@ theorem strict_extension_requires_novel_interface_witness
   rcases hstrict.2 with ⟨x, y, hold, hnotnew⟩
   apply hnotnew
   intro steps hsteps q hq
-  have holdPath : LawfulPath (modelWith d oldI) o steps := by
-    induction steps generalizing o with
-    | nil =>
-        trivial
-    | cons s ss ih =>
-        exact ⟨(hnoNovel o s).1 hsteps.1,
-          ih (d.observerAct s o) hsteps.2⟩
+  have holdPath : LawfulPath (modelWith d oldI) o steps :=
+    lawfulPath_of_accessible_iff d oldI newI hnoNovel o steps hsteps
   have holdAvail :
       oldI.available (run d.observerAct steps o) q :=
     (hnoTestNovel _ _).1 hq
   have hEq := hold steps holdPath q holdAvail
+  change
+    newI.test (run d.observerAct steps o) q
+      (run d.worldAct steps x) =
+    newI.test (run d.observerAct steps o) q
+      (run d.worldAct steps y)
   rw [hext.test_same, hext.test_same]
   exact hEq
 
