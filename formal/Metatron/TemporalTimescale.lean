@@ -99,8 +99,10 @@ theorem gate1_no_faster :
 
 theorem downstream_no_faster_than_gate1 :
     SlowerOrEqualOn gate1 downstream departureIntervals := by
-  simpa [SlowerOrEqualOn, downstream] using
-    transitionCount_postcompose_le gate1 gate2 departureIntervals
+  change
+    TransitionCount (fun t : Departure => gate2 (gate1 t)) departureIntervals ≤
+      TransitionCount gate1 departureIntervals
+  exact transitionCount_postcompose_le gate1 gate2 departureIntervals
 
 theorem fixture_strict_event_rate_slowing :
     TransitionCount downstream departureIntervals <
