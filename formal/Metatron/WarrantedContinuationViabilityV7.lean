@@ -5,7 +5,6 @@ namespace Metatron.WarrantedContinuationViabilityV7
 open Metatron.WarrantedContinuationViability
 open Metatron.WarrantedContinuationViabilityV1
 open Metatron.WarrantedContinuationViabilityV6
-open Metatron.WarrantGraph
 
 /--
 Finite quotient of the full repair state. The constructors encode both the
@@ -88,7 +87,7 @@ theorem contention_no_postfixed_state
       have h0 := hS .ready hs 0 (by simp [admittedFailures])
       rcases h0 with ⟨s', hstep, hs'⟩
       have hs'Eq : s' = .depleted := by
-        simpa [statefulContentionStep] using hstep
+        simpa [statefulContentionStep] using hstep.symm
       subst s'
       have h1 := hS .depleted hs' 0 (by simp [admittedFailures])
       rcases h1 with ⟨s'', hstep', _⟩
