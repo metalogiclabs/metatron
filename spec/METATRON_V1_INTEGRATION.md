@@ -207,6 +207,44 @@ Thus V1 now distinguishes three layers cleanly:
 3. genuinely novel capability acquisition that extends the lawful interface and
    can strictly refine observer-relative identity.
 
+## Residual-generated capability synthesis
+
+Residual-Generated Capability V0 removes the finite completed-candidate list.
+
+The primitive ingredients are now reusable observation atoms plus a constructor
+algebra. Completed observations are generated compositionally.
+
+Lean formalizes a free observation language `ObsExpr`, its evaluation
+semantics, and instantiates the residual-cover sufficiency bridge at generated
+expressions:
+
+- `generatedCover_iff_targetSufficient`;
+- `generatedMinimum_minimalSufficient`;
+- `invented_pair_targetSufficient`;
+- `invented_pair_covers`.
+
+The blind experiment supplied only four anonymous primitive atoms and the XOR
+constructor. Metatron generated the extensional closure itself.
+
+On the sealed fixture:
+
+- generated closure size: 15 observations;
+- consequential residual: 48 pairs;
+- minimum primitive-only acquisition size: 3;
+- no generated singleton was sufficient;
+- minimum generated acquisition size: 2;
+- minimum total constructor cost: 2;
+- exactly 3 equivalent minimum generated bases;
+- the hidden planted generated basis belonged to that minimum family.
+
+All G1-G10 gates passed:
+
+BLIND_RESIDUAL_GENERATED_CAPABILITY_PASS
+
+This is a strict step beyond candidate selection: the missing capability was
+not supplied as a completed candidate. It was constructed from reusable
+primitives by free compositional completion and selected by consequence.
+
 ## Integrated architecture
 
 warrant log
@@ -215,6 +253,7 @@ warrant log
   -> compute greatest continuation-safe behavioral quotient
   -> identify unresolved target distinction
   -> minimum genuinely novel interface extension when required
+  -> synthesize missing observation semantics from reusable constructors
   -> refined observer-relative quotient
   -> future-demanded consequential residual
   -> minimum certified causal repair frontier
@@ -235,7 +274,7 @@ The Lean Kernel eight-lane controller remains external proof/measurement/promoti
 
 ## Claim boundary
 
-V1 now supports an embedded observer whose lawful future interface induces an objective observer-relative identity relation over fixed absolute dynamics, exact finite discovery of continuation-safe quotients, quotient-relative commutation, and minimum strict interface extensions inside a declared novel-capability language. It does not claim a complete ontology of human cognition, unrestricted invention outside the declared candidate language, infer the protected observation language or action vocabulary themselves, establish higher-order independence beyond pairwise swaps, synthesize symbolic fixed-point/commutation proofs on infinite carriers, or solve conflict/synchronization/feedback semantics. Nucleus authority remains unchanged.
+V1 now supports an embedded observer whose lawful future interface induces an objective observer-relative identity relation over fixed absolute dynamics, exact finite discovery of continuation-safe quotients, quotient-relative commutation, minimum strict interface extensions, and generated capability synthesis from reusable constructors without a supplied completed-candidate list. It does not claim a complete ontology of human cognition, invention of new primitive constructors beyond the declared constructor algebra, infer the protected observation language or action vocabulary themselves, establish higher-order independence beyond pairwise swaps, synthesize symbolic fixed-point/commutation proofs on infinite carriers, or solve conflict/synchronization/feedback semantics. Nucleus authority remains unchanged.
 
 ## Representation discipline
 
