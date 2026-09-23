@@ -1,0 +1,5 @@
+import CLCMetatronAdapter.ProvenanceAttestationGenerated
+
+#print axioms CLCMetatronAdapter.attestedUnitCertificateProvenance_index
+#print axioms CLCMetatronAdapter.attestedUnitCertificateProvenance_is_live
+#print axioms CLCMetatronAdapter.attestedUnitCertificateProvenance_support

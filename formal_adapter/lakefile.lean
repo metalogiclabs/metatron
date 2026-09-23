@@ -23,5 +23,6 @@ lean_lib CLCMetatronAdapter where
     `CLCMetatronAdapter.LiveWarrantCertificate,
     `CLCMetatronAdapter.LiveWarrantCertificateTest,
     `CLCMetatronAdapter.CertificateProvenance,
-    `CLCMetatronAdapter.CertificateProvenanceTest
+    `CLCMetatronAdapter.CertificateProvenanceTest,
+    `CLCMetatronAdapter.ProvenanceAttestationGenerated
   ]
