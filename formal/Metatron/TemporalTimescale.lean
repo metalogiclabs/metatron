@@ -58,9 +58,9 @@ theorem transitionCount_postcompose_le
 def SlowerOrEqualOn
     {A : Type u} {B : Type v} {C : Type w}
     [DecidableEq B] [DecidableEq C]
-    (micro : A → B) (macro : A → C)
+    (micro : A → B) (macroObs : A → C)
     (intervals : List (A × A)) : Prop :=
-  TransitionCount macro intervals ≤ TransitionCount micro intervals
+  TransitionCount macroObs intervals ≤ TransitionCount micro intervals
 
 theorem deterministic_readout_slower_or_equal
     {A : Type u} {B : Type v} {C : Type w}
