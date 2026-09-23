@@ -1,0 +1,8 @@
+import CLCMetatronAdapter.VerifiedTransportSupport
+import CLCMetatronAdapter.VerifiedTransportSupportTest
+
+#print axioms CLCMetatronAdapter.verifiedTransport_support_live
+#print axioms CLCMetatronAdapter.verifiedTransport_static_authority
+#print axioms CLCMetatronAdapter.verifiedTransport_decisive_preserved_with_live_support
+#print axioms CLCMetatronAdapter.baseline_id_decisive_preserved_with_live_support
+#print axioms CLCMetatronAdapter.revoked_one_support_cannot_be_live

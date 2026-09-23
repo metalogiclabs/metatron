@@ -12,8 +12,12 @@ require mathlib from git
 lean_lib CLCMetatronAdapter where
   srcDir := "."
   roots := #[
+    `CLC.Verdict,
     `CLC.Support,
+    `CLC.Transport,
     `Metatron.WarrantGraph,
     `CLCMetatronAdapter.Adapter,
-    `CLCMetatronAdapter.Regression
+    `CLCMetatronAdapter.Regression,
+    `CLCMetatronAdapter.VerifiedTransportSupport,
+    `CLCMetatronAdapter.VerifiedTransportSupportTest
   ]

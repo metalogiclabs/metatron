@@ -1,0 +1,14 @@
+{
+  "schema": "metatron.clc-verified-transport-support-v0.candidate",
+  "status": "CANDIDATE_UNQUALIFIED",
+  "branch": "feature/clc-verified-transport-support-v0",
+  "parent_a9_head": "d61b5bb6b8299f79ec44e359fb3723ce3f15f0e7",
+  "parent_a9_run": 35924177681,
+  "parent_a9_artifact": 10778148087,
+  "msi_clc_head": "900a73c1d386ee0eee1205a1cf31d270f3311ef7",
+  "clc_transport_blob": "fd76f47aba3fcb37ff8d59a6deadd4848f5a239c",
+  "clc_verdict_blob": "47add0bc00e239cfa8dc0786e0f0031669ca04ac",
+  "theorem": "verifiedTransport_decisive_preserved_with_live_support",
+  "negative_separator": "revoked_one_support_cannot_be_live",
+  "claim_boundary": "Static declared certificate-support liveness composed with CLC VerifiedTransport decisive protected-verdict preservation; no runtime universality, dynamic revocation/reclosure, quotient, causal-port, authentication, reversibility, or Nucleus enlargement."
+}
