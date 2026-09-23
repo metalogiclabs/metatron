@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "experiment": "grammar-shape-genesis-v0",
+  "implementation_head": "d8a833e27b32e409255f34d7e01959403659d2b5",
+  "qualification_run": 35811885815,
+  "qualification_job": 107025059849,
+  "verdict": "PASS_RESIDUAL_DRIVEN_GRAMMAR_SHAPE_GENESIS",
+  "trusted_core": {
+    "runtime_nucleus_blob": "d9d4293e54471714bf098593bf4018c3f6403273",
+    "formal_warrant_graph_blob": "d2affc0a57a1815f303f6f1859941465c69e7d32"
+  },
+  "result": {
+    "state_count": 32,
+    "initial_grammar_shape": "bijective unary local Boolean rewrites",
+    "initial_unary_max_gain": 0,
+    "new_grammar_shape": "LocalTruthTableRewrite(control,target,table)",
+    "new_arity": 2,
+    "residual_trace": [240, 112, 48, 16, 0],
+    "generic_binary_synthesis_calls": 2,
+    "induced_constructor_calls": 2,
+    "induced_constructor_table": [0, 1, 1, 0],
+    "heldout_reuse_pass": true,
+    "restart_pass": true,
+    "semantic_sham_pass": true,
+    "g1_knockout_restores_seed": true
+  },
+  "claim_boundary": "Grammar-shape genesis relative to a declared finite arity-2 extensional truth-table meta-meta grammar; unrestricted syntax invention or unbounded arity is not claimed."
+}
