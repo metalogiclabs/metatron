@@ -21,5 +21,7 @@ lean_lib CLCMetatronAdapter where
     `CLCMetatronAdapter.VerifiedTransportSupport,
     `CLCMetatronAdapter.VerifiedTransportSupportTest,
     `CLCMetatronAdapter.LiveWarrantCertificate,
-    `CLCMetatronAdapter.LiveWarrantCertificateTest
+    `CLCMetatronAdapter.LiveWarrantCertificateTest,
+    `CLCMetatronAdapter.CertificateProvenance,
+    `CLCMetatronAdapter.CertificateProvenanceTest
   ]
