@@ -1,0 +1,99 @@
+name: Grammar Shape Genesis V0
+
+on:
+  push:
+    branches: [grammar-shape-genesis-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: grammar-shape-genesis-v0-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualification:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify trusted thin waist
+        run: |
+          set -euo pipefail
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "TRUSTED_THIN_WAIST_IDENTICAL"
+
+      - name: Run grammar-shape tests
+        run: |
+          python -m unittest tests.test_grammar_shape_genesis_v0 -v
+
+      - name: Execute grammar-shape genesis
+        run: |
+          python -m scripts.grammar_shape_genesis_v0 --out /tmp/grammar-shape-genesis-v0.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("/tmp/grammar-shape-genesis-v0.json").read_text())
+          assert d["verdict"] == "PASS_RESIDUAL_DRIVEN_GRAMMAR_SHAPE_GENESIS"
+          r=d["result"]
+          assert r["selector_parameters"] == ["current_residual","installed","dim"]
+          assert r["selector_has_target_argument"] is False
+          assert r["residual_trace"] == [240,112,48,16,0]
+          assert r["generic_binary_synthesis_calls"] == 2
+          assert r["induced_constructor_calls"] == 2
+          assert r["shape_warrant_live"]
+          assert r["constructor_schema"]["arity"] == 2
+          assert r["constructor_schema"]["table"] == [0,1,1,0]
+          assert [g["mode"] for g in r["generations"]] == [
+            "grammar_shape_genesis",
+            "generic_binary_synthesis",
+            "induced_binary_constructor",
+            "induced_binary_constructor",
+          ]
+          assert r["generations"][0]["unary_grammar_max_gain"] == 0
+          assert r["generations"][0]["selected_program"]["arity"] == 2
+          assert r["restart"]["same_interface"] and r["restart"]["same_constructor"]
+          assert r["semantic_sham"]["same_controls"]
+          assert r["knockout"]["restores_seed_interface"]
+          print("GRAMMAR_SHAPE_GENESIS_PASS")
+          PY
+
+      - name: Reject named binary shortcut
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          src=Path("scripts/grammar_shape_genesis_v0.py").read_text()
+          tree=ast.parse(src)
+          fn=next(
+              n for n in tree.body
+              if isinstance(n,ast.FunctionDef) and n.name=="synthesize_binary_shape"
+          )
+          args=[a.arg for a in fn.args.args]
+          assert args == ["current_residual","installed","dim"], args
+          assert "target" not in args
+          lowered=src.lower()
+          for forbidden in ("def xor", "class xor", "def cnot", "class cnot", "repair_map", "generation_schedule"):
+              assert forbidden not in lowered, forbidden
+          print("NO_NAMED_BINARY_SHORTCUT")
+          PY
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Build retained theorem stack
+        run: |
+          lake build Metatron.ResidualBasis Metatron.ResidualInteractions
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: grammar-shape-genesis-v0
+          path: /tmp/grammar-shape-genesis-v0.json
