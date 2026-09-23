@@ -1,0 +1,145 @@
+name: CLC Certificate Provenance Binding V0
+
+on:
+  push:
+    branches:
+      - feature/clc-certificate-provenance-binding-v0
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify qualified parents and trusted waist
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 3b10b276f132600a2a51d0a8260c24a108fbd748 "$GITHUB_SHA"
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          test "$(git hash-object formal_adapter/CLCMetatronAdapter/LiveWarrantCertificate.lean)" = "d480a7b308240093e34010f2fc9b8863fdbfdc8d"
+          echo "QUALIFIED_PARENTS_AND_WAIST=PASS"
+
+      - name: Verify pinned pre-existing CLC Unit certificate identity
+        run: |
+          set -euo pipefail
+          curl -fsSL "https://raw.githubusercontent.com/heathsanchez/Minimal-Sufficient-Interface/900a73c1d386ee0eee1205a1cf31d270f3311ef7/qcklean/CLC/Fixtures.lean" -o /tmp/Fixtures.lean
+          test "$(git hash-object /tmp/Fixtures.lean)" = "ead1d6f1da004770f93539f589acd83a35578a15"
+          grep -q 'CertId := Unit' /tmp/Fixtures.lean
+          grep -q 'def positiveAuthority : AuthoritySnapshot Unit' /tmp/Fixtures.lean
+          echo "PINNED_CLC_UNIT_CERT_IDENTITY=PASS"
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Recheck unchanged root Metatron
+        run: |
+          lake build Metatron
+          lake build metatron_reference
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)'             formal_adapter/CLCMetatronAdapter             formal_adapter/CLC             formal_adapter/Metatron
+
+      - name: Build certificate provenance binding
+        run: |
+          cd formal_adapter
+          lake update
+          lake exe cache get
+          lake build CLCMetatronAdapter
+          mkdir -p ../out
+          lake env lean CLCMetatronAdapter/CertificateProvenanceAudit.lean             | tee ../out/certificate-provenance-axiom-audit.txt
+
+      - name: Enforce axiom boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text=Path("out/certificate-provenance-axiom-audit.txt").read_text()
+          assert "sorryAx" not in text, text
+          allowed={"propext","Classical.choice","Quot.sound"}
+          compact=" ".join(text.splitlines())
+          tails=compact.split("depends on axioms:")[1:]
+          assert tails, text
+          for tail in tails:
+              inside=tail.split("[",1)[1].split("]",1)[0]
+              seen={x.strip() for x in inside.split(",") if x.strip()}
+              assert seen <= allowed, (inside, seen-allowed)
+          print("CERT_PROVENANCE_AXIOM_BOUNDARY=PASS")
+          PY
+
+      - name: Re-run retained Python authority suite
+        run: |
+          python - <<'PY'
+          import unittest
+          suite=unittest.defaultTestLoader.discover("tests", pattern="test_*.py")
+          count=suite.countTestCases()
+          print("PYTHON_TEST_COUNT",count)
+          assert count == 32, count
+          PY
+          python -m unittest discover -s tests -p 'test_*.py' -v             2>&1 | tee out/python-tests.txt
+
+      - name: Verify positive and negative theorem boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src=Path("formal_adapter/CLCMetatronAdapter/CertificateProvenance.lean").read_text()
+          tst=Path("formal_adapter/CLCMetatronAdapter/CertificateProvenanceTest.lean").read_text()
+          assert "structure CertificateProvenance" in src
+          for name in (
+              "certificateProvenance_verifiedTransport_static_authority",
+              "certificateProvenance_verifiedTransport_decisive_preserved",
+          ):
+              assert f"theorem {name}" in src, name
+          for name in (
+              "unit_certificate_provenance_not_unique",
+              "unit_certificate_identity_does_not_determine_warrant",
+              "unit_identity_transport_preserved_with_bound_provenance",
+          ):
+              assert f"theorem {name}" in tst, name
+          print("CERT_PROVENANCE_BOUNDARY=PASS")
+          PY
+
+      - name: Emit qualification artifact
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          d={
+            "schema":"metatron.clc-certificate-provenance-binding-v0.qualification",
+            "status":"HOSTED_EXACT_HEAD_PASS",
+            "head_sha":os.environ["GITHUB_SHA"],
+            "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
+            "parent_a9c_head":"3b10b276f132600a2a51d0a8260c24a108fbd748",
+            "parent_a9c_run":35926898664,
+            "parent_a9c_artifact":10779337182,
+            "pinned_clc_fixtures_head":"900a73c1d386ee0eee1205a1cf31d270f3311ef7",
+            "pinned_clc_fixtures_blob":"ead1d6f1da004770f93539f589acd83a35578a15",
+            "positive_theorem":"certificateProvenance_verifiedTransport_decisive_preserved",
+            "negative_theorem":"unit_certificate_identity_does_not_determine_warrant",
+            "python_tests":32,
+            "claim_boundary":"Certificate identity alone does not determine Metatron warrant provenance; explicit Cert→LiveWarrantCertificate binding is sufficient for inherited static transport consequence but requires independent warrant."
+          }
+          Path("out/clc-certificate-provenance-binding-v0.json").write_text(
+              json.dumps(d,indent=2,sort_keys=True)+"\n")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clc-certificate-provenance-binding-v0
+          path: |
+            out/clc-certificate-provenance-binding-v0.json
+            out/certificate-provenance-axiom-audit.txt
+            out/python-tests.txt
