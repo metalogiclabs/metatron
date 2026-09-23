@@ -4,6 +4,7 @@ namespace Metatron.BehavioralCommutation
 
 open Metatron.FutureObservations
 open Metatron.CausalTraceQuotient
+open Metatron.CausalLinearization
 
 universe u v w z
 
