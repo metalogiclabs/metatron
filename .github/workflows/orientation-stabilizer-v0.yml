@@ -1,0 +1,105 @@
+name: Orientation Stabilizer V0
+
+on:
+  push:
+    branches:
+      - orientation-stabilizer-v0
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify trusted thin waist unchanged
+        run: |
+          set -euo pipefail
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "TRUSTED_THIN_WAIST_IDENTICAL"
+
+      - name: Run exhaustive orientation census
+        run: |
+          python scripts/orientation_stabilizer_v0.py | tee /tmp/orientation-census.txt
+          grep -F "ORIENTATION_STABILIZER_V0=PASS" /tmp/orientation-census.txt
+          grep -F "stabilizer=('identity', 'compound')" /tmp/orientation-census.txt
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+
+      - name: Build integrated formal stack
+        run: lake build Metatron
+
+      - name: Verify theorem and claim boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = Path("formal/Metatron/OrientationStabilizer.lean").read_text()
+          spec = Path("spec/ORIENTATION_STABILIZER_V0.md").read_text()
+          for name in (
+              "reflection_does_not_preserve",
+              "reversal_does_not_preserve",
+              "compound_preserves",
+              "reflection_reversal_commute",
+              "stabilizer_exact",
+              "only_nontrivial_preserver_is_compound",
+          ):
+              assert f"theorem {name}" in src, name
+          for phrase in (
+              "It is not a physical phase-transition claim.",
+              "This does not establish:",
+              "uniqueness among transformations outside the declared four-element group",
+          ):
+              assert phrase in spec, phrase
+          print("ORIENTATION_STABILIZER_BOUNDARY_OK")
+          PY
+
+      - name: Emit qualification attestation
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          result = {
+              "schema_version": 1,
+              "status": "QUALIFIED_ORIENTATION_STABILIZER_V0",
+              "head_sha": os.environ["GITHUB_SHA"],
+              "workflow_run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "base_sha": "b9d1b5cc10477188be6e55617699be60e70f6dad",
+              "state_count": 4,
+              "generated_symmetry_count": 4,
+              "coherent_state_count": 2,
+              "stabilizer": ["identity", "compound"],
+              "unique_nontrivial_preserver": "compound",
+              "reflection_preserves": False,
+              "reversal_preserves": False,
+              "compound_preserves": True,
+              "trusted_runtime_changed": False,
+              "warrant_graph_changed": False,
+              "boundary": "declared two-bit orientation model and four generated transformations only",
+          }
+          Path("/tmp/orientation-stabilizer-v0.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orientation-stabilizer-v0
+          path: |
+            /tmp/orientation-stabilizer-v0.json
+            /tmp/orientation-census.txt
