@@ -16,6 +16,7 @@ warrant log
   -> objective world + observer dynamics
   -> observer-accessible lawful future observations
   -> compute continuation-safe behavioral quotient
+  -> acquire minimum genuinely novel interface extension when needed
   -> future-demanded residual
   -> minimum certified causal repair frontier
   -> earn safe swaps modulo FutureEq
@@ -35,6 +36,8 @@ Blind Future Quotient V0 now removes the supplied quotient too: from anonymous t
 
 Embedded Observer Ontology V0 now places the observer inside the formal system. Absolute world/observer dynamics stay objective, while the observer's current lawful interface induces a mathematically determined relational identity over the world. The same absolute dynamics can therefore support different observer-relative quotients without making those quotients arbitrary or subjective. If a learning transition is already lawful, the current future-equivalence already anticipates it.
 
+Novel Capability Genesis V0 now isolates genuine invention as a strict extension of that lawful interface. In a blind finite test Metatron found that no single new test sufficed, recovered a minimum two-capability interface extension, and preserved the full family of equivalent minimum realizations.
+
 The Lean Kernel controller remains an external engineering wedge; none of this enlarges Nucleus authority.
 
 See:
@@ -44,6 +47,8 @@ See:
 - spec/BLIND_BEHAVIORAL_COMMUTATION_V1_PREREG.md
 - spec/BLIND_FUTURE_QUOTIENT_V0_PREREG.md
 - spec/EMBEDDED_OBSERVER_ONTOLOGY_V0.md
+- spec/NOVEL_CAPABILITY_GENESIS_V0.md
+- spec/BLIND_NOVEL_CAPABILITY_V0_PREREG.md
 - spec/EARNED_COMMUTATION_BASIS_V0.md
 - spec/FINITE_POSET_TOPOSORT_CONNECTIVITY_V0.md
 - spec/CAUSAL_TRACE_QUOTIENT_V0.md
