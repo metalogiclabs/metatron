@@ -1,0 +1,118 @@
+name: Warranted Continuation Viability V1
+
+on:
+  push:
+    branches:
+      - warranted-continuation-viability-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify V0 lineage and trusted thin waist
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 0c4141c106fb74e3b9340443cbbe525ab72b716f HEAD
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "V0_LINEAGE_AND_THIN_WAIST_OK"
+
+      - name: Run finite viability-kernel and reclosure census
+        run: |
+          python scripts/warranted_continuation_viability_v1.py | tee /tmp/wcv-v1.txt
+          grep -F "WARRANTED_CONTINUATION_VIABILITY_V1=PASS" /tmp/wcv-v1.txt
+          grep -F "viability_kernel=('adaptive',)" /tmp/wcv-v1.txt
+          grep -F "base_live=(0, 1, 2, 3)" /tmp/wcv-v1.txt
+          grep -F "primary_revoked_reclosed_live=(2, 3, 5, 6)" /tmp/wcv-v1.txt
+          grep -F "backup_revoked_reclosed_live=(0, 1, 5, 6)" /tmp/wcv-v1.txt
+
+      - name: Verify claim boundary text
+        run: |
+          set -euo pipefail
+          grep -F "greatest-fixed-point viability characterization" spec/WARRANTED_CONTINUATION_VIABILITY_V1.md
+          grep -F "not a claim about every possible Flash implementation" spec/WARRANTED_CONTINUATION_VIABILITY_V1.md
+          grep -F "capability loss" spec/WARRANTED_CONTINUATION_VIABILITY_V1.md
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+
+      - name: Build integrated formal stack
+        run: lake build Metatron
+
+      - name: Verify theorem surface
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = Path("formal/Metatron/WarrantedContinuationViabilityV1.lean").read_text()
+          for name in (
+              "kernel_postfixed",
+              "kernel_greatest",
+              "kernel_exact",
+              "dual_support_base_live",
+              "primary_revocation_cuts_cone",
+              "primary_verified_repair_recloses",
+              "backup_revocation_cuts_cone",
+              "backup_verified_repair_recloses",
+              "repair_history_is_append_only",
+              "proof_lifted_revocation_preserves_alternative",
+              "adaptive_handles_every_admitted_revocation",
+          ):
+              assert f"theorem {name}" in src, name
+          print("WCV_V1_THEOREM_SURFACE_OK")
+          PY
+
+      - name: Emit qualification attestation
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          result = {
+              "schema_version": 1,
+              "status": "QUALIFIED_WARRANTED_CONTINUATION_VIABILITY_V1",
+              "head_sha": os.environ["GITHUB_SHA"],
+              "workflow_run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "parent_v0_sha": "0c4141c106fb74e3b9340443cbbe525ab72b716f",
+              "parent_v0_run": 35922349272,
+              "abstract_states": ["adaptive", "primary_only", "backup_only", "none"],
+              "admitted_encounters": ["revoke_primary", "revoke_backup"],
+              "greatest_viability_kernel": ["adaptive"],
+              "gfp_round_sizes": [4, 1, 1],
+              "base_live": [0, 1, 2, 3],
+              "primary_revoked_reclosed_live": [2, 3, 5, 6],
+              "backup_revoked_reclosed_live": [0, 1, 5, 6],
+              "generic_theorems": ["kernel_postfixed", "kernel_greatest"],
+              "proof_lifted_flash_reuse": True,
+              "trusted_runtime_changed": False,
+              "warrant_graph_changed": False,
+              "boundary": "finite four-state/two-encounter viability kernel plus exact WarrantGraph and proof-lifted revocation fixtures",
+          }
+          Path("/tmp/warranted-continuation-viability-v1.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: warranted-continuation-viability-v1
+          path: |
+            /tmp/warranted-continuation-viability-v1.json
+            /tmp/wcv-v1.txt
