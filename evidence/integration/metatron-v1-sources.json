@@ -132,5 +132,15 @@
     "minimum_behavioral_basis_size": 5,
     "formal_theorem": "continuationSafe_eq_gfp",
     "authority": "derived_formal_semantics_and_external_policy_evidence"
+  },
+  "embedded_observer": {
+    "source_branch": "embedded-observer-ontology-v0",
+    "source_head": "e1d2b3cddf0b3610f0bd0d5855b359ff70f47c73",
+    "qualification_run": 35815957808,
+    "equivalence": "EmbeddedFutureEq",
+    "anticipation_theorem": "accessible_transition_already_anticipated",
+    "objectivity_theorem": "absolute_dynamics_relational_identity",
+    "refinement_theorem": "observer_state_strictly_refines_identity",
+    "authority": "derived_formal_semantics"
   }
 }
