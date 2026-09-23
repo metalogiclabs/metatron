@@ -33,7 +33,7 @@ The research programme has repeatedly rediscovered one developmental law at mult
 }
 \]
 
-The next step is therefore not another manually named meta-level. It is to formalize this typed developmental operator itself and test it outside the finite Boolean lineage.
+The next step is therefore not another manually named meta-level. It is to formalize this generic developmental operator itself, with its types preserved, and test it outside the finite Boolean lineage.
 
 ## Authority boundary
 
