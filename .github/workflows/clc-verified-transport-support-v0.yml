@@ -69,15 +69,16 @@ jobs:
       - name: Enforce axiom boundary
         run: |
           python - <<'PY'
-          import re
           from pathlib import Path
           text=Path("out/verified-transport-axiom-audit.txt").read_text()
           assert "sorryAx" not in text, text
           allowed={"propext","Classical.choice","Quot.sound"}
-          blocks=re.findall(r"depends on axioms:\\s*\\[([^]]*)\\]", text, flags=re.S)
-          assert blocks, text
-          for inside in blocks:
-              seen={x.strip() for x in inside.replace("\\n"," ").split(",") if x.strip()}
+          compact=" ".join(text.splitlines())
+          tails=compact.split("depends on axioms:")[1:]
+          assert tails, text
+          for tail in tails:
+              inside=tail.split("[",1)[1].split("]",1)[0]
+              seen={x.strip() for x in inside.split(",") if x.strip()}
               assert seen <= allowed, (inside, seen-allowed)
           print("VERIFIED_TRANSPORT_AXIOM_BOUNDARY=PASS")
           PY
