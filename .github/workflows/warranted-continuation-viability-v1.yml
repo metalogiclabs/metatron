@@ -42,7 +42,7 @@ jobs:
         run: |
           set -euo pipefail
           grep -F "greatest-fixed-point viability characterization" spec/WARRANTED_CONTINUATION_VIABILITY_V1.md
-          grep -F "not a claim about every possible Flash implementation" spec/WARRANTED_CONTINUATION_VIABILITY_V1.md
+          grep -F "These are exact WarrantGraph computations" spec/WARRANTED_CONTINUATION_VIABILITY_V1.md
           grep -F "capability loss" spec/WARRANTED_CONTINUATION_VIABILITY_V1.md
 
       - name: Install Lean
