@@ -1,0 +1,116 @@
+name: Certified Development Loop V0
+
+on:
+  push:
+    branches:
+      - certified-development-loop-v0
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify trusted waist unchanged
+        run: |
+          set -euo pipefail
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "TRUSTED_WAIST_UNCHANGED=PASS"
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)'             formal/Metatron/CertifiedDevelopmentLoop.lean
+
+      - name: Build integrated formal stack
+        run: |
+          lake build Metatron
+          lake build metatron_reference
+          mkdir -p out
+          cat > /tmp/Audit.lean <<'LEAN'
+          import Metatron.CertifiedDevelopmentLoop
+          #print axioms Metatron.CertifiedDevelopmentLoop.promote_closes_residual
+          #print axioms Metatron.CertifiedDevelopmentLoop.bool_promoted_eq_target
+          #print axioms Metatron.CertifiedDevelopmentLoop.bool_empty_repair_not_qualified
+          #print axioms Metatron.CertifiedDevelopmentLoop.bool_certified_loop_exact
+          LEAN
+          lake env lean /tmp/Audit.lean | tee out/axiom-audit.txt
+
+      - name: Enforce axiom boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text=Path("out/axiom-audit.txt").read_text()
+          assert "sorryAx" not in text, text
+          allowed={"propext","Classical.choice","Quot.sound"}
+          compact=" ".join(text.splitlines())
+          tails=compact.split("depends on axioms:")[1:]
+          assert tails, text
+          for tail in tails:
+              inside=tail.split("[",1)[1].split("]",1)[0]
+              seen={x.strip() for x in inside.split(",") if x.strip()}
+              assert seen <= allowed, (inside, seen-allowed)
+          print("CDL_AXIOM_BOUNDARY=PASS")
+          PY
+
+      - name: Re-run retained Python authority suite
+        run: |
+          python scripts/check_manifest.py
+          python -m unittest discover -s tests -p 'test_*.py' -v             2>&1 | tee out/python-tests.txt
+
+      - name: Verify frozen theorem boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          src=Path("formal/Metatron/CertifiedDevelopmentLoop.lean").read_text()
+          d=json.loads(Path("evidence/integration/certified-development-loop-v0-candidate.json").read_text())
+          assert d["status"] == "CANDIDATE_UNQUALIFIED"
+          for name in d["core_theorems"]:
+              assert f"theorem {name}" in src, name
+          assert "structure QualifiedRepair" in src
+          assert "structure CertifiedLoopResult" in src
+          print("CDL_FROZEN_BOUNDARY=PASS")
+          PY
+
+      - name: Emit hosted attestation
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          d={
+            "schema":"metatron.certified-development-loop-v0.qualification",
+            "status":"HOSTED_EXACT_HEAD_PASS",
+            "head_sha":os.environ["GITHUB_SHA"],
+            "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
+            "base_head":"b9d1b5cc10477188be6e55617699be60e70f6dad",
+            "theorem":"promote_closes_residual",
+            "exact_fixture":"bool_certified_loop_exact",
+            "negative_control":"bool_empty_repair_not_qualified",
+            "trusted_waist_unchanged":True,
+            "claim_boundary":"Finite declarative residual→qualified repair→promotion→target-sufficient zero-residual loop only; no repair discovery/authentication, runtime scheduling, dynamic reclosure, universal convergence, or Nucleus enlargement."
+          }
+          Path("out/certified-development-loop-v0.json").write_text(
+              json.dumps(d,indent=2,sort_keys=True)+"\n")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: certified-development-loop-v0
+          path: |
+            out/certified-development-loop-v0.json
+            out/axiom-audit.txt
+            out/python-tests.txt

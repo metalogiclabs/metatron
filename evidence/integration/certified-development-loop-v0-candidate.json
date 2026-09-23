@@ -1,0 +1,16 @@
+{
+  "schema": "metatron.certified-development-loop-v0.candidate",
+  "status": "CANDIDATE_UNQUALIFIED",
+  "base_head": "b9d1b5cc10477188be6e55617699be60e70f6dad",
+  "source_module": "formal/Metatron/CertifiedDevelopmentLoop.lean",
+  "parent_theory": "Metatron.ResidualBasis",
+  "core_theorems": [
+    "promote_refines_current",
+    "promote_target_sufficient",
+    "promote_closes_residual",
+    "bool_promoted_eq_target",
+    "bool_empty_repair_not_qualified",
+    "bool_certified_loop_exact"
+  ],
+  "claim_boundary": "Finite declarative residual→qualified repair→promotion→target-sufficient zero-residual loop only; repair discovery/authentication, runtime scheduling, dynamic reclosure, universal convergence, and Nucleus enlargement are out of scope."
+}
