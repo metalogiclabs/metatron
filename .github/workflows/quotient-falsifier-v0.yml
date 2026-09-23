@@ -1,0 +1,97 @@
+name: Quotient Falsifier V0
+
+on:
+  push:
+    branches:
+      - quotient-falsifier-v0
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify trusted thin waist unchanged
+        run: |
+          set -euo pipefail
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "TRUSTED_THIN_WAIST_IDENTICAL"
+
+      - name: Verify lineage pins and boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          spec = Path("spec/QUOTIENT_FALSIFIER_V0.md").read_text()
+          required = (
+              "af60141ab47a68c67f4c04d7ec6a9adb2a50776a",
+              "07116e8733c62a4f544599db087ed7d11bf9c5cd1fc2f558cd4f72d6a4fe17c8",
+              "failure to find a witness establishes",
+              "No new authority is added",
+          )
+          for token in required:
+              assert token in spec, token
+          print("QUOTIENT_FALSIFIER_LINEAGE_OK")
+          PY
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+
+      - name: Build integrated formal stack
+        run: |
+          lake build Metatron
+
+      - name: Verify quotient falsifier bridge
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = Path("formal/Metatron/QuotientFalsifier.lean").read_text()
+          for name in (
+              "witness_refutes_factorization",
+              "residualPair_refutes_factorization",
+              "bool_pair_is_kernel_residual",
+              "bool_quotient_not_target_sufficient",
+          ):
+              assert f"theorem {name}" in src, name
+          print("QUOTIENT_FALSIFIER_THEOREMS_PRESENT")
+          PY
+
+      - name: Emit qualification attestation
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          result = {
+              "schema_version": 1,
+              "status": "QUALIFIED_QUOTIENT_FALSIFIER_V0",
+              "head_sha": os.environ["GITHUB_SHA"],
+              "workflow_run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "base_sha": "b9d1b5cc10477188be6e55617699be60e70f6dad",
+              "msi_source_sha": "af60141ab47a68c67f4c04d7ec6a9adb2a50776a",
+              "external_source_sha256": "07116e8733c62a4f544599db087ed7d11bf9c5cd1fc2f558cd4f72d6a4fe17c8",
+              "universal_theorem": "residualPair_refutes_factorization",
+              "runtime_authority_changed": False,
+              "warrant_graph_changed": False,
+              "finite_negative_boundary": "no witness only certifies the enumerated finite domain",
+          }
+          Path("/tmp/quotient-falsifier-v0.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: quotient-falsifier-v0
+          path: /tmp/quotient-falsifier-v0.json
