@@ -47,7 +47,7 @@ jobs:
         run: |
           set -euo pipefail
           grep -F "same uniform-class average repair cost 1" spec/WARRANTED_CONTINUATION_VIABILITY_V8.md
-          grep -F "scalar average repair/disruption or average supply/demand ratio is not sufficient" spec/WARRANTED_CONTINUATION_VIABILITY_V8.md
+          grep -F "not sufficient even in this six-state deterministic system." spec/WARRANTED_CONTINUATION_VIABILITY_V8.md
           grep -F "No stochastic encounter distribution is assumed" spec/WARRANTED_CONTINUATION_VIABILITY_V8.md
 
       - name: Install Lean
