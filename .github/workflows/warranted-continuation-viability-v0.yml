@@ -1,0 +1,121 @@
+name: Warranted Continuation Viability V0
+
+on:
+  push:
+    branches:
+      - warranted-continuation-viability-v0
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify trusted thin waist unchanged
+        run: |
+          set -euo pipefail
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "TRUSTED_THIN_WAIST_IDENTICAL"
+
+      - name: Run finite viability census
+        run: |
+          python scripts/warranted_continuation_viability_v0.py | tee /tmp/wcv-v0.txt
+          grep -F "WARRANTED_CONTINUATION_VIABILITY_V0=PASS" /tmp/wcv-v0.txt
+          grep -F "scalar_summary_balanced=(2, 4)" /tmp/wcv-v0.txt
+          grep -F "scalar_summary_skewed=(2, 4)" /tmp/wcv-v0.txt
+          grep -F "balanced_objective_viable=True" /tmp/wcv-v0.txt
+          grep -F "skewed_objective_viable=False" /tmp/wcv-v0.txt
+
+      - name: Verify CLC lineage and boundary text
+        run: |
+          set -euo pipefail
+          grep -F "161c6c41812124b4a114defe243c92fac03261d3921daddcf310dd0ca3769a88" spec/WARRANTED_CONTINUATION_VIABILITY_V0.md
+          grep -F "does not claim to mechanize all of CLC" spec/WARRANTED_CONTINUATION_VIABILITY_V0.md
+          grep -F "fail-closed UNKNOWN" spec/WARRANTED_CONTINUATION_VIABILITY_V0.md
+          grep -F "aggregate scalar summary" spec/WARRANTED_CONTINUATION_VIABILITY_V0.md
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+
+      - name: Build integrated formal stack
+        run: lake build Metatron
+
+      - name: Verify theorem names
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = Path("formal/Metatron/WarrantedContinuationViability.lean").read_text()
+          for name in (
+              "runViable_preserves",
+              "runViable_append",
+              "same_scalar_summary",
+              "balanced_objective_viable",
+              "skewed_not_objective_viable",
+              "balanced_authority_trace",
+              "skewed_authority_trace",
+              "both_preserve_protected_boundary",
+              "skewed_unknown_does_not_fabricate_beta",
+              "same_scalar_different_typed_viability",
+              "reclosure_compiles_future_reuse",
+          ):
+              assert f"theorem {name}" in src, name
+          print("WCV_V0_THEOREM_SURFACE_OK")
+          PY
+
+      - name: Emit qualification attestation
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          result = {
+              "schema_version": 1,
+              "status": "QUALIFIED_WARRANTED_CONTINUATION_VIABILITY_V0",
+              "head_sha": os.environ["GITHUB_SHA"],
+              "workflow_run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "base_sha": "b9d1b5cc10477188be6e55617699be60e70f6dad",
+              "clc_source_sha256": "161c6c41812124b4a114defe243c92fac03261d3921daddcf310dd0ca3769a88",
+              "encounter_stream": ["alpha", "beta", "alpha", "beta"],
+              "balanced_initial_typed_capacity": {"alpha": 1, "beta": 1},
+              "skewed_initial_typed_capacity": {"alpha": 2, "beta": 0},
+              "aggregate_scalar_summary_both": [2, 4],
+              "balanced_trace": ["acquired", "acquired", "reused", "reused"],
+              "skewed_trace": ["acquired", "unknown", "reused", "unknown"],
+              "balanced_objective_viable": True,
+              "skewed_objective_viable": False,
+              "authority_boundary_preserved_both": True,
+              "generic_composition_theorems": [
+                  "runViable_preserves",
+                  "runViable_append"
+              ],
+              "scalar_falsifier_theorem": "same_scalar_different_typed_viability",
+              "trusted_runtime_changed": False,
+              "warrant_graph_changed": False,
+              "boundary": "finite deterministic typed continuation, fail-closed UNKNOWN, minimal reclosure fixture",
+          }
+          Path("/tmp/warranted-continuation-viability-v0.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: warranted-continuation-viability-v0
+          path: |
+            /tmp/warranted-continuation-viability-v0.json
+            /tmp/wcv-v0.txt
