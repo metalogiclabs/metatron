@@ -86,8 +86,8 @@ theorem contention_no_postfixed_state
   | ready =>
       have h0 := hS .ready hs 0 (by simp [admittedFailures])
       rcases h0 with ⟨s', hstep, hs'⟩
-      have hs'Eq : s' = .depleted := by
-        simpa [statefulContentionStep] using hstep.symm.symm
+      have hs'Eq : .depleted = s' := by
+        simpa [statefulContentionStep] using hstep
       subst s'
       have h1 := hS .depleted hs' 0 (by simp [admittedFailures])
       rcases h1 with ⟨s'', hstep', _⟩
