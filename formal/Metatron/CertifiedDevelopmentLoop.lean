@@ -90,7 +90,10 @@ def boolRepair :
 
 theorem bool_has_initial_residual :
     ResidualPair boolCurrent boolTarget false true := by
-  exact ⟨by trivial, by decide⟩
+  constructor
+  · trivial
+  · intro h
+    cases h
 
 theorem bool_promoted_eq_target :
     promote boolRepair = boolTarget := by
