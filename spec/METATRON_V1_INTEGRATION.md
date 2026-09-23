@@ -108,10 +108,59 @@ This empirically closes the finite loop already characterized formally by
 `continuationSafe_eq_gfp`: the quotient is now derived from protected
 consequence and lawful transition closure rather than supplied as context.
 
+## Embedded observer ontology
+
+Embedded Observer Ontology V0 makes the observer part of the same formal system
+as the world.
+
+It separates:
+
+- `AbsoluteDynamics`: objective world and observer-state transitions;
+- `ObserverInterface`: accessible steps, available tests, and test evaluation;
+- `EmbeddedFutureEq`: observer-indexed identity under every lawful future path
+  available from that observer state.
+
+Lean proves `EmbeddedFutureEq` is an equivalence relation and proves:
+
+[
+oxed{	exttt{accessible_transition_already_anticipated}}
+]
+
+If a transition is already accessible in the observer's lawful future, current
+future-equivalence already anticipates every distinction exposed after taking
+that transition.
+
+The concrete fixture then holds absolute dynamics fixed while changing only the
+observer interface/state. Two world states that differ only in a hidden bit are
+identified by the coarse observer and distinguished by the fine observer.
+
+Lean proves:
+
+- `observer_state_strictly_refines_identity`;
+- `same_world_dynamics_different_relational_identity`;
+- `absolute_dynamics_relational_identity`.
+
+It also proves that when learning is already accessible to the coarse observer,
+the coarse future-equivalence already sees the future hidden distinction.
+
+So Metatron now formally supports both simultaneously:
+
+[
+oxed{
+	ext{objective joint dynamics}
++
+	ext{objective observer-relative identity}
+}
+]
+
+The observer is not outside the model. Its state, capabilities, and lawful
+future interface are variables inside the same declared dynamics.
+
 ## Integrated architecture
 
 warrant log
-  -> lawful future semantics
+  -> objective world + observer dynamics
+  -> observer-accessible lawful future semantics
   -> compute greatest continuation-safe behavioral quotient
   -> future-demanded consequential residual
   -> minimum certified causal repair frontier
@@ -132,7 +181,7 @@ The Lean Kernel eight-lane controller remains external proof/measurement/promoti
 
 ## Claim boundary
 
-V1 now supports exact finite discovery of the greatest continuation-safe quotient from protected observations and deterministic transitions, followed by quotient-relative commutation discovery. It does not yet infer the protected observation language or action vocabulary themselves, establish higher-order independence beyond pairwise swaps, synthesize symbolic fixed-point/commutation proofs on infinite carriers, or solve conflict/synchronization/feedback semantics. Nucleus authority remains unchanged.
+V1 now supports an embedded observer whose lawful future interface induces an objective observer-relative identity relation over fixed absolute dynamics, plus exact finite discovery of continuation-safe quotients and quotient-relative commutation. It does not claim a complete ontology of human cognition, infer the protected observation language or action vocabulary themselves, establish higher-order independence beyond pairwise swaps, synthesize symbolic fixed-point/commutation proofs on infinite carriers, or solve conflict/synchronization/feedback semantics. Nucleus authority remains unchanged.
 
 ## Representation discipline
 
