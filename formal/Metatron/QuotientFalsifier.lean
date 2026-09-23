@@ -57,7 +57,9 @@ theorem bool_pair_is_kernel_residual :
       false true := by
   constructor
   · rfl
-  · decide
+  · intro h
+    change false = true at h
+    cases h
 
 theorem bool_quotient_not_target_sufficient :
     ¬ FactorsThrough boolQuotient boolTarget :=
