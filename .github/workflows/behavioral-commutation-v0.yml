@@ -1,0 +1,103 @@
+name: Behavioral Commutation V0
+
+on:
+  push:
+    branches: [behavioral-commutation-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  theorem-gate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify trusted Nucleus unchanged
+        run: |
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Reject proof placeholders
+        run: |
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron/BehavioralCommutation.lean
+      - name: Build theorem stack
+        run: lake build Metatron
+      - name: Run retained Python suite
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Check theorem package
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lean=Path("formal/Metatron/BehavioralCommutation.lean").read_text()
+          for name in (
+            "stepClosed_run",
+            "behavioral_adjacent_swap_preserves",
+            "behavioralTrace_preserves",
+            "futureBehavioralTrace_preserves",
+            "futureBehavioralTrace_preserves_protected_observation",
+            "qFutureEq_iff_observed_eq",
+            "hidden_pair_not_exact_commute",
+            "hidden_pair_futureCommute",
+            "observed_pair_not_futureCommute",
+            "behavioral_commutation_strictly_extends_exact",
+          ):
+            assert f"theorem {name}" in lean, name
+          print("BEHAVIORAL_COMMUTATION_THEOREMS_OK")
+          PY
+
+  blind-generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: |
+          mkdir -p out/public out/hidden
+          python -m scripts.blind_behavioral_commutation_v1_generate --public out/public/public.json --hidden out/hidden/hidden.json
+      - uses: actions/upload-artifact@v4
+        with: {name: behavioral-commutation-public, path: out/public/public.json}
+      - uses: actions/upload-artifact@v4
+        with: {name: behavioral-commutation-hidden, path: out/hidden/hidden.json}
+
+  blind-predict:
+    needs: blind-generate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - uses: actions/download-artifact@v4
+        with: {name: behavioral-commutation-public, path: in/public}
+      - run: test ! -e in/hidden
+      - run: |
+          mkdir -p out
+          python -m scripts.blind_behavioral_commutation_v1_predict --public in/public/public.json --prediction out/prediction.json
+      - uses: actions/upload-artifact@v4
+        with: {name: behavioral-commutation-prediction, path: out/prediction.json}
+
+  blind-reveal:
+    needs: [blind-generate, blind-predict]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - uses: actions/download-artifact@v4
+        with: {name: behavioral-commutation-public, path: in/public}
+      - uses: actions/download-artifact@v4
+        with: {name: behavioral-commutation-hidden, path: in/hidden}
+      - uses: actions/download-artifact@v4
+        with: {name: behavioral-commutation-prediction, path: in/prediction}
+      - run: |
+          mkdir -p out
+          python -m scripts.blind_behavioral_commutation_v1_reveal --public in/public/public.json --hidden in/hidden/hidden.json --prediction in/prediction/prediction.json --report out/reveal.json
+      - uses: actions/upload-artifact@v4
+        with: {name: behavioral-commutation-reveal, path: out/reveal.json}
