@@ -38,7 +38,7 @@ the exact greatest post-fixed viability kernel is:
 
 The exhaustive predecessor iteration is:
 
-    4 -> 1 -> 1 states.
+    4 -> 2 -> 1 -> 1 states.
 
 When capability revocation is added:
 
