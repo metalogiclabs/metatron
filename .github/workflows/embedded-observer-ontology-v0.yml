@@ -2,7 +2,9 @@ name: Embedded Observer Ontology V0
 
 on:
   push:
-    branches: [embedded-observer-ontology-v0]
+    branches:
+      - embedded-observer-ontology-v0
+      - main
   workflow_dispatch:
 
 permissions:
