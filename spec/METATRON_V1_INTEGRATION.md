@@ -80,11 +80,39 @@ BLIND_BEHAVIORAL_COMMUTATION_PASS
 
 Thus exact state equality is no longer the canonical independence criterion. Metatron may erase an implementation-order distinction whenever the full lawful future quotient cannot expose it.
 
+## Blind future quotient discovery
+
+Blind Future Quotient V0 removes the remaining supplied behavioral-class input.
+
+The public predictor receives only anonymous state IDs, deterministic action
+transitions, and protected test outcomes. It starts from the protected-test
+partition and repeatedly refines by successor-class signatures until stable.
+
+On the sealed finite fixture it recovered:
+
+- the hidden continuation-safe quotient exactly: two blocks of size 2;
+- fixed point after one refinement round;
+- exactly 2 admissible finite partitions;
+- exhaustive verification that every admissible partition refines the predicted quotient;
+- 4 exact commuting pairs;
+- 5 quotient-relative commuting pairs;
+- exactly 1 strict future-only gain pair;
+- 24 schedules collapsing to exactly 2 semantic trace classes of size 12;
+- a minimum irredundant behavioral certificate basis of size 5.
+
+All Q1-Q10 reveal gates passed:
+
+BLIND_FUTURE_QUOTIENT_PASS
+
+This empirically closes the finite loop already characterized formally by
+`continuationSafe_eq_gfp`: the quotient is now derived from protected
+consequence and lawful transition closure rather than supplied as context.
+
 ## Integrated architecture
 
 warrant log
   -> lawful future semantics
-  -> behavioral quotient
+  -> compute greatest continuation-safe behavioral quotient
   -> future-demanded consequential residual
   -> minimum certified causal repair frontier
   -> earn safe swaps modulo FutureEq
@@ -104,7 +132,7 @@ The Lean Kernel eight-lane controller remains external proof/measurement/promoti
 
 ## Claim boundary
 
-V1 now supports exact finite quotient-relative commutation discovery for a declared continuation-safe quotient. It does not yet discover the behavioral quotient itself from scratch, establish higher-order independence beyond pairwise swaps, synthesize symbolic commutation proofs on infinite carriers, or solve conflict/synchronization/feedback semantics. Nucleus authority remains unchanged.
+V1 now supports exact finite discovery of the greatest continuation-safe quotient from protected observations and deterministic transitions, followed by quotient-relative commutation discovery. It does not yet infer the protected observation language or action vocabulary themselves, establish higher-order independence beyond pairwise swaps, synthesize symbolic fixed-point/commutation proofs on infinite carriers, or solve conflict/synchronization/feedback semantics. Nucleus authority remains unchanged.
 
 ## Representation discipline
 
