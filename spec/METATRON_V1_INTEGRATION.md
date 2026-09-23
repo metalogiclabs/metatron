@@ -1,6 +1,6 @@
 # Metatron V1 Integration
 
-**Status:** integrated theorem + blind causal discovery + finite causal quotient
+**Status:** integrated theorem + blind causal discovery + earned commutation
 
 Metatron V1 keeps one trusted thin waist and layers all richer mathematics outside it.
 
@@ -22,72 +22,58 @@ For pure same-carrier refinement the canonical map remains Q_new ->> Q_old. Gene
 
 ## Discovery and repair
 
-The blind separating-hypergraph line established the arity-one search law for separable candidate generators.
+Blind V3 established the arity-one minimum-basis law for separable candidate generators.
 
-Residual Synergy V0 proved the limitation: two generators may be individually inert yet jointly sufficient because causal composition creates a new observation, with A->B sufficient while B->A is not.
+Residual Synergy V0 proved that composition can create distinctions absent from every singleton generator.
 
-The general repair object is therefore a certified causal repair carrying a finite port-aware causal event structure, executable schedule, generator labels, and certification that the schedule covers the event carrier exactly and respects every causal edge.
+Certified Causal Repair V0 replaced isolated generators with port-aware ordered repair structures, and Blind Causal Repair V1 prospectively recovered the exact hidden ordered repair from anonymous consequences alone.
 
-Ordinary generators embed as one-event causal repairs. Ordinary tau is therefore the arity-one/separable special case.
+## Finite causal quotient
 
-## General bridge theorem
+Causal Linearization Invariance V0 proved the primitive swap rule: incomparable events may exchange order only when semantic commutation warrants the swap.
 
-formal/Metatron/CausalRepairCover.lean proves causalRepairCover_iff_targetSufficient and minimumCausalRepair_minimalSufficient.
+Causal Trace Quotient V0 lifted that rule to arbitrary finite chains of certified swaps.
 
-The qualified A->B / B->A theorem fixture proves causal structure is semantically relevant.
+Finite Poset Topological-Sort Connectivity V0 then proved constructively that any two duplicate-free topological schedules of the same finite event set are connected by adjacent swaps of incomparable events.
 
-## Blind causal-repair qualification
+Hence if every incomparable pair is certified to commute, all legal topological schedules have identical semantics.
 
-Blind Causal Repair V1 tested discovery rather than explanation.
+## Earned commutation
 
-On a fresh hidden finite world, the public-only predictor recovered the exact minimum ordered two-event repair before reveal, while all singleton repairs and the reverse order were insufficient.
+Earned Commutation Basis V0 removes the last assumption that pair certificates are supplied externally.
 
-The run sealed BLIND_CAUSAL_REPAIR_PASS.
+For events a,b, an EarnedPair requires both:
 
-## Certified trace semantics
-
-Causal Linearization Invariance V0 proves the primitive rule:
-
-- incomparable events may swap only when their actions semantically commute;
-- the same PES with noncommuting A/B actions remains order-sensitive.
-
-Causal Trace Quotient V0 lifts that to any explicit finite chain of certified adjacent commuting swaps. Execution and observation are invariant across the full trace relation.
-
-## Finite topological-sort connectivity
-
-Finite Poset Topological-Sort Connectivity V0 closes the remaining combinatorial gap.
+1. causal incomparability;
+2. exact semantic commutation of the labeled actions.
 
 Lean proves:
 
-[
-oxed{	exttt{all_topological_sorts_traceConnected}}
-]
+- earnedTrace_to_posetTrace;
+- earnedTrace_to_semanticTrace;
+- earnedTrace_preserves_run;
+- sameEarnedComponent_semantically_equal;
+- all_incomparables_earned_traceConnected;
+- all_topological_sorts_equal_if_all_incomparables_earned.
 
-Any two duplicate-free topological schedules that are permutations of the same finite event set are connected by adjacent swaps of incomparable events.
+The blind earned-commutation challenge then exposed only anonymous finite transition tables. Before reveal, the predictor recovered:
 
-The proof is constructive: align the schedules from left to right, bubble the required head event left across only incomparable events, cancel the common head, and recurse.
+- exactly 3 warranted commuting action pairs;
+- 24 legal schedules;
+- exactly 8 safe-trace connected components;
+- exactly 8 execution-semantic classes with identical size profile;
+- a minimum pair-certificate basis of size 3;
+- irredundancy of all three basis certificates.
 
-It then composes with the semantic trace theorem:
+The hidden semantic mapping confirmed the pair relation exactly and every rejected pair had an explicit counterexample state.
 
-[
-oxed{	exttt{all_topological_sorts_semantically_invariant}}
-]
+Verdict:
 
-If every incomparable pair carries a Commute certificate, every topological schedule of that finite causal presentation has identical execution semantics.
+BLIND_EARNED_COMMUTATION_PASS
 
-For PES presentations Lean also proves:
+with all E1-E9 gates true.
 
-- pes_topological_sorts_traceConnected;
-- pes_all_topological_sorts_semantically_invariant.
-
-So the finite canonical repair object is now:
-
-certified finite causal presentation
-/
-all legal topological schedules,
-provided every incomparable pair is semantically certified to commute.
-
-Equivalently, the whole topological-sort space collapses to one semantic trace class exactly under the warranted independence condition.
+So commutation is now a derived, falsifiable capability rather than constitutional input.
 
 ## Integrated architecture
 
@@ -96,12 +82,14 @@ warrant log
   -> behavioral quotient
   -> future-demanded consequential residual
   -> minimum certified causal repair frontier
-  -> finite causal quotient over all swap-safe topological schedules
+  -> earn exact safe-swap relation from execution consequences
+  -> minimum warranted commutation basis
+  -> semantic trace components / causal quotient
   -> independent verification
   -> warranted promotion
   -> global reclosure
 
-Search may preserve multiple minimum causal repairs when consequence does not distinguish them. Cost, admissibility, external measurement, or later protected futures may refine that frontier.
+If every incomparable pair is earned, the whole topological-sort space collapses to one semantic trace class. If not, the safe-swap graph splits it into the maximum currently warranted semantic components.
 
 ## External engineering wedge
 
@@ -115,13 +103,13 @@ The integration preserves distinct roles:
 - behavioral quotient: what may currently be identified;
 - singleton hypergraph: arity-one residual search;
 - certified causal repair: compositional repair semantics;
-- port event structure: causal/wiring structure of developmental history;
-- commutation certificate: which incomparable events may swap;
-- finite-poset theorem: connectivity of all legal topological schedules;
+- port event structure: causal/wiring structure;
+- earned commutation relation: which incomparable pairs may lawfully swap;
+- trace components: which legal schedules are currently identified;
 - benchmark frontier: external engineering policy.
 
 No generic property of raw storage-graph geometry is promoted to semantics.
 
 ## Claim boundary
 
-V1 does not claim unrestricted event-structure invention, tractable minimum repair search in arbitrary large languages, automatic discovery of commutation certificates, confluence under conflict/synchronization/feedback, or any enlargement of Nucleus authority.
+V1 now supports exact finite pairwise commutation discovery from declared transition semantics. It does not yet establish higher-order independence that exists without pairwise commutation, observational-only commutation modulo FutureEq, symbolic proof synthesis of commutation on infinite carriers, conflict/synchronization/feedback semantics, or tractable search over arbitrary large action languages. Nucleus authority remains unchanged.
