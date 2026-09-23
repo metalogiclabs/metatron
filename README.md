@@ -17,6 +17,7 @@ warrant log
   -> observer-accessible lawful future observations
   -> compute continuation-safe behavioral quotient
   -> acquire minimum genuinely novel interface extension when needed
+  -> synthesize missing observations from reusable constructors
   -> future-demanded residual
   -> minimum certified causal repair frontier
   -> earn safe swaps modulo FutureEq
@@ -38,6 +39,8 @@ Embedded Observer Ontology V0 now places the observer inside the formal system. 
 
 Novel Capability Genesis V0 now isolates genuine invention as a strict extension of that lawful interface. In a blind finite test Metatron found that no single new test sufficed, recovered a minimum two-capability interface extension, and preserved the full family of equivalent minimum realizations.
 
+Residual-Generated Capability V0 then removes the supplied completed-candidate list. Given only reusable anonymous observation atoms plus XOR as a constructor, Metatron generated the closure itself and discovered a two-expression invented basis where primitive-only acquisition required three observations.
+
 The Lean Kernel controller remains an external engineering wedge; none of this enlarges Nucleus authority.
 
 See:
@@ -49,6 +52,8 @@ See:
 - spec/EMBEDDED_OBSERVER_ONTOLOGY_V0.md
 - spec/NOVEL_CAPABILITY_GENESIS_V0.md
 - spec/BLIND_NOVEL_CAPABILITY_V0_PREREG.md
+- spec/RESIDUAL_GENERATED_CAPABILITY_V0.md
+- spec/BLIND_RESIDUAL_GENERATED_CAPABILITY_V0_PREREG.md
 - spec/EARNED_COMMUTATION_BASIS_V0.md
 - spec/FINITE_POSET_TOPOSORT_CONNECTIVITY_V0.md
 - spec/CAUSAL_TRACE_QUOTIENT_V0.md
