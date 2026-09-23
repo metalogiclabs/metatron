@@ -1,0 +1,114 @@
+name: Warranted Continuation Viability V4
+
+on:
+  push:
+    branches:
+      - warranted-continuation-viability-v4
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify V3 lineage and trusted thin waist
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 61a8388caecce031123307cf8debade9dfeda79c HEAD
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "V3_LINEAGE_AND_THIN_WAIST_OK"
+
+      - name: Run generic depth and cross-layer census
+        run: |
+          python scripts/warranted_continuation_viability_v4.py | tee /tmp/wcv-v4.txt
+          grep -F "WARRANTED_CONTINUATION_VIABILITY_V4=PASS" /tmp/wcv-v4.txt
+          grep -F "cross_layer_both_revoked=(3,)" /tmp/wcv-v4.txt
+          grep -F "cross_layer_support_repaired=(3, 6, 7)" /tmp/wcv-v4.txt
+          grep -F "ordinary_repair_remains_revoked=True" /tmp/wcv-v4.txt
+
+      - name: Verify claim boundary text
+        run: |
+          set -euo pipefail
+          grep -F "strict serial tower is then attacked" spec/WARRANTED_CONTINUATION_VIABILITY_V4.md
+          grep -F "repair dependency/coverage graph" spec/WARRANTED_CONTINUATION_VIABILITY_V4.md
+          grep -F "strict serial depth is sufficient" spec/WARRANTED_CONTINUATION_VIABILITY_V4.md
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+
+      - name: Build integrated formal stack
+        run: lake build Metatron
+
+      - name: Verify theorem surface
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = Path("formal/Metatron/WarrantedContinuationViabilityV4.lean").read_text()
+          for name in (
+              "lower_failure_absorbed",
+              "outer_failure_removes_one_layer",
+              "one_more_layer_moves_boundary",
+              "base_support_failure_unrepairable",
+              "descending_boundary_cascade_fails",
+              "top_depth_postfixed_under_lower_failures",
+              "cross_layer_base_live",
+              "cross_layer_both_revoked",
+              "shared_capability_repairs_across_missing_layer",
+              "ordinary_repair_remains_revoked",
+              "strict_serial_tower_not_necessary",
+          ):
+              assert f"theorem {name}" in src, name
+          print("WCV_V4_THEOREM_SURFACE_OK")
+          PY
+
+      - name: Emit qualification attestation
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          result = {
+              "schema_version": 1,
+              "status": "QUALIFIED_WARRANTED_CONTINUATION_VIABILITY_V4",
+              "head_sha": os.environ["GITHUB_SHA"],
+              "workflow_run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "parent_v3_sha": "61a8388caecce031123307cf8debade9dfeda79c",
+              "parent_v3_run": 35925633029,
+              "generic_depth_theorem": "one_more_layer_moves_boundary",
+              "generic_cascade_theorem": "descending_boundary_cascade_fails",
+              "finite_census_depths": list(range(1, 9)),
+              "cross_layer_live_after_bypass": [3, 6, 7],
+              "ordinary_repair_still_revoked": True,
+              "strict_serial_tower_necessary": False,
+              "trusted_runtime_changed": False,
+              "warrant_graph_changed": False,
+              "boundary": "generic strict Nat tower plus exact finite cross-layer WarrantGraph falsifier",
+          }
+          Path("/tmp/warranted-continuation-viability-v4.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: warranted-continuation-viability-v4
+          path: |
+            /tmp/warranted-continuation-viability-v4.json
+            /tmp/wcv-v4.txt
