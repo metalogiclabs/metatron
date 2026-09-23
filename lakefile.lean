@@ -22,7 +22,8 @@ lean_lib Metatron where
     `Metatron.CausalLinearization,
     `Metatron.CausalTraceQuotient,
     `Metatron.FinitePosetConnectivity,
-    `Metatron.EarnedCommutation
+    `Metatron.EarnedCommutation,
+    `Metatron.BehavioralCommutation
   ]
 
 lean_exe metatron_reference where
