@@ -34,7 +34,7 @@ jobs:
           python scripts/warranted_continuation_viability_v2.py | tee /tmp/wcv-v2.txt
           grep -F "WARRANTED_CONTINUATION_VIABILITY_V2=PASS" /tmp/wcv-v2.txt
           grep -F "support_only_kernel=('adaptive',)" /tmp/wcv-v2.txt
-          grep -F "support_only_round_sizes=(4, 1, 1)" /tmp/wcv-v2.txt
+          grep -F "support_only_round_sizes=(4, 2, 1, 1)" /tmp/wcv-v2.txt
           grep -F "capability_loss_kernel=()" /tmp/wcv-v2.txt
           grep -F "capability_loss_round_sizes=(4, 2, 1, 0, 0)" /tmp/wcv-v2.txt
           grep -F "primary_repaired_live=(2, 3, 4, 6, 7)" /tmp/wcv-v2.txt
@@ -97,7 +97,7 @@ jobs:
               "parent_v1_sha": "bf71eafec63511a47a351cc2c95b8b239b37e6d5",
               "parent_v1_run": 35923675108,
               "support_only_kernel": ["adaptive"],
-              "support_only_round_sizes": [4, 1, 1],
+              "support_only_round_sizes": [4, 2, 1, 1],
               "capability_loss_kernel": [],
               "capability_loss_round_sizes": [4, 2, 1, 0, 0],
               "base_live": [0, 1, 2, 3, 4],
