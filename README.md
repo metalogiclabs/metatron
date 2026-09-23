@@ -13,7 +13,8 @@ Everything richer is derived semantics or external policy.
 ## V1 architecture
 
 warrant log
-  -> lawful future observations
+  -> objective world + observer dynamics
+  -> observer-accessible lawful future observations
   -> compute continuation-safe behavioral quotient
   -> future-demanded residual
   -> minimum certified causal repair frontier
@@ -32,6 +33,8 @@ In the blind quotient-relative test, 4 raw-state commuting pairs expanded to 5 b
 
 Blind Future Quotient V0 now removes the supplied quotient too: from anonymous transitions plus protected test outcomes alone, Metatron recovered the exact greatest continuation-safe finite partition, exhaustively verified maximal admissibility, and then recovered the same strict behavioral-commutation gain.
 
+Embedded Observer Ontology V0 now places the observer inside the formal system. Absolute world/observer dynamics stay objective, while the observer's current lawful interface induces a mathematically determined relational identity over the world. The same absolute dynamics can therefore support different observer-relative quotients without making those quotients arbitrary or subjective. If a learning transition is already lawful, the current future-equivalence already anticipates it.
+
 The Lean Kernel controller remains an external engineering wedge; none of this enlarges Nucleus authority.
 
 See:
@@ -40,6 +43,7 @@ See:
 - spec/BEHAVIORAL_COMMUTATION_V0.md
 - spec/BLIND_BEHAVIORAL_COMMUTATION_V1_PREREG.md
 - spec/BLIND_FUTURE_QUOTIENT_V0_PREREG.md
+- spec/EMBEDDED_OBSERVER_ONTOLOGY_V0.md
 - spec/EARNED_COMMUTATION_BASIS_V0.md
 - spec/FINITE_POSET_TOPOSORT_CONNECTIVITY_V0.md
 - spec/CAUSAL_TRACE_QUOTIENT_V0.md
