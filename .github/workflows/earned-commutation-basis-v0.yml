@@ -1,0 +1,128 @@
+name: Earned Commutation Basis V0
+
+on:
+  push:
+    branches: [earned-commutation-basis-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  theorem-gate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify trusted Nucleus unchanged
+        run: |
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron/EarnedCommutation.lean
+      - name: Build theorem stack
+        run: lake build Metatron
+      - name: Run retained Python suite
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Check earned theorem package
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lean=Path("formal/Metatron/EarnedCommutation.lean").read_text()
+          spec=Path("spec/EARNED_COMMUTATION_BASIS_V0.md").read_text()
+          for name in (
+              "earnedTrace_to_posetTrace",
+              "earnedTrace_to_semanticTrace",
+              "earnedTrace_preserves_run",
+              "sameEarnedComponent_semantically_equal",
+              "all_incomparables_earned_traceConnected",
+              "all_topological_sorts_one_earned_component",
+              "all_topological_sorts_equal_if_all_incomparables_earned",
+              "exactWarrantedCommute_iff_commute",
+          ):
+              assert f"theorem {name}" in lean, name
+          assert "basis necessity" in spec
+          print("EARNED_COMMUTATION_THEOREMS_OK")
+          PY
+
+  blind-generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Generate fresh anonymous commutation world
+        run: |
+          mkdir -p out/public out/hidden
+          python -m scripts.blind_earned_commutation_v1_generate             --public out/public/public.json             --hidden out/hidden/hidden.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: earned-commutation-public
+          path: out/public/public.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: earned-commutation-hidden
+          path: out/hidden/hidden.json
+
+  blind-predict:
+    needs: blind-generate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: earned-commutation-public
+          path: in/public
+      - name: Prove hidden artifact absent
+        run: test ! -e in/hidden
+      - name: Commit public-only commutation prediction
+        run: |
+          mkdir -p out
+          python -m scripts.blind_earned_commutation_v1_predict             --public in/public/public.json             --prediction out/prediction.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: earned-commutation-prediction
+          path: out/prediction.json
+
+  blind-reveal:
+    needs:
+      - blind-generate
+      - blind-predict
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: earned-commutation-public
+          path: in/public
+      - uses: actions/download-artifact@v4
+        with:
+          name: earned-commutation-hidden
+          path: in/hidden
+      - uses: actions/download-artifact@v4
+        with:
+          name: earned-commutation-prediction
+          path: in/prediction
+      - name: Reveal and verify earned relation
+        run: |
+          mkdir -p out
+          python -m scripts.blind_earned_commutation_v1_reveal             --public in/public/public.json             --hidden in/hidden/hidden.json             --prediction in/prediction/prediction.json             --report out/reveal.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: earned-commutation-reveal
+          path: out/reveal.json
