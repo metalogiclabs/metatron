@@ -36,13 +36,21 @@ theorem warrantStep_preserves_not_revoked
       | false =>
           by_cases hprem :
               ∀ premise ∈ entry.premises, premise ∈ state.2
-          · have hj' : j ∈ state.2 ∨ j = state.1 := by
-              simpa [warrantStep, hentry, hcur, hprem] using hj
-            rcases hj' with hjOld | rfl
+          · have hj' :
+                j ∈ (if (∀ x ∈ entry.premises, x ∈ state.2)
+                  then state.2 ++ [state.1] else state.2) := by
+              simpa [warrantStep, hentry, hcur] using hj
+            rw [if_pos hprem] at hj'
+            have hmem : j ∈ state.2 ∨ j = state.1 := by
+              simpa using hj'
+            rcases hmem with hjOld | rfl
             · exact h j hjOld
             · exact hcur
-          · have hj' : j ∈ state.2 := by
-              simpa [warrantStep, hentry, hcur, hprem] using hj
+          · have hj' :
+                j ∈ (if (∀ x ∈ entry.premises, x ∈ state.2)
+                  then state.2 ++ [state.1] else state.2) := by
+              simpa [warrantStep, hentry, hcur] using hj
+            rw [if_neg hprem] at hj'
             exact h j hj'
 
 theorem fold_preserves_not_revoked
