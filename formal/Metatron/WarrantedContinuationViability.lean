@@ -20,21 +20,21 @@ def runViable
 /-- Successful local continuation preserves a protected invariant. -/
 def StepPreserves
     {State : Type u} {Encounter : Type v}
-    (protected : State → Prop)
+    (guarded : State → Prop)
     (step : State → Encounter → Option State) : Prop :=
-  ∀ s e s', protected s → step s e = some s' → protected s'
+  ∀ s e s', guarded s → step s e = some s' → guarded s'
 
 /-- Local protected-continuation preservation composes across every
     successful finite encounter stream. -/
 theorem runViable_preserves
     {State : Type u} {Encounter : Type v}
-    (protected : State → Prop)
+    (guarded : State → Prop)
     (step : State → Encounter → Option State)
-    (hstep : StepPreserves protected step) :
+    (hstep : StepPreserves guarded step) :
     ∀ s es s',
-      protected s →
+      guarded s →
       runViable step s es = some s' →
-      protected s' := by
+      guarded s' := by
   intro s es
   induction es generalizing s with
   | nil =>
@@ -48,7 +48,7 @@ theorem runViable_preserves
       | none =>
           simp [runViable, hse] at hrun
       | some s1 =>
-          have hs1 : protected s1 :=
+          have hs1 : guarded s1 :=
             hstep s e s1 hs hse
           have htail : runViable step s1 es = some s' := by
             simpa [runViable, hse] using hrun
@@ -92,7 +92,7 @@ structure DevState where
   compiledBeta : Bool := false
   liveAlpha : Bool := false
   liveBeta : Bool := false
-  protected : Bool := true
+  guarded : Bool := true
   deriving DecidableEq, Repr
 
 def typedBudget : DevState → Residual → Nat
@@ -188,9 +188,9 @@ theorem skewed_authority_trace :
       [.acquired, .unknown, .reused, .unknown] := by
   decide
 
-theorem both_preserve_protected_boundary :
-    (runAuthority balanced encounterStream).1.protected = true ∧
-    (runAuthority skewed encounterStream).1.protected = true := by
+theorem both_preserve_guarded_boundary :
+    (runAuthority balanced encounterStream).1.guarded = true ∧
+    (runAuthority skewed encounterStream).1.guarded = true := by
   decide
 
 theorem skewed_unknown_does_not_fabricate_beta :
