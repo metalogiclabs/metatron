@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "experiment": "blind-grammar-shape-genesis-v1",
+  "preregistration_commit": "1fbac081555f1af53327c17ea337db823cef6e08",
+  "qualified_implementation_head": "f57393ee9dcefaaa9c5e9916d37570a142316456",
+  "qualification_run": 35816613683,
+  "reveal_job": 107039446682,
+  "reveal_artifact": 10731147981,
+  "verdict": "BLIND_GRAMMAR_SHAPE_PASS",
+  "result": {
+    "residual_pair_count": 128,
+    "planted_minimum_arity": 3,
+    "predicted_minimum_arity": 3,
+    "maximum_gain_by_arity": {
+      "1": 0,
+      "2": 0,
+      "3": 128
+    },
+    "minimum_arity_exact_closer_count": 3,
+    "planted_candidate_id": "g_7o9luwbnih",
+    "predicted_canonical_closer": {
+      "id": "g_4tadxl9pfd",
+      "arity": 3,
+      "controls": [1,4],
+      "target": 2,
+      "truth_table": [1,0,0,1,1,0,0,1]
+    },
+    "all_reveal_gates_pass": true,
+    "state_relabel_invariant": true
+  },
+  "digests": {
+    "public_sha256": "eca6278cc348f558af5519e6c8ddc913768ec0521012b87f8b3e6235bdf0a077",
+    "hidden_sha256": "830a3c83e64a0566de6b0783b52966ce02bc3403547e454f3e22155258c2d6e0"
+  },
+  "claim_boundary": "Blind prospective minimum-arity and extensional-shape selection inside the preregistered finite arity-1/2/3 grammar. Unrestricted syntax invention or unbounded arity is not claimed."
+}
