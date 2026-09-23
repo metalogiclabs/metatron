@@ -42,7 +42,7 @@ jobs:
       - name: Verify claim boundary text
         run: |
           set -euo pipefail
-          grep -F "generic cut/cover theorem" spec/WARRANTED_CONTINUATION_VIABILITY_V5.md
+          grep -F "Generic cut/cover theorem" spec/WARRANTED_CONTINUATION_VIABILITY_V5.md
           grep -F "minimum cut size is 2 in this exact fixture" spec/WARRANTED_CONTINUATION_VIABILITY_V5.md
           grep -F "does not replace it" spec/WARRANTED_CONTINUATION_VIABILITY_V5.md
 
