@@ -1,0 +1,88 @@
+{
+  "schema": "metatron.consolidation.v2",
+  "date": "2026-09-23",
+  "base_branch": "main",
+  "programme_principle": "When reality proves the present insufficient, change only what the proof earns.",
+  "choice_principle": "When several changes remain lawful, let independently verified future consequence decide which one persists.",
+  "repositories": {
+    "metatron": {
+      "repo": "metalogiclabs/metatron",
+      "main": "0f7c4df44f093f5d3b33b5a87f286cf6e9460cb1",
+      "grammar_shape_evidence": "377d5c863a981c0ee9cd1eb1d594ca8ff20b7aa9",
+      "minimal_warrant_branch_head": "c14b74929e64f6c819d320698079147356480b16",
+      "trusted_runtime_blob": "d9d4293e54471714bf098593bf4018c3f6403273",
+      "formal_warrant_graph_blob": "d2affc0a57a1815f303f6f1859941465c69e7d32",
+      "main_integration_run": 35816101951,
+      "blind_grammar_shape_v1_run": 35816613683
+    },
+    "msi": {
+      "repo": "heathsanchez/Minimal-Sufficient-Interface",
+      "main": "5d448c0ecc82ff3945d009963064ebbb67d2f308"
+    },
+    "realitygraph": {
+      "repo": "heathsanchez/realitygraph",
+      "main": "aea6d005a0997e22831b126b487c919e57831db9"
+    },
+    "mathgraph": {
+      "repo": "metalogiclabs/mathgraph",
+      "main": "e80fed62b6e58d2f4b62e2ceb012646c60dd1e28"
+    },
+    "mathgraph_lean_kernel": {
+      "repo": "metalogiclabs/mathgraph-lean-kernel",
+      "consolidated_current_v1": "6497eab156b2cf16ef25a2dbc0b88080ac435589"
+    }
+  },
+  "metatron_qualification_runs": {
+    "blind_causal_repair_v1": 35786720524,
+    "causal_linearization_invariance_v0": 35789562205,
+    "causal_trace_quotient_v0": 35796715189,
+    "earned_commutation_basis_v0": 35807936240,
+    "behavioral_commutation_v0": 35812127856,
+    "blind_future_quotient_v0": 35812769629,
+    "embedded_observer_ontology_v0": 35816102020,
+    "residual_driven_interface_v0": 35789566471,
+    "language_genesis_v0": 35797919027,
+    "constructor_genesis_v0": 35807777122,
+    "blind_grammar_shape_v1": 35816613683
+  },
+  "blind_grammar_shape_v1": {
+    "verdict": "BLIND_GRAMMAR_SHAPE_PASS",
+    "residual_pair_count": 128,
+    "maximum_gain_by_arity": {
+      "1": 0,
+      "2": 0,
+      "3": 128
+    },
+    "planted_minimum_arity": 3,
+    "predicted_minimum_arity": 3,
+    "minimum_arity_exact_closer_count": 3
+  },
+  "papers": [
+    "The Boundary Learns — Master Canonical Synthesis",
+    "The Boundary Learns — Verified Developmental Kernel V1",
+    "Certified Lineage Calculus V1",
+    "Branching as Active Inheritance — Quinn Porter",
+    "Awareness Where Time Concentrates — Quinn Porter",
+    "From Temporal Gating to Conscious Organization — Quinn Porter",
+    "The Combinatorial Repertoire of Consciousness — Quinn Porter"
+  ],
+  "synthesis": {
+    "trusted_authority": "append-only warrant log",
+    "identity": "observer-indexed continuation-safe future equivalence",
+    "residual": "future-demanded distinctions still erased by the current interface",
+    "repair": "minimum verified causal/process lift sufficient for the residual",
+    "history": "proof-relevant port-aware causal event structure modulo earned future-safe trace equivalence",
+    "development": "same residual-driven lift law recursively applied to the active interface/language",
+    "realization_boundary": "semantic skeleton, closure/concept nucleus, and executable realization remain distinct"
+  },
+  "open_boundaries": [
+    "unrestricted or unbounded genesis",
+    "autonomous invention from no prior substrate",
+    "learned ultimate viability/value criterion",
+    "infinite-carrier completeness",
+    "universal least developmental repair",
+    "scalable arbitrary event-structure synthesis",
+    "natural-world validation of the full developmental geometry",
+    "consciousness identity claims"
+  ]
+}
