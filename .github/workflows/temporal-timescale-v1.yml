@@ -1,0 +1,110 @@
+name: Temporal Timescale V1
+
+on:
+  push:
+    branches:
+      - temporal-timescale-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify V0 lineage and trusted thin waist
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 5ffad1c87769881b50e48b7865c75e47b6af414f HEAD
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "V0_LINEAGE_AND_THIN_WAIST_OK"
+
+      - name: Run finite same-horizon timescale census
+        run: |
+          python scripts/temporal_timescale_v1.py | tee /tmp/temporal-timescale-v1.txt
+          grep -F "TEMPORAL_TIMESCALE_V1=PASS" /tmp/temporal-timescale-v1.txt
+          grep -F "transition_counts=(3, 2, 1)" /tmp/temporal-timescale-v1.txt
+          grep -F "kernel_pair_counts=(4, 6, 8)" /tmp/temporal-timescale-v1.txt
+          grep -F "same_horizon_event_rate=strictly_decreasing" /tmp/temporal-timescale-v1.txt
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+
+      - name: Build integrated formal stack
+        run: lake build Metatron
+
+      - name: Verify theorem and claim boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = Path("formal/Metatron/TemporalTimescale.lean").read_text()
+          spec = Path("spec/TEMPORAL_TIMESCALE_V1.md").read_text()
+          for name in (
+              "downstream_change_requires_upstream_change",
+              "transitionCount_postcompose_le",
+              "deterministic_readout_slower_or_equal",
+              "departure_transition_count",
+              "gate1_transition_count",
+              "downstream_transition_count",
+              "fixture_strict_event_rate_slowing",
+              "concentration_with_strict_slowing",
+          ):
+              assert f"theorem {name}" in src, name
+          for phrase in (
+              "slower wall-clock physical dynamics",
+              "The generic theorem guarantees only nonincrease.",
+              "not a theory of subjective time",
+          ):
+              assert phrase in spec, phrase
+          print("TEMPORAL_TIMESCALE_V1_BOUNDARY_OK")
+          PY
+
+      - name: Emit qualification attestation
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          result = {
+              "schema_version": 1,
+              "status": "QUALIFIED_TEMPORAL_TIMESCALE_V1",
+              "head_sha": os.environ["GITHUB_SHA"],
+              "workflow_run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "parent_temporal_concentration_sha": "5ffad1c87769881b50e48b7865c75e47b6af414f",
+              "parent_run": 35912669250,
+              "generic_theorem": "transitionCount_postcompose_le",
+              "operational_timescale": "transition-event count on a common sampling grid",
+              "fixture_transition_counts": [3, 2, 1],
+              "fixture_kernel_pair_counts": [4, 6, 8],
+              "generic_claim": "deterministic readout cannot increase same-horizon transition count",
+              "strict_claim": "strict 3->2->1 only on declared fixture",
+              "trusted_runtime_changed": False,
+              "warrant_graph_changed": False,
+          }
+          Path("/tmp/temporal-timescale-v1.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: temporal-timescale-v1
+          path: |
+            /tmp/temporal-timescale-v1.json
+            /tmp/temporal-timescale-v1.txt
