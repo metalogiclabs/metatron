@@ -161,5 +161,21 @@
     "strictness_theorem": "extension_with_new_distinction_is_strict",
     "novelty_theorem": "strict_extension_requires_novel_interface_witness",
     "authority": "derived_formal_semantics_and_external_policy_evidence"
+  },
+  "residual_generated_capability": {
+    "source_branch": "residual-generated-capability-v0",
+    "source_head": "cdad086d723bb048ab1ecb466fe6d0bb6cfd68a6",
+    "preregistration_commit": "5303b4001852b890692737536a36c802d1cb4cc0",
+    "qualification_run": 35823275922,
+    "verdict": "BLIND_RESIDUAL_GENERATED_CAPABILITY_PASS",
+    "closure_size": 15,
+    "residual_pair_count": 48,
+    "primitive_minimum_size": 3,
+    "minimum_generated_size": 2,
+    "minimum_total_constructor_cost": 2,
+    "exact_minimum_basis_count": 3,
+    "theorem": "generatedCover_iff_targetSufficient",
+    "minimum_theorem": "generatedMinimum_minimalSufficient",
+    "authority": "derived_formal_semantics_and_external_policy_evidence"
   }
 }
