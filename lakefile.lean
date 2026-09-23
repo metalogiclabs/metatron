@@ -25,7 +25,8 @@ lean_lib Metatron where
     `Metatron.EarnedCommutation,
     `Metatron.BehavioralCommutation,
     `Metatron.EmbeddedObserverOntology,
-    `Metatron.NovelCapabilityGenesis
+    `Metatron.NovelCapabilityGenesis,
+    `Metatron.ResidualGeneratedCapability
   ]
 
 lean_exe metatron_reference where
