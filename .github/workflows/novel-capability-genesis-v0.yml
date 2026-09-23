@@ -1,0 +1,104 @@
+name: Novel Capability Genesis V0
+
+on:
+  push:
+    branches: [novel-capability-genesis-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  theorem-gate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify trusted Nucleus unchanged
+        run: |
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Reject proof placeholders
+        run: |
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)'             formal/Metatron/NovelCapabilityGenesis.lean
+      - name: Build formal stack
+        run: lake build Metatron
+      - name: Run retained Python suite
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Check novel-capability theorem package
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lean=Path("formal/Metatron/NovelCapabilityGenesis.lean").read_text()
+          spec=Path("spec/NOVEL_CAPABILITY_GENESIS_V0.md").read_text()
+          for name in (
+              "lawfulPath_mono",
+              "interfaceExtension_refines",
+              "extension_with_new_distinction_is_strict",
+              "strict_extension_requires_novel_interface_witness",
+              "closed_to_gained_extension",
+              "gained_hidden_separates_witness",
+              "hidden_test_acquisition_is_strict",
+              "hidden_test_is_genuinely_novel",
+          ):
+              assert f"theorem {name}" in lean, name
+          assert "genuinely new capability" in spec
+          print("NOVEL_CAPABILITY_GENESIS_THEOREMS_OK")
+          PY
+
+  blind-generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: |
+          mkdir -p out/public out/hidden
+          python -m scripts.blind_novel_capability_v0_generate             --public out/public/public.json             --hidden out/hidden/hidden.json
+      - uses: actions/upload-artifact@v4
+        with: {name: novel-capability-public, path: out/public/public.json}
+      - uses: actions/upload-artifact@v4
+        with: {name: novel-capability-hidden, path: out/hidden/hidden.json}
+
+  blind-predict:
+    needs: blind-generate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - uses: actions/download-artifact@v4
+        with: {name: novel-capability-public, path: in/public}
+      - name: Prove hidden artifact absent
+        run: test ! -e in/hidden
+      - name: Commit minimum interface extension prediction
+        run: |
+          mkdir -p out
+          python -m scripts.blind_novel_capability_v0_predict             --public in/public/public.json             --prediction out/prediction.json
+      - uses: actions/upload-artifact@v4
+        with: {name: novel-capability-prediction, path: out/prediction.json}
+
+  blind-reveal:
+    needs: [blind-generate, blind-predict]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - uses: actions/download-artifact@v4
+        with: {name: novel-capability-public, path: in/public}
+      - uses: actions/download-artifact@v4
+        with: {name: novel-capability-hidden, path: in/hidden}
+      - uses: actions/download-artifact@v4
+        with: {name: novel-capability-prediction, path: in/prediction}
+      - run: |
+          mkdir -p out
+          python -m scripts.blind_novel_capability_v0_reveal             --public in/public/public.json             --hidden in/hidden/hidden.json             --prediction in/prediction/prediction.json             --report out/reveal.json
+      - uses: actions/upload-artifact@v4
+        with: {name: novel-capability-reveal, path: out/reveal.json}
