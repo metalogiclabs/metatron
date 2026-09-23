@@ -173,7 +173,7 @@ theorem hidden_test_acquisition_is_strict :
 theorem hidden_test_is_genuinely_novel :
     HasNovelAccess closedInterface gainedHiddenInterface := by
   right
-  exact ⟨Observer.coarse, Test.hidden, True.intro,
-    closed_learning_not_accessible.elim?⟩
+  refine ⟨Observer.coarse, Test.hidden, True.intro, ?_⟩
+  simp [closedInterface, testAvailable]
 
 end Metatron.NovelCapabilityGenesis
