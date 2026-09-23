@@ -69,7 +69,7 @@ jobs:
               "skewed_not_objective_viable",
               "balanced_authority_trace",
               "skewed_authority_trace",
-              "both_preserve_protected_boundary",
+              "both_preserve_guarded_boundary",
               "skewed_unknown_does_not_fabricate_beta",
               "same_scalar_different_typed_viability",
               "reclosure_compiles_future_reuse",
