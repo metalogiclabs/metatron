@@ -27,7 +27,7 @@ jobs:
           git merge-base --is-ancestor 5d8e141f095c23e8ee2d8a3afd40e1264ae2965b HEAD
           test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
           test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
-          test "$(git hash-object formal/Metatron/WarrantedContinuationViabilityV6.lean)" = "cb30b7d20853496174a75a6bbaf1de3e034474fc"
+          test "$(git hash-object formal/Metatron/WarrantedContinuationViabilityV6.lean)" = "c265a17980ca373c82ca7c252636697c5ac657e5"
           echo "V6_LINEAGE_AND_THIN_WAIST_OK"
 
       - name: Run stateful-kernel and replenishment census
