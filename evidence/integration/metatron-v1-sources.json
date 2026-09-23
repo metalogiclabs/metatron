@@ -99,5 +99,21 @@
     "theorem": "earnedTrace_preserves_run",
     "global_theorem": "all_topological_sorts_equal_if_all_incomparables_earned",
     "authority": "derived_formal_semantics_and_external_policy_evidence"
+  },
+  "behavioral_commutation": {
+    "source_branch": "behavioral-commutation-v0",
+    "source_head": "69f642c8be6774cec06effc530adbc254d15984c",
+    "preregistration_commit": "0681cc9b03d11df385fbd76d9c3c3e7b01de855f",
+    "qualification_run": 35811799527,
+    "verdict": "BLIND_BEHAVIORAL_COMMUTATION_PASS",
+    "exact_pair_count": 4,
+    "behavioral_pair_count": 5,
+    "strict_gain_pair_count": 1,
+    "schedule_count": 24,
+    "behavioral_class_count": 2,
+    "minimum_behavioral_basis_size": 5,
+    "theorem": "futureBehavioralTrace_preserves",
+    "strict_gain_theorem": "behavioral_commutation_strictly_extends_exact",
+    "authority": "derived_formal_semantics_and_external_policy_evidence"
   }
 }
