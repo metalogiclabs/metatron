@@ -345,6 +345,8 @@ def run_once() -> dict:
         )
         log = append(log, obstruction)
 
+        pending_shape_verify_id = None
+
         if not shape_warrant_live(log):
             if unary_max != 0:
                 raise AssertionError("unary grammar was not actually insufficient")
@@ -379,16 +381,7 @@ def run_once() -> dict:
             )
             log = append(log, shape_verify)
 
-            shape_warrant = Node(
-                "grammar_shape_warrant",
-                {
-                    "arity": 2,
-                    "skeleton": "LocalTruthTableRewrite(control,target,table)",
-                },
-                (shape_verify.id,),
-            )
-            log = append(log, shape_warrant)
-            shape_warrant_id = shape_warrant.id
+            pending_shape_verify_id = shape_verify.id
             mode = "grammar_shape_genesis"
         else:
             schema = constructor_schema(log)
@@ -410,7 +403,9 @@ def run_once() -> dict:
         )
 
         proposal_premises = [obstruction.id]
-        if shape_warrant_id is not None:
+        if mode == "grammar_shape_genesis":
+            proposal_premises.append(pending_shape_verify_id)
+        elif shape_warrant_id is not None:
             proposal_premises.append(shape_warrant_id)
 
         proposal = Node(
@@ -432,7 +427,9 @@ def run_once() -> dict:
         log = append(log, verified)
 
         warrant_premises = [verified.id, parent]
-        if shape_warrant_id is not None:
+        if mode == "grammar_shape_genesis":
+            warrant_premises.append(pending_shape_verify_id)
+        elif shape_warrant_id is not None:
             warrant_premises.append(shape_warrant_id)
         schema_now = constructor_schema(log)
         if mode == "induced_binary_constructor" and schema_now is not None:
@@ -452,6 +449,18 @@ def run_once() -> dict:
         log = append(log, warrant)
         program_warrant_ids.append(warrant.id)
         successes.append(selected)
+
+        if mode == "grammar_shape_genesis":
+            shape_warrant = Node(
+                "grammar_shape_warrant",
+                {
+                    "arity": 2,
+                    "skeleton": "LocalTruthTableRewrite(control,target,table)",
+                },
+                (pending_shape_verify_id, warrant.id),
+            )
+            log = append(log, shape_warrant)
+            shape_warrant_id = shape_warrant.id
 
         constructor_promoted_now = False
         if constructor_schema(log) is None:
