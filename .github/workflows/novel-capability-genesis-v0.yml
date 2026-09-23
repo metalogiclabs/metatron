@@ -2,7 +2,9 @@ name: Novel Capability Genesis V0
 
 on:
   push:
-    branches: [novel-capability-genesis-v0]
+    branches:
+      - novel-capability-genesis-v0
+      - main
   workflow_dispatch:
 
 permissions:
