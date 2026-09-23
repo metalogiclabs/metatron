@@ -1,0 +1,117 @@
+name: Consolidation V2 Seal
+
+on:
+  push:
+    branches: [consolidated/current-v2]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: consolidation-v2-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  consolidation-seal:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify documentation-only consolidation
+        run: |
+          set -euo pipefail
+          BASE=0f7c4df44f093f5d3b33b5a87f286cf6e9460cb1
+          bad="$(git diff --name-only "$BASE"...HEAD | grep -Ev '^(PROGRAM\.md|RESEARCH_STATE\.md|CONSOLIDATION\.md|evidence/consolidation-v2/|\.github/workflows/consolidation-v2\.yml$)' || true)"
+          test -z "$bad" || { echo "Unexpected consolidation changes:"; echo "$bad"; exit 1; }
+          echo "DOCUMENTATION_ONLY_CONSOLIDATION"
+
+      - name: Verify trusted thin waist unchanged
+        run: |
+          set -euo pipefail
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "TRUSTED_THIN_WAIST_IDENTICAL"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate retained Python suite
+        run: |
+          python scripts/check_manifest.py
+          python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Build retained formal stack
+        run: |
+          lake build Metatron
+          lake build metatron_reference
+
+      - name: Validate consolidation manifest and boundaries
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          m=json.loads(Path("evidence/consolidation-v2/manifest.json").read_text())
+          assert m["schema"] == "metatron.consolidation.v2"
+          assert m["repositories"]["metatron"]["main"] == "0f7c4df44f093f5d3b33b5a87f286cf6e9460cb1"
+          assert m["repositories"]["metatron"]["grammar_shape_evidence"] == "377d5c863a981c0ee9cd1eb1d594ca8ff20b7aa9"
+          assert m["repositories"]["metatron"]["blind_grammar_shape_v1_run"] == 35816613683
+          assert m["blind_grammar_shape_v1"]["verdict"] == "BLIND_GRAMMAR_SHAPE_PASS"
+          assert m["blind_grammar_shape_v1"]["maximum_gain_by_arity"] == {"1":0,"2":0,"3":128}
+
+          program=Path("PROGRAM.md").read_text()
+          state=Path("RESEARCH_STATE.md").read_text()
+          summary=Path("CONSOLIDATION.md").read_text()
+
+          for phrase in (
+              "nucleus}\\neq\\text{minimal realization",
+              "Never distinguish more than the future forces",
+              "DevelopmentalLift",
+              "Independent convergence with Quinn Porter",
+              "does **not** establish",
+          ):
+              assert phrase in program, phrase
+
+          assert "BLIND_GRAMMAR_SHAPE_PASS" in state
+          assert "Do **not** continue building a hand-authored meta/meta-meta ladder." in program
+          assert "generic developmental operator" in summary
+
+          rows=Path("evidence/consolidation-v2/metatron-branches.tsv").read_text().splitlines()
+          assert rows[0] == "branch\thead_sha"
+          assert any(line.startswith("main\t0f7c4df4") for line in rows)
+          assert any(line.startswith("grammar-shape-genesis-v0\t377d5c86") for line in rows)
+          print("CONSOLIDATION_V2_BOUNDARY_OK")
+          PY
+
+      - name: Emit consolidation attestation
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          out={
+            "schema":"metatron.consolidation.v2.attestation",
+            "status":"QUALIFIED_NON_DESTRUCTIVE_CONSOLIDATION",
+            "head_sha":os.environ["GITHUB_SHA"],
+            "run_id":int(os.environ["GITHUB_RUN_ID"]),
+            "trusted_runtime_blob":"d9d4293e54471714bf098593bf4018c3f6403273",
+            "formal_warrant_graph_blob":"d2affc0a57a1815f303f6f1859941465c69e7d32",
+            "base_main":"0f7c4df44f093f5d3b33b5a87f286cf6e9460cb1",
+            "canonical_programme_doc":"PROGRAM.md",
+            "research_state_doc":"RESEARCH_STATE.md"
+          }
+          Path("/tmp/consolidation-v2-attestation.json").write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: consolidation-v2-attestation
+          path: /tmp/consolidation-v2-attestation.json
