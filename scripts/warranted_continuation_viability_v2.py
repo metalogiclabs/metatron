@@ -95,7 +95,7 @@ def main():
     loss_kernel, loss_chain = gfp(WITH_CAPABILITY_LOSS)
 
     assert support_kernel == {State.ADAPTIVE}
-    assert tuple(len(x) for x in support_chain) == (4, 1, 1)
+    assert tuple(len(x) for x in support_chain) == (4, 2, 1, 1)
 
     assert loss_kernel == set()
     assert tuple(len(x) for x in loss_chain) == (4, 2, 1, 0, 0)
