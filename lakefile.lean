@@ -23,7 +23,8 @@ lean_lib Metatron where
     `Metatron.CausalTraceQuotient,
     `Metatron.FinitePosetConnectivity,
     `Metatron.EarnedCommutation,
-    `Metatron.BehavioralCommutation
+    `Metatron.BehavioralCommutation,
+    `Metatron.EmbeddedObserverOntology
   ]
 
 lean_exe metatron_reference where
