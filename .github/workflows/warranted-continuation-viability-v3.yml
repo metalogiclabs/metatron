@@ -1,0 +1,66 @@
+name: Warranted Continuation Viability V3
+on:
+  push:
+    branches: [warranted-continuation-viability-v3]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Verify V2 lineage and trusted thin waist
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 6d40b505c1a113da6d3cd1340f752c1fdbf83557 HEAD
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+      - name: Run recursive meta-repair census
+        run: |
+          python scripts/warranted_continuation_viability_v3.py | tee /tmp/wcv-v3.txt
+          grep -F "WARRANTED_CONTINUATION_VIABILITY_V3=PASS" /tmp/wcv-v3.txt
+          grep -F "depth1_kernel=('meta_adaptive',)" /tmp/wcv-v3.txt
+          grep -F "meta_loss_kernel=()" /tmp/wcv-v3.txt
+          grep -F "repair_restored_live=(0, 1, 2, 3, 5, 7)" /tmp/wcv-v3.txt
+          grep -F "support_repaired_by_restored_cap_live=(2, 3, 5, 7, 9, 10)" /tmp/wcv-v3.txt
+          grep -F "restored_repair_then_meta_revoked_live=(0, 1, 2, 3)" /tmp/wcv-v3.txt
+      - name: Verify boundary text
+        run: |
+          grep -F "move the viability boundary outward by one declared failure class" spec/WARRANTED_CONTINUATION_VIABILITY_V3.md
+          grep -F "recursive repair is warrant-dependent, not magical" spec/WARRANTED_CONTINUATION_VIABILITY_V3.md
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Reject proof placeholders
+        run: |
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+      - name: Build integrated formal stack
+        run: lake build Metatron
+      - name: Verify theorem surface
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path("formal/Metatron/WarrantedContinuationViabilityV3.lean").read_text()
+          for n in ("depth_one_kernel_postfixed","depth_one_kernel_greatest","meta_repair_restores_nonempty_kernel","meta_loss_no_postfixed_state","one_more_repair_layer_moves_the_boundary","recursive_base_live","meta_restores_repair_capability","restored_capability_repairs_support","meta_revocation_cuts_restored_repair","no_meta_repair_after_meta_loss","recursive_authority_separator"):
+              assert f"theorem {n}" in s,n
+          print("WCV_V3_THEOREM_SURFACE_OK")
+          PY
+      - name: Emit qualification attestation
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          d={"schema_version":1,"status":"QUALIFIED_WARRANTED_CONTINUATION_VIABILITY_V3","head_sha":os.environ["GITHUB_SHA"],"workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),"parent_v2_sha":"6d40b505c1a113da6d3cd1340f752c1fdbf83557","parent_v2_run":35924173950,"depth1_kernel":["meta_adaptive"],"meta_loss_kernel":[],"meta_repair_warrant_index":5,"restored_repair_index":7,"trusted_runtime_changed":False,"warrant_graph_changed":False,"boundary":"finite recursive repair depth with exact WarrantGraph authority"}
+          Path("/tmp/warranted-continuation-viability-v3.json").write_text(json.dumps(d,indent=2,sort_keys=True)+"\n")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: warranted-continuation-viability-v3
+          path: |
+            /tmp/warranted-continuation-viability-v3.json
+            /tmp/wcv-v3.txt
