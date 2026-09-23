@@ -156,12 +156,66 @@ So Metatron now formally supports both simultaneously:
 The observer is not outside the model. Its state, capabilities, and lawful
 future interface are variables inside the same declared dynamics.
 
+## Novel capability genesis
+
+Novel Capability Genesis V0 isolates the formal location of genuine novelty.
+
+An `InterfaceExtension oldI newI` preserves every previously accessible step,
+every previously available test, and the semantics of shared tests, while
+allowing additional capabilities.
+
+Lean proves:
+
+- `lawfulPath_mono`;
+- `interfaceExtension_refines`;
+- `extension_with_new_distinction_is_strict`;
+- `strict_extension_requires_novel_interface_witness`.
+
+So interface growth can only refine observer-relative reality, and a strict
+refinement is impossible unless some step or test is genuinely new to the old
+lawful interface.
+
+This complements `accessible_transition_already_anticipated`: a capability
+already reachable in the old lawful future cannot be the source of an
+unanticipated distinction. Strict novelty lives exactly at an extension of the
+previous future interface.
+
+The blind minimum-acquisition experiment then exposed anonymous world states,
+the old protected observation, a target quotient, and an anonymous candidate
+test language.
+
+Before reveal Metatron found:
+
+- current observer quotient: two blocks of size 4;
+- 8 target-relevant residual pairs;
+- exactly 3 genuinely novel candidate tests;
+- no singleton novel capability was target-sufficient;
+- exact minimum acquisition size: 2;
+- exactly 2 equivalent minimum acquisition bases.
+
+The planted hidden basis belonged to that exact minimum family, every minimum
+basis was sufficient, and the canonical basis was irredundant.
+
+All N1-N10 gates passed:
+
+BLIND_NOVEL_CAPABILITY_PASS
+
+Thus V1 now distinguishes three layers cleanly:
+
+1. inference inside the existing interface;
+2. learning already reachable inside the existing lawful future;
+3. genuinely novel capability acquisition that extends the lawful interface and
+   can strictly refine observer-relative identity.
+
 ## Integrated architecture
 
 warrant log
   -> objective world + observer dynamics
   -> observer-accessible lawful future semantics
   -> compute greatest continuation-safe behavioral quotient
+  -> identify unresolved target distinction
+  -> minimum genuinely novel interface extension when required
+  -> refined observer-relative quotient
   -> future-demanded consequential residual
   -> minimum certified causal repair frontier
   -> earn safe swaps modulo FutureEq
@@ -181,7 +235,7 @@ The Lean Kernel eight-lane controller remains external proof/measurement/promoti
 
 ## Claim boundary
 
-V1 now supports an embedded observer whose lawful future interface induces an objective observer-relative identity relation over fixed absolute dynamics, plus exact finite discovery of continuation-safe quotients and quotient-relative commutation. It does not claim a complete ontology of human cognition, infer the protected observation language or action vocabulary themselves, establish higher-order independence beyond pairwise swaps, synthesize symbolic fixed-point/commutation proofs on infinite carriers, or solve conflict/synchronization/feedback semantics. Nucleus authority remains unchanged.
+V1 now supports an embedded observer whose lawful future interface induces an objective observer-relative identity relation over fixed absolute dynamics, exact finite discovery of continuation-safe quotients, quotient-relative commutation, and minimum strict interface extensions inside a declared novel-capability language. It does not claim a complete ontology of human cognition, unrestricted invention outside the declared candidate language, infer the protected observation language or action vocabulary themselves, establish higher-order independence beyond pairwise swaps, synthesize symbolic fixed-point/commutation proofs on infinite carriers, or solve conflict/synchronization/feedback semantics. Nucleus authority remains unchanged.
 
 ## Representation discipline
 
