@@ -1,0 +1,21 @@
+{
+  "schema": "metatron.clc-frozen-log-adapter.rebuild-v1",
+  "status": "CANDIDATE_UNQUALIFIED",
+  "base_head": "b9d1b5cc10477188be6e55617699be60e70f6dad",
+  "branch": "feature/clc-frozen-log-support-v1",
+  "supersedes_unrecoverable_local_candidate": "d32b7227e323c99dc53139045c6604259bfa678e",
+  "exact_theorem": "warrant_support_iff",
+  "metatron_warrant_graph_blob": "d2affc0a57a1815f303f6f1859941465c69e7d32",
+  "metatron_warrant_graph_sha256": "0625dd2c9d9af3c6900faf0a37da8011d9a1a3a0eef63f7664530eaeabc80b7b",
+  "msi_clc_head": "900a73c1d386ee0eee1205a1cf31d270f3311ef7",
+  "clc_support_sha256": "accef51e223c081947794e26f8f5f4bc36217308ea759ec7baa7042408819ae5",
+  "mathlib_head": "44ba35c6daa9d69aff8fed9fff9bbde17ded774d",
+  "lean": "v4.35.0-rc2",
+  "historical_negative": {
+    "triskelion_run": 35552653057,
+    "triskelion_job": 106190153436
+  },
+  "expected_python_tests": 32,
+  "exhaustive_support_cases": 2048,
+  "claim_boundary": "Static frozen List WarrantEntry support-liveness equivalence only; no transport, runtime universality, dynamic reclosure, quotient, causal-port, authentication, reversibility, or Nucleus enlargement."
+}

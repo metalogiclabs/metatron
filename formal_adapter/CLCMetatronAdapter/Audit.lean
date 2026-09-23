@@ -1,0 +1,6 @@
+import CLCMetatronAdapter.Adapter
+import CLCMetatronAdapter.Regression
+
+#print axioms CLCMetatronAdapter.live_revoked_disjoint
+#print axioms CLCMetatronAdapter.warrant_support_iff
+#print axioms CLCMetatronAdapter.boolean_flip_not_continuation_neutral

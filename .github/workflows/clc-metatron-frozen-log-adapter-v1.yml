@@ -1,0 +1,133 @@
+name: CLC Metatron Frozen-Log Adapter V1
+
+on:
+  push:
+    branches:
+      - feature/clc-frozen-log-support-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify frozen source boundary
+        run: |
+          set -euo pipefail
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          test "$(sha256sum formal_adapter/Metatron/WarrantGraph.lean | cut -d' ' -f1)" = "0625dd2c9d9af3c6900faf0a37da8011d9a1a3a0eef63f7664530eaeabc80b7b"
+          test "$(sha256sum formal_adapter/CLC/Support.lean | cut -d' ' -f1)" = "accef51e223c081947794e26f8f5f4bc36217308ea759ec7baa7042408819ae5"
+          cmp formal/Metatron/WarrantGraph.lean formal_adapter/Metatron/WarrantGraph.lean
+          curl -fsSL "https://raw.githubusercontent.com/heathsanchez/Minimal-Sufficient-Interface/900a73c1d386ee0eee1205a1cf31d270f3311ef7/qcklean/CLC/Support.lean" -o /tmp/Support.lean
+          cmp /tmp/Support.lean formal_adapter/CLC/Support.lean
+          echo "FROZEN_SOURCE_BOUNDARY=PASS"
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Build unchanged root Metatron
+        run: |
+          lake build Metatron
+          lake build metatron_reference
+
+      - name: Reject adapter proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)'             formal_adapter/CLCMetatronAdapter formal_adapter/CLC formal_adapter/Metatron
+
+      - name: Build isolated CLC Metatron adapter
+        run: |
+          cd formal_adapter
+          lake update
+          lake exe cache get
+          lake build CLCMetatronAdapter
+          mkdir -p ../out
+          lake env lean CLCMetatronAdapter/Audit.lean | tee ../out/axiom-audit.txt
+
+      - name: Enforce axiom audit boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text=Path("out/axiom-audit.txt").read_text()
+          assert "sorryAx" not in text, text
+          allowed={"propext","Classical.choice","Quot.sound"}
+          for line in text.splitlines():
+              if "depends on axioms:" not in line:
+                  continue
+              inside=line.split("[",1)[1].rsplit("]",1)[0].strip()
+              if not inside:
+                  continue
+              seen={x.strip() for x in inside.split(",")}
+              assert seen <= allowed, (line,seen-allowed)
+          print("AXIOM_AUDIT_BOUNDARY=PASS")
+          PY
+
+      - name: Run retained and adapter Python suite
+        run: |
+          python - <<'PY'
+          import unittest
+          suite=unittest.defaultTestLoader.discover("tests", pattern="test_*.py")
+          count=suite.countTestCases()
+          print("PYTHON_TEST_COUNT",count)
+          assert count == 32, count
+          PY
+          python -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee out/python-tests.txt
+
+      - name: Verify candidate evidence boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("evidence/integration/clc-metatron-frozen-log-adapter-v1-candidate.json").read_text())
+          assert d["status"] == "CANDIDATE_UNQUALIFIED"
+          assert d["base_head"] == "b9d1b5cc10477188be6e55617699be60e70f6dad"
+          assert d["supersedes_unrecoverable_local_candidate"] == "d32b7227e323c99dc53139045c6604259bfa678e"
+          assert d["expected_python_tests"] == 32
+          assert d["exhaustive_support_cases"] == 2048
+          print("CANDIDATE_EVIDENCE_BOUNDARY=PASS")
+          PY
+
+      - name: Emit hosted qualification artifact
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          d={
+            "schema":"metatron.clc-frozen-log-adapter.qualification-v1",
+            "status":"HOSTED_EXACT_HEAD_PASS",
+            "head_sha":os.environ["GITHUB_SHA"],
+            "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
+            "base_head":"b9d1b5cc10477188be6e55617699be60e70f6dad",
+            "branch":"feature/clc-frozen-log-support-v1",
+            "theorem":"warrant_support_iff",
+            "live_revoked_theorem":"live_revoked_disjoint",
+            "python_tests":32,
+            "exhaustive_support_cases":2048,
+            "metatron_warrant_graph_sha256":"0625dd2c9d9af3c6900faf0a37da8011d9a1a3a0eef63f7664530eaeabc80b7b",
+            "clc_support_sha256":"accef51e223c081947794e26f8f5f4bc36217308ea759ec7baa7042408819ae5",
+            "msi_clc_head":"900a73c1d386ee0eee1205a1cf31d270f3311ef7",
+            "historical_local_candidate":"d32b7227e323c99dc53139045c6604259bfa678e",
+            "historical_triskelion_failure_run":35552653057,
+            "claim_boundary":"Static frozen List WarrantEntry support-liveness equivalence only; no transport, runtime universality, dynamic append/revoke commutation, quotient, causal-port, authentication, reversibility, reclosure, or Nucleus enlargement."
+          }
+          Path("out/clc-metatron-frozen-log-adapter-v1.json").write_text(json.dumps(d,indent=2,sort_keys=True)+"\n")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clc-metatron-frozen-log-adapter-v1
+          path: |
+            out/clc-metatron-frozen-log-adapter-v1.json
+            out/axiom-audit.txt
+            out/python-tests.txt
