@@ -13,23 +13,7 @@ theorem mem_revokedTargets_warrantRevoked_true
     {L : List WarrantEntry} {i : Nat}
     (h : i ∈ revokedTargets L) :
     warrantRevoked L i = true := by
-  induction L with
-  | nil =>
-      simp [revokedTargets] at h
-  | cons entry rest ih =>
-      cases hrev : entry.revokes with
-      | none =>
-          have hrest : i ∈ revokedTargets rest := by
-            simpa [revokedTargets, hrev] using h
-          have hi := ih hrest
-          simp [warrantRevoked, hrev, hi]
-      | some target =>
-          have hcases : i = target ∨ i ∈ revokedTargets rest := by
-            simpa [revokedTargets, hrev, eq_comm] using h
-          rcases hcases with rfl | hrest
-          · simp [warrantRevoked, hrev]
-          · have hi := ih hrest
-            simp [warrantRevoked, hrev, hi]
+  simpa [revokedTargets, warrantRevoked] using h
 
 theorem warrantStep_preserves_not_revoked
     (L : List WarrantEntry)
@@ -50,31 +34,28 @@ theorem warrantStep_preserves_not_revoked
             simpa [warrantStep, hentry, hcur] using hj
           exact h j hj'
       | false =>
-          cases hprem :
-              entry.premises.all (fun premise => state.2.contains premise) with
-          | false =>
-              have hj' : j ∈ state.2 := by
-                simpa [warrantStep, hentry, hcur, hprem] using hj
-              exact h j hj'
-          | true =>
-              have hj' : j ∈ state.2 ∨ j = state.1 := by
-                simpa [warrantStep, hentry, hcur, hprem] using hj
-              rcases hj' with hjOld | rfl
-              · exact h j hjOld
-              · exact hcur
+          by_cases hprem :
+              ∀ premise ∈ entry.premises, premise ∈ state.2
+          · have hj' : j ∈ state.2 ∨ j = state.1 := by
+              simpa [warrantStep, hentry, hcur, hprem] using hj
+            rcases hj' with hjOld | rfl
+            · exact h j hjOld
+            · exact hcur
+          · have hj' : j ∈ state.2 := by
+              simpa [warrantStep, hentry, hcur, hprem] using hj
+            exact h j hj'
 
-theorem fold_preserves_not_revoked (L : List WarrantEntry) :
-    ∀ xs state,
-      (∀ j ∈ state.2, warrantRevoked L j = false) →
-      ∀ j ∈ (xs.foldl (warrantStep L) state).2,
-        warrantRevoked L j = false := by
-  intro xs
-  induction xs with
+theorem fold_preserves_not_revoked
+    (L xs : List WarrantEntry)
+    (state : Nat × List Nat)
+    (h : ∀ j ∈ state.2, warrantRevoked L j = false) :
+    ∀ j ∈ (xs.foldl (warrantStep L) state).2,
+      warrantRevoked L j = false := by
+  induction xs generalizing state with
   | nil =>
-      intro state h j hj
+      intro j hj
       exact h j hj
   | cons entry rest ih =>
-      intro state h
       simp only [List.foldl_cons]
       exact ih (warrantStep L state entry)
         (warrantStep_preserves_not_revoked L state entry h)
