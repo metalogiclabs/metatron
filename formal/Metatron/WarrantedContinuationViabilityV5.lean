@@ -65,37 +65,23 @@ def SingletonKernel (live : List Nat) (state : List Nat) : Prop :=
 
 theorem all_true_of_mem
     {α : Type}
-    (p : α → Bool) :
-    ∀ (xs : List α) (x : α), xs.all p = true → x ∈ xs → p x = true := by
-  intro xs
-  induction xs with
-  | nil =>
-      intro x h hx
-      simp at hx
-  | cons a rest ih =>
-      intro x h hx
-      simp at h hx
-      rcases hx with rfl | hx
-      · exact h.1
-      · exact ih x h.2 hx
+    (p : α → Bool)
+    (xs : List α)
+    (x : α)
+    (h : xs.all p = true)
+    (hx : x ∈ xs) :
+    p x = true := by
+  have hall : ∀ y, y ∈ xs → p y = true := by
+    simpa using h
+  exact hall x hx
 
 theorem all_true_intro
     {α : Type}
-    (p : α → Bool) :
-    ∀ (xs : List α), (∀ x, x ∈ xs → p x = true) → xs.all p = true := by
-  intro xs
-  induction xs with
-  | nil =>
-      intro h
-      rfl
-  | cons a rest ih =>
-      intro h
-      simp
-      constructor
-      · exact h a (by simp)
-      · apply ih
-        intro x hx
-        exact h x (by simp [hx])
+    (p : α → Bool)
+    (xs : List α)
+    (h : ∀ x, x ∈ xs → p x = true) :
+    xs.all p = true := by
+  simpa using h
 
 /-- Complete live repair coverage is sufficient for one-step invariant
     viability under every admitted failure. -/
