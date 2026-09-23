@@ -105,3 +105,7 @@ The Lean Kernel eight-lane controller remains external proof/measurement/promoti
 ## Claim boundary
 
 V1 now supports exact finite quotient-relative commutation discovery for a declared continuation-safe quotient. It does not yet discover the behavioral quotient itself from scratch, establish higher-order independence beyond pairwise swaps, synthesize symbolic commutation proofs on infinite carriers, or solve conflict/synchronization/feedback semantics. Nucleus authority remains unchanged.
+
+## Representation discipline
+
+No generic property of raw storage-graph geometry is promoted to semantics.
