@@ -216,7 +216,7 @@ theorem closed_coarse_iff_visible
       x.visible = y.visible := by
   constructor
   · intro h
-    simpa [closedModel, observerTest, testAvailable, run] using
+    simpa [closedModel, closedInterface, observerTest, testAvailable, run] using
       h [] True.intro Test.visible True.intro
   · intro hvis steps hsteps q hq
     have ho := closed_lawful_keeps_coarse steps hsteps
@@ -224,10 +224,10 @@ theorem closed_coarse_iff_visible
     have hy := world_run_identity steps y
     cases q with
     | visible =>
-        simpa [closedModel, observerTest, hx, hy] using hvis
+        simpa [closedModel, closedInterface, observerTest, ho, hx, hy] using hvis
     | hidden =>
         have : False := by
-          simpa [closedModel, testAvailable, ho] using hq
+          simpa [closedModel, closedInterface, testAvailable, ho] using hq
         exact False.elim this
 
 def witness0 : World := ⟨false, false⟩
@@ -245,7 +245,7 @@ theorem fine_separates_witness :
   intro h
   have hhidden :=
     h [] True.intro Test.hidden True.intro
-  simp [closedModel, observerTest, testAvailable,
+  simp [closedModel, closedInterface, observerTest, testAvailable,
     witness0, witness1, run] at hhidden
 
 theorem observer_state_strictly_refines_identity :
