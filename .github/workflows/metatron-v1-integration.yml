@@ -12,6 +12,7 @@ on:
       - blind-future-quotient-v0
       - embedded-observer-ontology-v0
       - novel-capability-genesis-v0
+      - residual-generated-capability-v0
       - main
   workflow_dispatch:
 
@@ -113,6 +114,12 @@ jobs:
           assert d["novel_capability_genesis"]["verdict"] == "BLIND_NOVEL_CAPABILITY_PASS"
           assert d["novel_capability_genesis"]["minimum_acquisition_size"] == 2
           assert d["novel_capability_genesis"]["exact_minimum_basis_count"] == 2
+          assert d["residual_generated_capability"]["source_head"] == "cdad086d723bb048ab1ecb466fe6d0bb6cfd68a6"
+          assert d["residual_generated_capability"]["qualification_run"] == 35823275922
+          assert d["residual_generated_capability"]["verdict"] == "BLIND_RESIDUAL_GENERATED_CAPABILITY_PASS"
+          assert d["residual_generated_capability"]["primitive_minimum_size"] == 3
+          assert d["residual_generated_capability"]["minimum_generated_size"] == 2
+          assert d["residual_generated_capability"]["minimum_total_constructor_cost"] == 2
           assert d["search_policy"]["authority"] == "external_policy"
           assert d["external_adapter"]["authority"] == "external_evidence_policy"
           print("INTEGRATION_SOURCE_PINS_OK")
@@ -152,6 +159,7 @@ jobs:
           future=Path("formal/Metatron/FutureObservations.lean").read_text()
           observer=Path("formal/Metatron/EmbeddedObserverOntology.lean").read_text()
           novelty=Path("formal/Metatron/NovelCapabilityGenesis.lean").read_text()
+          generated=Path("formal/Metatron/ResidualGeneratedCapability.lean").read_text()
           spec=Path("spec/METATRON_V1_INTEGRATION.md").read_text()
           for name in (
               "certifiedResidualBasis_closes",
@@ -226,10 +234,18 @@ jobs:
               "hidden_test_acquisition_is_strict",
           ):
               assert f"theorem {name}" in novelty, name
+          for name in (
+              "generatedCover_iff_targetSufficient",
+              "generatedMinimum_minimalSufficient",
+              "invented_pair_targetSufficient",
+              "invented_pair_covers",
+          ):
+              assert f"theorem {name}" in generated, name
           assert "minimum certified causal repair frontier" in spec
           assert "BLIND_BEHAVIORAL_COMMUTATION_PASS" in spec
           assert "BLIND_FUTURE_QUOTIENT_PASS" in spec
           assert "BLIND_NOVEL_CAPABILITY_PASS" in spec
+          assert "BLIND_RESIDUAL_GENERATED_CAPABILITY_PASS" in spec
           assert "objective observer-relative identity" in spec
           assert "minimum warranted behavioral commutation basis" in spec
           assert "No generic property of raw storage-graph geometry is promoted to semantics." in spec
@@ -259,6 +275,7 @@ jobs:
             "future_quotient_discovery_run":35812504704,
             "embedded_observer_run":35815957808,
             "novel_capability_genesis_run":35819719752,
+            "residual_generated_capability_run":35823275922,
             "clc_head":"20844ab1c68b8c4f9d6528a191eb136c0bdce791",
             "blind_v3_run":35761034357,
             "minimal_nucleus_run":35764668476,
