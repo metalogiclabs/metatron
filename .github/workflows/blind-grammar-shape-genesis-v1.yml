@@ -1,0 +1,127 @@
+name: Blind Grammar Shape Genesis V1
+
+on:
+  push:
+    branches: [grammar-shape-genesis-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: blind-grammar-shape-genesis-v1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate-seal:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify preregistration and trusted thin waist
+        run: |
+          set -euo pipefail
+          test -f spec/BLIND_GRAMMAR_SHAPE_GENESIS_V1_PREREG.md
+          git cat-file -e 1fbac081555f1af53327c17ea337db823cef6e08^{commit}
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+
+      - name: Generate fresh hidden challenge and seal
+        run: |
+          mkdir -p out/public out/hidden
+          python -m scripts.blind_grammar_shape_v1_generate             --public out/public/public.json             --hidden out/hidden/hidden.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: blind-grammar-v1-public
+          path: out/public/public.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: blind-grammar-v1-hidden
+          path: out/hidden/hidden.json
+
+  predict:
+    needs: generate-seal
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: blind-grammar-v1-public
+          path: in/public
+
+      - name: Assert hidden artifact is absent
+        run: |
+          set -euo pipefail
+          test ! -e in/hidden
+          test ! -e hidden.json
+          ! find in -type f -iname '*hidden*' | grep .
+
+      - name: Commit public-only prediction
+        run: |
+          mkdir -p out
+          python -m scripts.blind_grammar_shape_v1_predict             --public in/public/public.json             --prediction out/prediction.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("out/prediction.json").read_text())
+          assert d["relabel_control"]["invariant"]
+          assert d["predicted_minimum_arity"] in (2,3)
+          assert d["minimum_arity_exact_closer_count"] >= 1
+          print("BLIND_GRAMMAR_PUBLIC_ONLY_PREDICTION_OK")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: blind-grammar-v1-prediction
+          path: out/prediction.json
+
+  reveal:
+    needs: [generate-seal, predict]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: blind-grammar-v1-public
+          path: in/public
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: blind-grammar-v1-hidden
+          path: in/hidden
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: blind-grammar-v1-prediction
+          path: in/prediction
+
+      - name: Reveal and verify
+        run: |
+          mkdir -p out
+          python -m scripts.blind_grammar_shape_v1_reveal             --public in/public/public.json             --hidden in/hidden/hidden.json             --prediction in/prediction/prediction.json             --report out/reveal.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("out/reveal.json").read_text())
+          assert d["verdict"] == "BLIND_GRAMMAR_SHAPE_PASS"
+          assert all(d["gates"].values())
+          print("BLIND_GRAMMAR_SHAPE_V1_PASS")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: blind-grammar-v1-reveal
+          path: out/reveal.json
