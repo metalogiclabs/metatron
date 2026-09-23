@@ -13,39 +13,89 @@ structure RepairHyperedge where
 def edgeLive (live : List Nat) (edge : RepairHyperedge) : Bool :=
   edge.requires.all live.contains
 
+def coversFailureB
+    (live : List Nat)
+    (edges : List RepairHyperedge)
+    (failure : Nat) : Bool :=
+  edges.any (fun edge =>
+    (edge.failure == failure) && edgeLive live edge)
+
 def CoversFailure
     (live : List Nat)
     (edges : List RepairHyperedge)
     (failure : Nat) : Prop :=
-  ∃ edge, edge ∈ edges ∧ edge.failure = failure ∧ edgeLive live edge = true
+  coversFailureB live edges failure = true
+
+def completeCoverB
+    (live : List Nat)
+    (edges : List RepairHyperedge)
+    (admitted : List Nat) : Bool :=
+  admitted.all (coversFailureB live edges)
 
 def CompleteCover
     (live : List Nat)
     (edges : List RepairHyperedge)
     (admitted : List Nat) : Prop :=
-  ∀ failure, failure ∈ admitted → CoversFailure live edges failure
+  completeCoverB live edges admitted = true
 
 def repairStep
-    (live : List Nat)
     (edges : List RepairHyperedge)
+    (live : List Nat)
     (failure : Nat) : Option (List Nat) :=
-  if CoversFailure live edges failure then some live else none
+  if coversFailureB live edges failure then some live else none
 
 def SingletonKernel (live : List Nat) (state : List Nat) : Prop :=
   state = live
 
-/-- The declared live repair cover is sufficient for one-step invariant
+theorem all_true_of_mem
+    {α : Type}
+    (p : α → Bool) :
+    ∀ xs x, xs.all p = true → x ∈ xs → p x = true := by
+  intro xs
+  induction xs with
+  | nil =>
+      intro x h hx
+      simp at hx
+  | cons a rest ih =>
+      intro x h hx
+      simp at h hx
+      rcases hx with rfl | hx
+      · exact h.1
+      · exact ih x h.2 hx
+
+theorem all_true_intro
+    {α : Type}
+    (p : α → Bool) :
+    ∀ xs, (∀ x, x ∈ xs → p x = true) → xs.all p = true := by
+  intro xs
+  induction xs with
+  | nil =>
+      intro h
+      rfl
+  | cons a rest ih =>
+      intro h
+      simp
+      constructor
+      · exact h a (by simp)
+      · apply ih
+        intro x hx
+        exact h x (by simp [hx])
+
+/-- Complete live repair coverage is sufficient for one-step invariant
     viability under every admitted failure. -/
 theorem complete_cover_implies_postfixed
     (live : List Nat)
     (edges : List RepairHyperedge)
     (admitted : List Nat)
     (hcover : CompleteCover live edges admitted) :
-    PostFixed (repairStep live edges) admitted (SingletonKernel live) := by
+    PostFixed (repairStep edges) admitted (SingletonKernel live) := by
   intro state hstate
   subst state
   intro failure hfailure
-  have hc : CoversFailure live edges failure := hcover failure hfailure
+  have hc : coversFailureB live edges failure = true := by
+    exact all_true_of_mem
+      (coversFailureB live edges)
+      admitted failure hcover hfailure
   exact ⟨live, by simp [repairStep, hc], rfl⟩
 
 /-- If the singleton live state is post-fixed under the repair semantics,
@@ -54,20 +104,24 @@ theorem postfixed_implies_complete_cover
     (live : List Nat)
     (edges : List RepairHyperedge)
     (admitted : List Nat)
-    (hpost : PostFixed (repairStep live edges) admitted (SingletonKernel live)) :
+    (hpost : PostFixed (repairStep edges) admitted (SingletonKernel live)) :
     CompleteCover live edges admitted := by
+  apply all_true_intro (coversFailureB live edges) admitted
   intro failure hfailure
   have h := hpost live rfl failure hfailure
   rcases h with ⟨state', hstep, _⟩
-  by_contra hcov
-  simp [repairStep, hcov] at hstep
+  cases hcov : coversFailureB live edges failure with
+  | false =>
+      simp [repairStep, hcov] at hstep
+  | true =>
+      rfl
 
 theorem complete_cover_iff_postfixed
     (live : List Nat)
     (edges : List RepairHyperedge)
     (admitted : List Nat) :
     CompleteCover live edges admitted ↔
-      PostFixed (repairStep live edges) admitted (SingletonKernel live) := by
+      PostFixed (repairStep edges) admitted (SingletonKernel live) := by
   constructor
   · exact complete_cover_implies_postfixed live edges admitted
   · exact postfixed_implies_complete_cover live edges admitted
@@ -79,7 +133,7 @@ def RepairCut
     (live cut : List Nat)
     (edges : List RepairHyperedge)
     (admitted : List Nat) : Prop :=
-  ¬ CompleteCover (afterCut live cut) edges admitted
+  completeCoverB (afterCut live cut) edges admitted = false
 
 /-- In the declared repair semantics, a cut destroys viability exactly when
     it destroys complete live repair coverage. -/
@@ -89,11 +143,12 @@ theorem cut_breaks_viability_iff
     (admitted : List Nat) :
     RepairCut live cut edges admitted ↔
       ¬ PostFixed
-        (repairStep (afterCut live cut) edges)
+        (repairStep edges)
         admitted
         (SingletonKernel (afterCut live cut)) := by
-  unfold RepairCut
-  exact not_congr (complete_cover_iff_postfixed (afterCut live cut) edges admitted)
+  rw [← complete_cover_iff_postfixed (afterCut live cut) edges admitted]
+  unfold RepairCut CompleteCover
+  cases h : completeCoverB (afterCut live cut) edges admitted <;> simp [h]
 
 /-! Redundant + conjunctive finite fixture. -/
 
@@ -165,24 +220,27 @@ theorem warrant_cut_breaks_complete_cover :
 
 /-- Exact finite synthesis:
     viable continuation is equivalent to complete live repair coverage, and
-    the WarrantGraph cut {1,3} is a consequential cut because it uncovers
-    admitted failure class 1 while leaving class 0 covered. -/
+    the WarrantGraph cut {1,3} is consequential because it uncovers admitted
+    failure class 1 while leaving class 0 covered. -/
 theorem repair_cover_cut_characterization_fixture :
     PostFixed
-      (repairStep fixtureLive fixtureEdges)
+      (repairStep fixtureEdges)
       fixtureAdmitted
       (SingletonKernel fixtureLive) ∧
     ¬ PostFixed
-      (repairStep (warrantLive coverageCut13Log) fixtureEdges)
+      (repairStep fixtureEdges)
       fixtureAdmitted
       (SingletonKernel (warrantLive coverageCut13Log)) := by
   constructor
-  · exact (complete_cover_iff_postfixed fixtureLive fixtureEdges fixtureAdmitted).1
-      fixture_complete_cover
+  · exact
+      (complete_cover_iff_postfixed
+        fixtureLive fixtureEdges fixtureAdmitted).1
+        fixture_complete_cover
   · intro hpost
     have hc :=
-      (postfixed_implies_complete_cover
-        (warrantLive coverageCut13Log) fixtureEdges fixtureAdmitted hpost)
+      postfixed_implies_complete_cover
+        (warrantLive coverageCut13Log)
+        fixtureEdges fixtureAdmitted hpost
     exact warrant_cut_breaks_complete_cover.2 hc
 
 end Metatron.WarrantedContinuationViabilityV5
