@@ -27,7 +27,8 @@ lean_lib Metatron where
     `Metatron.EmbeddedObserverOntology,
     `Metatron.NovelCapabilityGenesis,
     `Metatron.ResidualGeneratedCapability,
-    `Metatron.TemporalConcentration
+    `Metatron.TemporalConcentration,
+    `Metatron.TemporalTimescale
   ]
 
 lean_exe metatron_reference where
