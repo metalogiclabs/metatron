@@ -1,0 +1,64 @@
+name: Embedded Observer Ontology V0
+
+on:
+  push:
+    branches: [embedded-observer-ontology-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  theorem-gate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify trusted Nucleus unchanged
+        run: |
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)'             formal/Metatron/EmbeddedObserverOntology.lean
+
+      - name: Build formal stack
+        run: lake build Metatron
+
+      - name: Run retained Python suite
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Check embedded observer theorem package
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lean=Path("formal/Metatron/EmbeddedObserverOntology.lean").read_text()
+          spec=Path("spec/EMBEDDED_OBSERVER_ONTOLOGY_V0.md").read_text()
+          for name in (
+              "embeddedFutureEq_refl",
+              "embeddedFutureEq_symm",
+              "embeddedFutureEq_trans",
+              "accessible_transition_already_anticipated",
+              "same_absolute_dynamics",
+              "closed_coarse_iff_visible",
+              "closed_coarse_identifies_witness",
+              "fine_separates_witness",
+              "observer_state_strictly_refines_identity",
+              "anticipatory_coarse_sees_future_hidden",
+              "same_world_dynamics_different_relational_identity",
+              "absolute_dynamics_relational_identity",
+          ):
+              assert f"theorem {name}" in lean, name
+          assert "absolute dynamics" in spec
+          assert "relational identity" in spec
+          print("EMBEDDED_OBSERVER_ONTOLOGY_V0_OK")
+          PY
