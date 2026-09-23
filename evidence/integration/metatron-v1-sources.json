@@ -115,5 +115,22 @@
     "theorem": "futureBehavioralTrace_preserves",
     "strict_gain_theorem": "behavioral_commutation_strictly_extends_exact",
     "authority": "derived_formal_semantics_and_external_policy_evidence"
+  },
+  "future_quotient_discovery": {
+    "source_branch": "blind-future-quotient-v0",
+    "source_head": "64f2f541cd0c6edb681de065179fd81a40b629da",
+    "preregistration_commit": "53a4f0932653c72295fc4e4d55308de754ff8913",
+    "qualification_run": 35812504704,
+    "verdict": "BLIND_FUTURE_QUOTIENT_PASS",
+    "future_block_sizes": [
+      2,
+      2
+    ],
+    "admissible_partition_count": 2,
+    "behavioral_pair_count": 5,
+    "strict_gain_pair_count": 1,
+    "minimum_behavioral_basis_size": 5,
+    "formal_theorem": "continuationSafe_eq_gfp",
+    "authority": "derived_formal_semantics_and_external_policy_evidence"
   }
 }
