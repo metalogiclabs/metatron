@@ -64,8 +64,11 @@ theorem support_kernel_greatest
       rfl
   | noCapBoth =>
       have hp := hS .noCapBoth hs .revokePrimary (by simp [supportOnly])
-      rcases hp with ⟨_, _, hbackup⟩
-      have hb := hS .backupOnlyNoCap hbackup .revokeBackup (by simp [supportOnly])
+      rcases hp with ⟨s1, hstep1, hs1⟩
+      have hs1eq : s1 = .backupOnlyNoCap := by
+        simpa [step] using hstep1.symm
+      subst s1
+      have hb := hS .backupOnlyNoCap hs1 .revokeBackup (by simp [supportOnly])
       rcases hb with ⟨s', hstep, _⟩
       simp [step] at hstep
   | primaryOnlyNoCap =>
@@ -87,16 +90,25 @@ theorem capability_loss_no_postfixed_state
   cases s with
   | adaptive =>
       have hc := hS .adaptive hs .revokeCapability (by simp [withCapabilityLoss])
-      rcases hc with ⟨_, _, hnoCap⟩
-      have hp := hS .noCapBoth hnoCap .revokePrimary (by simp [withCapabilityLoss])
-      rcases hp with ⟨_, _, hbackup⟩
-      have hb := hS .backupOnlyNoCap hbackup .revokeBackup (by simp [withCapabilityLoss])
+      rcases hc with ⟨s1, hstep1, hs1⟩
+      have hs1eq : s1 = .noCapBoth := by
+        simpa [step] using hstep1.symm
+      subst s1
+      have hp := hS .noCapBoth hs1 .revokePrimary (by simp [withCapabilityLoss])
+      rcases hp with ⟨s2, hstep2, hs2⟩
+      have hs2eq : s2 = .backupOnlyNoCap := by
+        simpa [step] using hstep2.symm
+      subst s2
+      have hb := hS .backupOnlyNoCap hs2 .revokeBackup (by simp [withCapabilityLoss])
       rcases hb with ⟨s', hstep, _⟩
       simp [step] at hstep
   | noCapBoth =>
       have hp := hS .noCapBoth hs .revokePrimary (by simp [withCapabilityLoss])
-      rcases hp with ⟨_, _, hbackup⟩
-      have hb := hS .backupOnlyNoCap hbackup .revokeBackup (by simp [withCapabilityLoss])
+      rcases hp with ⟨s1, hstep1, hs1⟩
+      have hs1eq : s1 = .backupOnlyNoCap := by
+        simpa [step] using hstep1.symm
+      subst s1
+      have hb := hS .backupOnlyNoCap hs1 .revokeBackup (by simp [withCapabilityLoss])
       rcases hb with ⟨s', hstep, _⟩
       simp [step] at hstep
   | primaryOnlyNoCap =>
