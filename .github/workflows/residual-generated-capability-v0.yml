@@ -2,7 +2,9 @@ name: Residual Generated Capability V0
 
 on:
   push:
-    branches: [residual-generated-capability-v0]
+    branches:
+      - residual-generated-capability-v0
+      - main
   workflow_dispatch:
 
 permissions:
