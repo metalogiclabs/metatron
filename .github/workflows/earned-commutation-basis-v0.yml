@@ -2,7 +2,9 @@ name: Earned Commutation Basis V0
 
 on:
   push:
-    branches: [earned-commutation-basis-v0]
+    branches:
+      - earned-commutation-basis-v0
+      - main
   workflow_dispatch:
 
 permissions:
