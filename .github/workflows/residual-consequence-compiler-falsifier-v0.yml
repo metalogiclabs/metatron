@@ -1,0 +1,89 @@
+name: Residual Consequence Compiler Falsifier V0
+
+on:
+  push:
+    branches:
+      - residual-consequence-compiler-falsifier-v0
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  falsify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify V7 lineage and unchanged trusted waist
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 21923060852ed75311e15045ddab3673ae93db37 HEAD
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "V7_LINEAGE_AND_THIN_WAIST_OK"
+
+      - name: Recheck qualified V7 stateful viability boundary
+        run: |
+          set -euo pipefail
+          python scripts/warranted_continuation_viability_v7.py | tee /tmp/wcv-v7.txt
+          grep -F "WARRANTED_CONTINUATION_VIABILITY_V7=PASS" /tmp/wcv-v7.txt
+          grep -F "contention_kernel_size=0" /tmp/wcv-v7.txt
+          grep -F "replenished_kernel=ready" /tmp/wcv-v7.txt
+
+      - name: Run residual-consequence compiler falsifier
+        run: |
+          set -euo pipefail
+          python scripts/residual_consequence_compiler_falsifier_v0.py | tee /tmp/rcc-v0.txt
+          grep -F "tests=5" /tmp/rcc-v0.txt
+          grep -F "surface_instance_cache_discoveries=6" /tmp/rcc-v0.txt
+          grep -F "semantic_compiler_discoveries=2" /tmp/rcc-v0.txt
+          grep -F "warrant_revocation_reopens=True" /tmp/rcc-v0.txt
+          grep -F "resource_contention_reopens=True" /tmp/rcc-v0.txt
+          grep -F "zero_consequence_rejected=True" /tmp/rcc-v0.txt
+          grep -F "overbroad_candidate_rejected=True" /tmp/rcc-v0.txt
+          grep -F "RESIDUAL_CONSEQUENCE_COMPILER_FALSIFIER_V0=PASS" /tmp/rcc-v0.txt
+
+      - name: Emit bounded attestation
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          result = {
+              "schema_version": 1,
+              "status": "RESIDUAL_CONSEQUENCE_COMPILER_FALSIFIER_V0_PASS",
+              "head_sha": os.environ["GITHUB_SHA"],
+              "workflow_run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "parent_v7_sha": "21923060852ed75311e15045ddab3673ae93db37",
+              "tests": 5,
+              "surface_instance_cache_discoveries": 6,
+              "semantic_compiler_discoveries": 2,
+              "discovery_savings": 4,
+              "warrant_revocation_reopens": True,
+              "warrant_restoration_reuses": True,
+              "resource_contention_reopens": True,
+              "replenishment_reuses": True,
+              "zero_consequence_rejected": True,
+              "overbroad_candidate_rejected": True,
+              "trusted_runtime_changed": False,
+              "warrant_graph_changed": False,
+              "boundary": "finite deterministic falsifier for semantic reuse, qualification gating, warrant invalidation, and finite resource contention"
+          }
+          Path("/tmp/residual-consequence-compiler-falsifier-v0.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: residual-consequence-compiler-falsifier-v0
+          path: |
+            /tmp/residual-consequence-compiler-falsifier-v0.json
+            /tmp/rcc-v0.txt
+            /tmp/wcv-v7.txt
