@@ -2,7 +2,9 @@ name: Behavioral Commutation V0
 
 on:
   push:
-    branches: [behavioral-commutation-v0]
+    branches:
+      - behavioral-commutation-v0
+      - main
   workflow_dispatch:
 
 permissions:
