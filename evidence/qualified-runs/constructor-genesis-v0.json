@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "experiment": "constructor-genesis-v0",
+  "implementation_head": "48dc0bfb7563ff1689067980ca0d378b53d30e83",
+  "qualification_run": 35807727590,
+  "qualification_job": 107012168233,
+  "verdict": "PASS_RESIDUAL_DRIVEN_CONSTRUCTOR_GENESIS",
+  "trusted_core": {
+    "runtime_nucleus_blob": "d9d4293e54471714bf098593bf4018c3f6403273",
+    "formal_warrant_graph_blob": "d2affc0a57a1815f303f6f1859941465c69e7d32"
+  },
+  "result": {
+    "state_count": 32,
+    "current_meta_language": "global_complement_closure",
+    "generic_meta_meta_grammar": "LocalRewrite(coord, unary_boolean_table)",
+    "residual_trace": [110, 54, 24, 8, 0],
+    "generic_synthesis_calls": 2,
+    "induced_schema_instantiations": 2,
+    "induced_schema": {
+      "op": "LocalRewrite",
+      "coord": "$i",
+      "table": [1, 0]
+    },
+    "heldout_reuse_pass": true,
+    "restart_pass": true,
+    "semantic_sham_pass": true,
+    "g1_knockout_restores_seed": true
+  },
+  "claim_boundary": "Reusable constructor induction inside a declared generic local-rewrite grammar; unrestricted invention outside that grammar is not claimed."
+}
