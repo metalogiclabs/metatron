@@ -86,5 +86,18 @@
     "pes_connectivity_theorem": "pes_topological_sorts_traceConnected",
     "pes_semantic_theorem": "pes_all_topological_sorts_semantically_invariant",
     "authority": "derived_formal_semantics"
+  },
+  "earned_commutation": {
+    "source_branch": "earned-commutation-basis-v0",
+    "source_head": "17ea61342e1666dcf91dddb95aae09954a6aa2ca",
+    "preregistration_commit": "ddc8e28f4b3b8862bcf158e5f07587e657e01fa5",
+    "qualification_run": 35807759558,
+    "verdict": "BLIND_EARNED_COMMUTATION_PASS",
+    "schedule_count": 24,
+    "semantic_class_count": 8,
+    "minimum_pair_basis_size": 3,
+    "theorem": "earnedTrace_preserves_run",
+    "global_theorem": "all_topological_sorts_equal_if_all_incomparables_earned",
+    "authority": "derived_formal_semantics_and_external_policy_evidence"
   }
 }
