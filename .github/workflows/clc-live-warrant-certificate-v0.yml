@@ -1,0 +1,132 @@
+name: CLC Live-Warrant Certificate Provenance V0
+
+on:
+  push:
+    branches:
+      - feature/clc-live-warrant-certificate-v0
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify qualified parent and trusted waist
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor e790de325a5a81dfb09371b69ea8a7eb8379714f "$GITHUB_SHA"
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          test "$(git hash-object formal_adapter/CLCMetatronAdapter/Adapter.lean)" = "980a4897f5d4131475aa7ea4084cf9db0d3d4ed4"
+          test "$(git hash-object formal_adapter/CLCMetatronAdapter/VerifiedTransportSupport.lean)" = "0e2d16d932ee4c72fe820fef550526131c4c3ba0"
+          echo "QUALIFIED_PARENT_AND_WAIST=PASS"
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Recheck unchanged root Metatron
+        run: |
+          lake build Metatron
+          lake build metatron_reference
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)'             formal_adapter/CLCMetatronAdapter             formal_adapter/CLC             formal_adapter/Metatron
+
+      - name: Build live-warrant certificate provenance bridge
+        run: |
+          cd formal_adapter
+          lake update
+          lake exe cache get
+          lake build CLCMetatronAdapter
+          mkdir -p ../out
+          lake env lean CLCMetatronAdapter/LiveWarrantCertificateAudit.lean             | tee ../out/live-warrant-certificate-axiom-audit.txt
+
+      - name: Enforce axiom boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text=Path("out/live-warrant-certificate-axiom-audit.txt").read_text()
+          assert "sorryAx" not in text, text
+          allowed={"propext","Classical.choice","Quot.sound"}
+          compact=" ".join(text.splitlines())
+          tails=compact.split("depends on axioms:")[1:]
+          assert tails, text
+          for tail in tails:
+              inside=tail.split("[",1)[1].split("]",1)[0]
+              seen={x.strip() for x in inside.split(",") if x.strip()}
+              assert seen <= allowed, (inside, seen-allowed)
+          print("LIVE_WARRANT_CERT_AXIOM_BOUNDARY=PASS")
+          PY
+
+      - name: Re-run retained Python authority suite
+        run: |
+          python - <<'PY'
+          import unittest
+          suite=unittest.defaultTestLoader.discover("tests", pattern="test_*.py")
+          count=suite.countTestCases()
+          print("PYTHON_TEST_COUNT",count)
+          assert count == 32, count
+          PY
+          python -m unittest discover -s tests -p 'test_*.py' -v             2>&1 | tee out/python-tests.txt
+
+      - name: Verify frozen theorem boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src=Path("formal_adapter/CLCMetatronAdapter/LiveWarrantCertificate.lean").read_text()
+          tst=Path("formal_adapter/CLCMetatronAdapter/LiveWarrantCertificateTest.lean").read_text()
+          for name in (
+              "liveWarrantCertificate_exists_iff",
+              "liveWarrantCertificate_verifiedTransport_static_authority",
+              "liveWarrantCertificate_verifiedTransport_decisive_preserved",
+          ):
+              assert f"theorem {name}" in src, name
+          assert "theorem revoked_fixture_has_no_certificate_one" in tst
+          print("LIVE_WARRANT_CERT_BOUNDARY=PASS")
+          PY
+
+      - name: Emit qualification artifact
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          d={
+            "schema":"metatron.clc-live-warrant-certificate-v0.qualification",
+            "status":"HOSTED_EXACT_HEAD_PASS",
+            "head_sha":os.environ["GITHUB_SHA"],
+            "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
+            "parent_a9b_head":"e790de325a5a81dfb09371b69ea8a7eb8379714f",
+            "parent_a9b_run":35926089692,
+            "parent_a9b_artifact":10779118003,
+            "representation":"LiveWarrantCertificate L := { i : Nat // i ∈ Metatron.warrantLive L }",
+            "equivalence":"liveWarrantCertificate_exists_iff",
+            "theorem":"liveWarrantCertificate_verifiedTransport_decisive_preserved",
+            "negative_separator":"revoked_fixture_has_no_certificate_one",
+            "python_tests":32,
+            "claim_boundary":"Type-level provenance for certificate IDs represented as live Metatron warrant indices; no arbitrary certificate-ID mapping, authentication, runtime universality, dynamic reclosure, quotient, causal-port, reversibility, or Nucleus enlargement."
+          }
+          Path("out/clc-live-warrant-certificate-v0.json").write_text(
+              json.dumps(d,indent=2,sort_keys=True)+"\n")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clc-live-warrant-certificate-v0
+          path: |
+            out/clc-live-warrant-certificate-v0.json
+            out/live-warrant-certificate-axiom-audit.txt
+            out/python-tests.txt

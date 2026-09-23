@@ -1,0 +1,13 @@
+{
+  "schema": "metatron.clc-live-warrant-certificate-v0.candidate",
+  "status": "CANDIDATE_UNQUALIFIED",
+  "branch": "feature/clc-live-warrant-certificate-v0",
+  "parent_a9b_head": "e790de325a5a81dfb09371b69ea8a7eb8379714f",
+  "parent_a9b_run": 35926089692,
+  "parent_a9b_artifact": 10779118003,
+  "representation": "LiveWarrantCertificate L := { i : Nat // i ∈ Metatron.warrantLive L }",
+  "equivalence": "liveWarrantCertificate_exists_iff",
+  "theorem": "liveWarrantCertificate_verifiedTransport_decisive_preserved",
+  "negative_separator": "revoked_fixture_has_no_certificate_one",
+  "claim_boundary": "Type-level provenance for certificate IDs represented as live Metatron warrant indices; no arbitrary certificate-ID mapping, authentication, runtime universality, dynamic reclosure, quotient, causal-port, reversibility, or Nucleus enlargement."
+}
