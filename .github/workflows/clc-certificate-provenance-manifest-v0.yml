@@ -1,0 +1,175 @@
+name: CLC Provenance Manifest V0
+
+on:
+  push:
+    branches:
+      - feature/clc-provenance-manifest-v0
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify A9d parent and trusted waist
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 8d2323da735720478c50eab068f844d9a3c0948d "$GITHUB_SHA"
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          test "$(git hash-object formal_adapter/CLCMetatronAdapter/CertificateProvenance.lean)" = "b3b51be7410410c4bf45b523fb221df84203fcf4"
+          echo "A9D_PARENT_AND_WAIST=PASS"
+
+      - name: Verify pinned CLC certificate source
+        run: |
+          set -euo pipefail
+          curl -fsSL "https://raw.githubusercontent.com/heathsanchez/Minimal-Sufficient-Interface/900a73c1d386ee0eee1205a1cf31d270f3311ef7/qcklean/CLC/Fixtures.lean" -o /tmp/Fixtures.lean
+          test "$(git hash-object /tmp/Fixtures.lean)" = "ead1d6f1da004770f93539f589acd83a35578a15"
+          grep -q 'CertId := Unit' /tmp/Fixtures.lean
+          grep -q 'def positiveAuthority : AuthoritySnapshot Unit' /tmp/Fixtures.lean
+          echo "PINNED_CLC_CERT_SOURCE=PASS"
+
+      - name: Validate provenance manifest
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          p=Path("evidence/integration/clc-certificate-provenance-manifest-v0.json")
+          d=json.loads(p.read_text())
+          assert d["schema"] == "metatron.clc-certificate-provenance-manifest-v0"
+          assert d["status"] == "CANDIDATE_UNQUALIFIED"
+          assert d["parent_a9d_head"] == "8d2323da735720478c50eab068f844d9a3c0948d"
+          assert d["clc_source_head"] == "900a73c1d386ee0eee1205a1cf31d270f3311ef7"
+          assert d["clc_fixture_blob"] == "ead1d6f1da004770f93539f589acd83a35578a15"
+          assert d["certificate_type"] == "Unit"
+          assert d["certificate_authority"] == "CLC.Fixtures.positiveAuthority"
+          assert d["certificate_literal"] == "()"
+          assert d["metatron_log"] == "Metatron.warrantBaseline"
+          assert d["warrant_index"] == 0
+          digest=hashlib.sha256(p.read_bytes()).hexdigest()
+          print("MANIFEST_SCHEMA=PASS")
+          print("MANIFEST_SHA256="+digest)
+          with open("/tmp/manifest_sha","w") as f:
+              f.write(digest)
+          PY
+          echo "MANIFEST_SHA256=$(cat /tmp/manifest_sha)" >> "$GITHUB_ENV"
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Recheck unchanged root and adapter stack
+        run: |
+          lake build Metatron
+          lake build metatron_reference
+          cd formal_adapter
+          lake update
+          lake exe cache get
+          lake build CLCMetatronAdapter
+
+      - name: Generate and compile provenance witness
+        run: |
+          python scripts/generate_clc_certificate_provenance_v0.py             --manifest evidence/integration/clc-certificate-provenance-manifest-v0.json             --output formal_adapter/CLCMetatronAdapter/GeneratedCertificateProvenance.lean             | tee /tmp/generator-main.txt
+          mkdir -p out
+          cd formal_adapter
+          lake env lean CLCMetatronAdapter/GeneratedCertificateProvenance.lean             | tee ../out/generated-provenance-axiom-audit.txt
+
+      - name: Enforce generated witness axiom boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text=Path("out/generated-provenance-axiom-audit.txt").read_text()
+          assert "sorryAx" not in text, text
+          allowed={"propext","Classical.choice","Quot.sound"}
+          compact=" ".join(text.splitlines())
+          tails=compact.split("depends on axioms:")[1:]
+          assert tails, text
+          for tail in tails:
+              inside=tail.split("[",1)[1].split("]",1)[0]
+              seen={x.strip() for x in inside.split(",") if x.strip()}
+              assert seen <= allowed, (inside, seen-allowed)
+          print("GENERATED_PROVENANCE_AXIOM_BOUNDARY=PASS")
+          PY
+
+      - name: Require non-live sham manifest to fail
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          src=Path("evidence/integration/clc-certificate-provenance-manifest-v0.json")
+          d=json.loads(src.read_text())
+          d["warrant_index"]=4
+          Path("/tmp/sham-provenance.json").write_text(
+              json.dumps(d,indent=2,sort_keys=True)+"\n")
+          PY
+          python scripts/generate_clc_certificate_provenance_v0.py             --manifest /tmp/sham-provenance.json             --output formal_adapter/CLCMetatronAdapter/GeneratedShamProvenance.lean
+          cd formal_adapter
+          if lake env lean CLCMetatronAdapter/GeneratedShamProvenance.lean               > ../out/sham-provenance.log 2>&1; then
+            cat ../out/sham-provenance.log
+            echo "SHAM_UNEXPECTEDLY_COMPILED"
+            exit 1
+          fi
+          echo "NONLIVE_SHAM_REJECTED=PASS"
+          cat ../out/sham-provenance.log
+
+      - name: Re-run retained Python authority suite
+        run: |
+          python - <<'PY'
+          import unittest
+          suite=unittest.defaultTestLoader.discover("tests", pattern="test_*.py")
+          count=suite.countTestCases()
+          print("PYTHON_TEST_COUNT",count)
+          assert count == 32, count
+          PY
+          python -m unittest discover -s tests -p 'test_*.py' -v             2>&1 | tee out/python-tests.txt
+
+      - name: Emit provenance attestation
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          d={
+            "schema":"metatron.clc-certificate-provenance-manifest-v0.qualification",
+            "status":"HOSTED_EXACT_HEAD_PASS",
+            "head_sha":os.environ["GITHUB_SHA"],
+            "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
+            "manifest_sha256":os.environ["MANIFEST_SHA256"],
+            "parent_a9d_head":"8d2323da735720478c50eab068f844d9a3c0948d",
+            "parent_a9d_run":35927873890,
+            "parent_a9d_artifact":10780042332,
+            "clc_source_head":"900a73c1d386ee0eee1205a1cf31d270f3311ef7",
+            "clc_fixture_blob":"ead1d6f1da004770f93539f589acd83a35578a15",
+            "certificate_authority":"CLC.Fixtures.positiveAuthority",
+            "certificate_type":"Unit",
+            "warrant_log":"Metatron.warrantBaseline",
+            "warrant_index":0,
+            "nonlive_sham_index":4,
+            "nonlive_sham_rejected":True,
+            "python_tests":32,
+            "claim_boundary":"Exact source-pinned provenance attestation only; no author-intent authentication, arbitrary certificate mapping, runtime universality, dynamic reclosure, quotient, causal-port, reversibility, or Nucleus enlargement."
+          }
+          Path("out/clc-certificate-provenance-manifest-v0.json").write_text(
+              json.dumps(d,indent=2,sort_keys=True)+"\n")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clc-certificate-provenance-manifest-v0
+          path: |
+            evidence/integration/clc-certificate-provenance-manifest-v0.json
+            formal_adapter/CLCMetatronAdapter/GeneratedCertificateProvenance.lean
+            out/clc-certificate-provenance-manifest-v0.json
+            out/generated-provenance-axiom-audit.txt
+            out/sham-provenance.log
+            out/python-tests.txt
