@@ -20,11 +20,12 @@ theorem attestedUnitCertificateProvenance_is_live :
     0 ∈ Metatron.warrantLive Metatron.warrantBaseline := by
   exact (attestedUnitCertificateProvenance.toLive ()).2
 
-theorem attestedUnitCertificateProvenance_support :
+theorem attestedUnitCertificateProvenance_support
+    (Ωauth : CLC.AuthoritySnapshot Unit) :
     (certificateProvenanceSupport
       Metatron.warrantBaseline
       attestedUnitCertificateProvenance
-      unitAuthority).support () = ({0} : CLC.Support Nat) := by
+      Ωauth).support () = ({0} : CLC.Support Nat) := by
   rfl
 
 end CLCMetatronAdapter
