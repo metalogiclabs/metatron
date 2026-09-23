@@ -26,6 +26,14 @@ def CoversFailure
     (failure : Nat) : Prop :=
   coversFailureB live edges failure = true
 
+instance coversFailureDecidable
+    (live : List Nat)
+    (edges : List RepairHyperedge)
+    (failure : Nat) :
+    Decidable (CoversFailure live edges failure) := by
+  unfold CoversFailure
+  infer_instance
+
 def completeCoverB
     (live : List Nat)
     (edges : List RepairHyperedge)
@@ -37,6 +45,14 @@ def CompleteCover
     (edges : List RepairHyperedge)
     (admitted : List Nat) : Prop :=
   completeCoverB live edges admitted = true
+
+instance completeCoverDecidable
+    (live : List Nat)
+    (edges : List RepairHyperedge)
+    (admitted : List Nat) :
+    Decidable (CompleteCover live edges admitted) := by
+  unfold CompleteCover
+  infer_instance
 
 def repairStep
     (edges : List RepairHyperedge)
@@ -50,7 +66,7 @@ def SingletonKernel (live : List Nat) (state : List Nat) : Prop :=
 theorem all_true_of_mem
     {α : Type}
     (p : α → Bool) :
-    ∀ xs x, xs.all p = true → x ∈ xs → p x = true := by
+    ∀ (xs : List α) (x : α), xs.all p = true → x ∈ xs → p x = true := by
   intro xs
   induction xs with
   | nil =>
@@ -66,7 +82,7 @@ theorem all_true_of_mem
 theorem all_true_intro
     {α : Type}
     (p : α → Bool) :
-    ∀ xs, (∀ x, x ∈ xs → p x = true) → xs.all p = true := by
+    ∀ (xs : List α), (∀ x, x ∈ xs → p x = true) → xs.all p = true := by
   intro xs
   induction xs with
   | nil =>
@@ -134,6 +150,14 @@ def RepairCut
     (edges : List RepairHyperedge)
     (admitted : List Nat) : Prop :=
   completeCoverB (afterCut live cut) edges admitted = false
+
+instance repairCutDecidable
+    (live cut : List Nat)
+    (edges : List RepairHyperedge)
+    (admitted : List Nat) :
+    Decidable (RepairCut live cut edges admitted) := by
+  unfold RepairCut
+  infer_instance
 
 /-- In the declared repair semantics, a cut destroys viability exactly when
     it destroys complete live repair coverage. -/
