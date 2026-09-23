@@ -10,6 +10,7 @@ on:
       - earned-commutation-basis-v0
       - behavioral-commutation-v0
       - blind-future-quotient-v0
+      - embedded-observer-ontology-v0
       - main
   workflow_dispatch:
 
@@ -102,6 +103,10 @@ jobs:
           assert d["future_quotient_discovery"]["verdict"] == "BLIND_FUTURE_QUOTIENT_PASS"
           assert d["future_quotient_discovery"]["future_block_sizes"] == [2, 2]
           assert d["future_quotient_discovery"]["strict_gain_pair_count"] == 1
+          assert d["embedded_observer"]["source_head"] == "e1d2b3cddf0b3610f0bd0d5855b359ff70f47c73"
+          assert d["embedded_observer"]["qualification_run"] == 35815957808
+          assert d["embedded_observer"]["anticipation_theorem"] == "accessible_transition_already_anticipated"
+          assert d["embedded_observer"]["objectivity_theorem"] == "absolute_dynamics_relational_identity"
           assert d["search_policy"]["authority"] == "external_policy"
           assert d["external_adapter"]["authority"] == "external_evidence_policy"
           print("INTEGRATION_SOURCE_PINS_OK")
@@ -139,6 +144,7 @@ jobs:
           earned=Path("formal/Metatron/EarnedCommutation.lean").read_text()
           behavioral=Path("formal/Metatron/BehavioralCommutation.lean").read_text()
           future=Path("formal/Metatron/FutureObservations.lean").read_text()
+          observer=Path("formal/Metatron/EmbeddedObserverOntology.lean").read_text()
           spec=Path("spec/METATRON_V1_INTEGRATION.md").read_text()
           for name in (
               "certifiedResidualBasis_closes",
@@ -197,9 +203,19 @@ jobs:
               "continuationSafe_eq_gfp",
           ):
               assert f"theorem {name}" in future, name
+          for name in (
+              "embeddedFutureEq_refl",
+              "embeddedFutureEq_symm",
+              "embeddedFutureEq_trans",
+              "accessible_transition_already_anticipated",
+              "observer_state_strictly_refines_identity",
+              "absolute_dynamics_relational_identity",
+          ):
+              assert f"theorem {name}" in observer, name
           assert "minimum certified causal repair frontier" in spec
           assert "BLIND_BEHAVIORAL_COMMUTATION_PASS" in spec
           assert "BLIND_FUTURE_QUOTIENT_PASS" in spec
+          assert "objective observer-relative identity" in spec
           assert "minimum warranted behavioral commutation basis" in spec
           assert "No generic property of raw storage-graph geometry is promoted to semantics." in spec
           print("METATRON_V1_INTEGRATION_BOUNDARY_OK")
@@ -226,6 +242,7 @@ jobs:
             "earned_commutation_run":35807759558,
             "behavioral_commutation_run":35811799527,
             "future_quotient_discovery_run":35812504704,
+            "embedded_observer_run":35815957808,
             "clc_head":"20844ab1c68b8c4f9d6528a191eb136c0bdce791",
             "blind_v3_run":35761034357,
             "minimal_nucleus_run":35764668476,
