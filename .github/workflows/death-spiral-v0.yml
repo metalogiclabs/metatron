@@ -1,0 +1,109 @@
+name: Death Spiral V0
+
+on:
+  push:
+    branches:
+      - death-spiral-v0
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify trusted thin waist unchanged
+        run: |
+          set -euo pipefail
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "TRUSTED_THIN_WAIST_IDENTICAL"
+
+      - name: Run finite constraint-collapse census
+        run: |
+          python scripts/death_spiral_v0.py | tee /tmp/death-spiral-v0.txt
+          grep -F "DEATH_SPIRAL_V0=PASS" /tmp/death-spiral-v0.txt
+          grep -F "restricted_trap_closed=True" /tmp/death-spiral-v0.txt
+          grep -F "full_trap_closed=False" /tmp/death-spiral-v0.txt
+          grep -F "trap_branching_full=2" /tmp/death-spiral-v0.txt
+          grep -F "trap_branching_restricted=1" /tmp/death-spiral-v0.txt
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+
+      - name: Build integrated formal stack
+        run: lake build Metatron
+
+      - name: Verify theorem and claim boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = Path("formal/Metatron/DeathSpiral.lean").read_text()
+          spec = Path("spec/DEATH_SPIRAL_V0.md").read_text()
+          for name in (
+              "closedUnder_run",
+              "restricted_trap_closed",
+              "restriction_creates_trap",
+              "restricted_start_enters_trap",
+              "restricted_two_cycle",
+              "restricted_no_escape_after_entry",
+              "finite_constraint_collapse_witness",
+          ):
+              assert f"theorem {name}" in src, name
+          for phrase in (
+              "reduced branching always creates a trap",
+              "psychological, cognitive, social or consciousness claims",
+              "without adding new trusted-runtime authority",
+          ):
+              assert phrase in spec, phrase
+          print("DEATH_SPIRAL_V0_BOUNDARY_OK")
+          PY
+
+      - name: Emit qualification attestation
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          result = {
+              "schema_version": 1,
+              "status": "QUALIFIED_DEATH_SPIRAL_V0",
+              "head_sha": os.environ["GITHUB_SHA"],
+              "workflow_run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "base_sha": "b9d1b5cc10477188be6e55617699be60e70f6dad",
+              "state_count": 4,
+              "full_action_count": 2,
+              "restricted_action_count": 1,
+              "trap_size": 2,
+              "full_trap_branching": 2,
+              "restricted_trap_branching": 1,
+              "generic_theorem": "closedUnder_run",
+              "fixture_theorem": "finite_constraint_collapse_witness",
+              "trusted_runtime_changed": False,
+              "warrant_graph_changed": False,
+              "boundary": "finite deterministic action restriction and declared four-state fixture",
+          }
+          Path("/tmp/death-spiral-v0.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: death-spiral-v0
+          path: |
+            /tmp/death-spiral-v0.json
+            /tmp/death-spiral-v0.txt
