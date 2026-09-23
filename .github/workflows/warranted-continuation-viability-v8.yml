@@ -1,0 +1,122 @@
+name: Warranted Continuation Viability V8
+
+on:
+  push:
+    branches:
+      - warranted-continuation-viability-v8
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify V7 lineage and trusted thin waist
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 21923060852ed75311e15045ddab3673ae93db37 HEAD
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          test "$(git hash-object formal/Metatron/WarrantedContinuationViabilityV7.lean)" = "d9ec5167aad46e2e01e187444c2c4a516e0f6315"
+          echo "V7_LINEAGE_AND_THIN_WAIST_OK"
+
+      - name: Run finite-capacity scalar falsifier census
+        run: |
+          python scripts/warranted_continuation_viability_v8.py | tee /tmp/wcv-v8.txt
+          grep -F "WARRANTED_CONTINUATION_VIABILITY_V8=PASS" /tmp/wcv-v8.txt
+          grep -F "balanced_average_cost=1" /tmp/wcv-v8.txt
+          grep -F "skewed_average_cost=1" /tmp/wcv-v8.txt
+          grep -F "balanced_kernel_chain=6,2,2" /tmp/wcv-v8.txt
+          grep -F "balanced_kernel=auth1,auth2" /tmp/wcv-v8.txt
+          grep -F "skewed_kernel_chain=6,1,0,0" /tmp/wcv-v8.txt
+          grep -F "skewed_kernel_size=0" /tmp/wcv-v8.txt
+          grep -F "balanced_heavy_heavy_viable=True" /tmp/wcv-v8.txt
+          grep -F "skewed_heavy_heavy_viable=False" /tmp/wcv-v8.txt
+
+      - name: Verify claim boundary text
+        run: |
+          set -euo pipefail
+          grep -F "same uniform-class average repair cost 1" spec/WARRANTED_CONTINUATION_VIABILITY_V8.md
+          grep -F "not sufficient even in this six-state deterministic system." spec/WARRANTED_CONTINUATION_VIABILITY_V8.md
+          grep -F "No stochastic encounter distribution is assumed" spec/WARRANTED_CONTINUATION_VIABILITY_V8.md
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Reject proof placeholders
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(^|[^[:alnum:]_])(sorry|admit|axiom|unsafe)([^[:alnum:]_]|$)' formal/Metatron
+
+      - name: Build integrated formal stack
+        run: lake build Metatron
+
+      - name: Verify theorem surface
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src=Path("formal/Metatron/WarrantedContinuationViabilityV8.lean").read_text()
+          for name in (
+              "balanced_and_skewed_same_scalar_summary",
+              "balanced_kernel_postfixed",
+              "balanced_kernel_greatest",
+              "balanced_kernel_exact",
+              "skewed_no_postfixed_state",
+              "skewed_empty_kernel_postfixed",
+              "skewed_empty_kernel_greatest",
+              "balanced_repeated_heavy_survives",
+              "skewed_repeated_heavy_fails",
+              "scalar_average_summary_not_viability_sufficient",
+              "authorized_projection_inherits_v7_warrant",
+          ):
+              assert f"theorem {name}" in src, name
+          print("WCV_V8_THEOREM_SURFACE_OK")
+          PY
+
+      - name: Emit qualification attestation
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          result={
+            "schema_version":1,
+            "status":"QUALIFIED_WARRANTED_CONTINUATION_VIABILITY_V8",
+            "head_sha":os.environ["GITHUB_SHA"],
+            "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
+            "parent_v7_sha":"21923060852ed75311e15045ddab3673ae93db37",
+            "parent_v7_run":35930307507,
+            "capacity":2,
+            "replenishment":1,
+            "balanced_costs":[1,1],
+            "skewed_costs":[0,2],
+            "uniform_average_cost":1,
+            "balanced_kernel":["auth1","auth2"],
+            "skewed_kernel":[],
+            "balanced_kernel_chain":[6,2,2],
+            "skewed_kernel_chain":[6,1,0,0],
+            "trusted_runtime_changed":False,
+            "warrant_graph_changed":False,
+            "boundary":"six-state deterministic finite-capacity cost-geometry falsifier of scalar average viability summary"
+          }
+          Path("/tmp/warranted-continuation-viability-v8.json").write_text(
+            json.dumps(result,indent=2,sort_keys=True)+"\n")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: warranted-continuation-viability-v8
+          path: |
+            /tmp/warranted-continuation-viability-v8.json
+            /tmp/wcv-v8.txt
