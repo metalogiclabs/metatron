@@ -1,0 +1,102 @@
+name: Constructor Genesis V0
+
+on:
+  push:
+    branches: [constructor-genesis-v0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: constructor-genesis-v0-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualification:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify trusted thin waist
+        run: |
+          set -euo pipefail
+          test "$(git hash-object runtime/metatron/nucleus.py)" = "d9d4293e54471714bf098593bf4018c3f6403273"
+          test "$(git hash-object formal/Metatron/WarrantGraph.lean)" = "d2affc0a57a1815f303f6f1859941465c69e7d32"
+          echo "TRUSTED_THIN_WAIST_IDENTICAL"
+
+      - name: Run constructor-genesis tests
+        run: |
+          python -m unittest tests.test_constructor_genesis_v0 -v
+
+      - name: Execute constructor genesis
+        run: |
+          python -m scripts.constructor_genesis_v0 --out /tmp/constructor-genesis-v0.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("/tmp/constructor-genesis-v0.json").read_text())
+          assert d["verdict"] == "PASS_RESIDUAL_DRIVEN_CONSTRUCTOR_GENESIS"
+          r=d["result"]
+          assert r["selector_parameters"] == ["current_residual","dim","installed_local"]
+          assert r["selector_has_target_argument"] is False
+          assert r["residual_trace"] == [110,54,24,8,0]
+          assert r["generic_synthesis_calls"] == 2
+          assert r["induced_instantiation_calls"] == 2
+          assert r["final_residual_count"] == 0
+          assert r["schema"]["op"] == "LocalRewrite"
+          assert r["schema"]["coord"] == "$i"
+          assert r["schema"]["table"] == [1,0]
+          assert [g["mode"] for g in r["generations"]] == [
+            "generic_concrete_synthesis",
+            "generic_concrete_synthesis",
+            "induced_schema_instantiation",
+            "induced_schema_instantiation",
+          ]
+          assert r["restart"]["same_coords"] and r["restart"]["same_schema"]
+          assert r["semantic_sham"]["same_coords"]
+          assert r["knockout"]["restores_seed_interface"]
+          print("CONSTRUCTOR_GENESIS_PASS")
+          PY
+
+      - name: Reject predeclared constructor shortcut
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          src=Path("scripts/constructor_genesis_v0.py").read_text()
+          tree=ast.parse(src)
+          synth=next(
+              n for n in tree.body
+              if isinstance(n,ast.FunctionDef) and n.name=="synthesize_concrete"
+          )
+          args=[a.arg for a in synth.args.args]
+          assert args == ["current_residual","dim","installed_local"], args
+          assert "target" not in args
+          for forbidden in ("repair_map","generation_schedule","expected_coord"):
+              assert forbidden not in src
+          # No predeclared constructor-family class or schema function.
+          assert "class Toggle" not in src
+          assert "class Flip" not in src
+          assert "def toggle" not in src
+          assert "def flip" not in src
+          print("NO_PREDECLARED_CONSTRUCTOR_SHORTCUT")
+          PY
+
+      - name: Install Lean
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Build retained theorem stack
+        run: |
+          lake build Metatron.ResidualBasis Metatron.ResidualInteractions
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: constructor-genesis-v0
+          path: /tmp/constructor-genesis-v0.json
