@@ -62,8 +62,8 @@ jobs:
           python -m unittest \
             tests.test_minimal_warrant_graph \
             tests.test_dogwood_policy_compiler -v
-          python scripts/build_dogwood_warrant_fixture_v1.py --out "$OUT"
-          python scripts/compile_dogwood_warrant_policy.py \
+          PYTHONPATH=. python scripts/build_dogwood_warrant_fixture_v1.py --out "$OUT"
+          PYTHONPATH=. python scripts/compile_dogwood_warrant_policy.py \
             "$OUT/warrant.jsonl" --out "$OUT/recompiled"
           diff -u "$OUT/policy.dw" "$OUT/recompiled/policy.dw"
           diff -u "$OUT/schema.cedarschema" "$OUT/recompiled/schema.cedarschema"
