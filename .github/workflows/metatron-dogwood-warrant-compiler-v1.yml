@@ -1,0 +1,180 @@
+name: Metatron Dogwood Warrant Compiler v1
+
+on:
+  push:
+    branches: [feature/metatron-dogwood-policy-compiler-v1]
+    paths:
+      - ".github/workflows/metatron-dogwood-policy-compiler-v1.yml"
+      - "runtime/metatron/dogwood.py"
+      - "scripts/compile_dogwood_warrant_policy.py"
+      - "scripts/build_dogwood_warrant_fixture_v1.py"
+      - "tests/test_dogwood_policy_compiler.py"
+      - "spec/DOGWOOD_WARRANT_COMPILER_V1.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: metatron-dogwood-warrant-compiler-v1
+  cancel-in-progress: true
+
+env:
+  BASE_SHA: b9d1b5cc10477188be6e55617699be60e70f6dad
+  DOGWOOD_SHA: 996d756de1013b7ae209a14f566a80375a59f2f0
+  OUT: /tmp/metatron-dogwood-v1
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Prove trusted Metatron waist is unchanged
+        run: |
+          set -euo pipefail
+          git diff --exit-code "$BASE_SHA" -- \
+            runtime/metatron/nucleus.py \
+            formal/Metatron/WarrantGraph.lean
+
+      - name: Run Metatron compiler and nucleus tests
+        run: |
+          set -euo pipefail
+          python -m unittest \
+            tests.test_minimal_warrant_graph \
+            tests.test_dogwood_policy_compiler -v
+          python scripts/build_dogwood_warrant_fixture_v1.py --out "$OUT"
+          python scripts/compile_dogwood_warrant_policy.py \
+            "$OUT/warrant.jsonl" --out "$OUT/recompiled"
+          diff -u "$OUT/policy.dw" "$OUT/recompiled/policy.dw"
+          diff -u "$OUT/schema.cedarschema" "$OUT/recompiled/schema.cedarschema"
+          diff -u "$OUT/events.dwschema" "$OUT/recompiled/events.dwschema"
+          diff -u "$OUT/manifest.json" "$OUT/recompiled/manifest.json"
+
+      - name: Install Lean and recheck warrant semantics
+        run: |
+          set -euo pipefail
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+          "$HOME/.elan/bin/lake" env lean formal/Metatron/WarrantGraph.lean
+
+      - name: Build exact Dogwood
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/dogwood-policy/dogwood /tmp/dogwood
+          git -C /tmp/dogwood checkout -q "$DOGWOOD_SHA"
+          test "$(git -C /tmp/dogwood rev-parse HEAD)" = "$DOGWOOD_SHA"
+          cargo build --release --manifest-path /tmp/dogwood/Cargo.toml -p dogwood-cli
+
+      - name: Validate generated Dogwood bundle
+        run: |
+          set -euo pipefail
+          DOGWOOD=/tmp/dogwood/target/release/dogwood
+          "$DOGWOOD" schema action "$OUT/schema.cedarschema"
+          "$DOGWOOD" schema event "$OUT/events.dwschema"
+          "$DOGWOOD" check-parse "$OUT/policy.dw"
+          "$DOGWOOD" validate "$OUT/policy.dw" \
+            --policy-schema "$OUT/schema.cedarschema" \
+            --event-schema "$OUT/events.dwschema"
+
+      - name: Replay Metatron history through Dogwood
+        run: |
+          set -euo pipefail
+          DOGWOOD=/tmp/dogwood/target/release/dogwood
+          "$DOGWOOD" replay "$OUT/policy.dw" \
+            --policy-schema "$OUT/schema.cedarschema" \
+            --event-schema "$OUT/events.dwschema" \
+            --trace "$OUT/trace.log" \
+            | tee "$OUT/replay.raw.out"
+
+          sed -E 's/  \[rules: [^]]+\]//' "$OUT/replay.raw.out" \
+            > "$OUT/replay.normalized.out"
+          diff -u "$OUT/expected.normalized.out" "$OUT/replay.normalized.out"
+
+      - name: Seal live-view enforcement evidence
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+
+          out = Path(os.environ["OUT"])
+          oracle = json.loads((out / "oracle.json").read_text())
+          manifest = json.loads((out / "manifest.json").read_text())
+          decisions = (out / "replay.normalized.out").read_text().splitlines()
+
+          expected = [
+              "@35 (time point 0): ALLOW",
+              "@50 (time point 1): DENY",
+              "@60 (time point 2): ALLOW",
+              "@70 (time point 3): DENY",
+              "@80 (time point 4): ALLOW",
+          ]
+          assert decisions == expected
+          assert oracle["generated_live_ids"] == oracle["final_live_ids"]
+          assert set(oracle["final_live_ids"]) == {
+              oracle["root"], oracle["independent"]
+          }
+          assert manifest["current_live_ids"] == oracle["final_live_ids"]
+
+          def digest(path):
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+
+          result = {
+              "schema": "metatron-dogwood-warrant-compiler-result-v1",
+              "status": "WARRANTED_BOUNDED",
+              "candidate_sha": os.environ["GITHUB_SHA"],
+              "metatron_base_sha": os.environ["BASE_SHA"],
+              "dogwood_sha": os.environ["DOGWOOD_SHA"],
+              "trusted_waist_unchanged": True,
+              "python_live_ids": oracle["final_live_ids"],
+              "generated_manifest_live_ids": manifest["current_live_ids"],
+              "decision_stream": decisions,
+              "protected_checks": {
+                  "dependent_before_revocation_allowed": decisions[0].endswith("ALLOW"),
+                  "dependent_after_middle_revocation_denied": decisions[1].endswith("DENY"),
+                  "independent_after_revocation_allowed": decisions[2].endswith("ALLOW"),
+                  "revoked_middle_denied": decisions[3].endswith("DENY"),
+                  "unaffected_root_allowed": decisions[4].endswith("ALLOW"),
+              },
+              "hashes": {
+                  "warrant_jsonl": digest(out / "warrant.jsonl"),
+                  "policy": digest(out / "policy.dw"),
+                  "action_schema": digest(out / "schema.cedarschema"),
+                  "event_schema": digest(out / "events.dwschema"),
+                  "trace": digest(out / "trace.log"),
+                  "manifest": digest(out / "manifest.json"),
+              },
+              "claim": (
+                  "On the qualified canonical projection and declared temporal "
+                  "window, generated Dogwood Use authorization matches the "
+                  "Metatron live-warrant dependency-cone consequence."
+              ),
+              "boundary": manifest["boundary"] + [
+                  "qualified finite fixture only",
+                  "arbitrary-history semantic equivalence remains UNKNOWN",
+              ],
+          }
+          assert all(result["protected_checks"].values())
+          (out / "result.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n"
+          )
+          print(json.dumps(result, sort_keys=True))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: metatron-dogwood-warrant-compiler-${{ github.sha }}
+          path: /tmp/metatron-dogwood-v1
+          if-no-files-found: warn
